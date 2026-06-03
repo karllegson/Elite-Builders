@@ -1,0 +1,20 @@
+@import "./admin.css";
+
+:root {
+  --brand-blue: #00205b;
+  --brand-red: #e31b23;
+  --admin-sidebar: #1d2327;
+  --admin-sidebar-hover: #2c3338;
+  --admin-sidebar-text: #c3c4c7;
+  --admin-sidebar-active: #2271b1;
+  --admin-topbar: #1d2327;
+  --admin-content-bg: #f0f0f1;
+  --admin-card-bg: #ffffff;
+  --admin-border: #c3c4c7;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans,
+    Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+}
