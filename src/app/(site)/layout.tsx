@@ -1,0 +1,48 @@
+import Link from "next/link";
+import { Fira_Sans, Poppins } from "next/font/google";
+import { Phone } from "lucide-react";
+import SiteHeader from "@/components/site/SiteHeader";
+import SiteFooter from "@/components/site/SiteFooter";
+import { business } from "@/lib/site/config";
+
+/** Arlington / Level 10 pairing: Fira Sans body + Poppins headings & nav */
+const firaSans = Fira_Sans({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-fira",
+  display: "swap",
+});
+
+const poppins = Poppins({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-poppins",
+  display: "swap",
+});
+
+export default function SiteLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <div className={`site ${firaSans.variable} ${poppins.variable} flex min-h-screen flex-col`}>
+      <SiteHeader />
+      <main className="flex-1 pb-16 sm:pb-0">{children}</main>
+      <SiteFooter />
+
+      {/* Sticky mobile call-to-action bar */}
+      <div className="fixed inset-x-0 bottom-0 z-50 grid grid-cols-2 sm:hidden">
+        <a
+          href={business.phoneHref}
+          className="flex items-center justify-center gap-2 bg-brand-navy py-3.5 text-sm font-bold text-white"
+        >
+          <Phone size={16} aria-hidden />
+          Call Now
+        </a>
+        <Link
+          href="/#estimate"
+          className="flex items-center justify-center bg-brand-red py-3.5 text-sm font-bold text-white"
+        >
+          Free Estimate
+        </Link>
+      </div>
+    </div>
+  );
+}

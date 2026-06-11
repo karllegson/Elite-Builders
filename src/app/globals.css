@@ -1,20 +1,165 @@
+/*
+ * Tailwind v4 — theme + utilities only.
+ * Preflight (base reset) is intentionally NOT imported so the existing
+ * admin dashboard styles (admin.css) are unaffected. The public site
+ * gets its own scoped reset under `.site` below.
+ */
+@layer theme, base, components, utilities;
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+
 @import "./admin.css";
+
+@theme {
+  --color-brand-navy: #00205b;
+  --color-brand-navy-light: #0d3a8f;
+  --color-brand-blue: #15569e;
+  --color-brand-blue-dark: #0e4480;
+  --color-brand-sky: #4aa3dd;
+  --color-brand-red: #e31b23;
+  --color-brand-red-dark: #b8141b;
+  --color-site-text: #545659;
+  --color-site-text-dark: #353638;
+  --color-site-text-muted: #696c6f;
+  /* Arlington / Level 10 nav & utility accents */
+  --color-site-accent: #00a4d7;
+  --color-site-nav-hover: #f0f0f1;
+  --color-site-nav-cta: #004f8e;
+  --font-sans: var(--font-fira), system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: var(--font-poppins), system-ui, -apple-system, "Segoe UI", sans-serif;
+}
 
 :root {
   --brand-blue: #00205b;
   --brand-red: #e31b23;
-  --admin-sidebar: #1d2327;
-  --admin-sidebar-hover: #2c3338;
-  --admin-sidebar-text: #c3c4c7;
-  --admin-sidebar-active: #2271b1;
-  --admin-topbar: #1d2327;
+
+  /* Light admin dashboard palette */
+  --admin-sidebar: #f0f0f1;
+  --admin-sidebar-active-bg: #ffffff;
+  --admin-sidebar-hover-bg: #dcdcde;
+  --admin-sidebar-text: #1d2327;
+  --admin-sidebar-muted: #50575e;
+  --admin-toolbar: #1d2327;
+  --admin-toolbar-text: #c3c4c7;
+  --admin-toolbar-hover: #2c3338;
+  --admin-toolbar-hover-text: #72aee6;
+  --admin-accent: #2271b1;
+  --admin-accent-hover: #135e96;
+  --admin-topbar: #f0f0f1;
+  --admin-topbar-text: #1d2327;
+  --admin-topbar-muted: #50575e;
   --admin-content-bg: #f0f0f1;
   --admin-card-bg: #ffffff;
-  --admin-border: #c3c4c7;
+  --admin-border: #ccd0d4;
+  --admin-text: #1d2327;
+  --admin-text-muted: #50575e;
+  --admin-badge: #d63638;
 }
 
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans,
     Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+}
+
+/* Scoped reset for the public website (replaces Tailwind preflight) */
+@layer base {
+  .site,
+  .site *,
+  .site *::before,
+  .site *::after {
+    box-sizing: border-box;
+    border: 0 solid;
+    margin: 0;
+    padding: 0;
+  }
+
+  .site {
+    --site-container-margin: max(1.5rem, 8vw);
+    font-family: var(--font-sans);
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    color: var(--color-site-text);
+    line-height: 1.6;
+  }
+
+  @media (min-width: 80rem) {
+    .site {
+      --site-container-margin: 8rem;
+    }
+  }
+
+  .site .site-container {
+    width: 100%;
+    max-width: calc(99vw - var(--site-container-margin) * 2);
+    margin-inline: auto;
+  }
+
+  .site h1,
+  .site h2,
+  .site h3,
+  .site h4,
+  .site nav,
+  .site button,
+  .site .font-display {
+    font-family: var(--font-display);
+  }
+
+  .site h1,
+  .site h2,
+  .site h3,
+  .site h4 {
+    color: var(--color-site-text-dark);
+    line-height: 1.2;
+    text-wrap: balance;
+  }
+
+  .site strong {
+    font-weight: 600;
+  }
+
+  .site img,
+  .site svg {
+    display: block;
+    max-width: 100%;
+  }
+
+  .site a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .site ul,
+  .site ol {
+    list-style: none;
+  }
+
+  .site button {
+    background: none;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+  }
+
+  .site input,
+  .site select,
+  .site textarea {
+    font: inherit;
+    color: inherit;
+  }
+
+  .site summary {
+    list-style: none;
+    cursor: pointer;
+  }
+
+  .site summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .site :focus-visible {
+    outline: 2px solid var(--color-brand-red);
+    outline-offset: 2px;
+  }
 }

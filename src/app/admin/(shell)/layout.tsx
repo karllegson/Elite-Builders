@@ -1,6 +1,8 @@
+import { AdminContentHeader } from "@/components/admin/AdminContentHeader";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
-import { AdminTopBar } from "@/components/admin/AdminTopBar";
+import { AdminToolbar } from "@/components/admin/AdminToolbar";
 import { bypassAdminUser, isAuthBypassEnabled } from "@/lib/admin/auth";
+import { siteConfig } from "@/lib/admin/config";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function AdminShellLayout({
@@ -34,13 +36,15 @@ export default async function AdminShellLayout({
 
   return (
     <div className="admin-shell">
-      <AdminTopBar
+      <AdminToolbar
         userEmail={userEmail}
         displayName={displayName}
+        userRole={siteConfig.defaultUserRole}
         authBypass={bypass}
       />
       <AdminSidebar />
       <main className="admin-main">
+        <AdminContentHeader />
         <div className="admin-content">{children}</div>
       </main>
     </div>

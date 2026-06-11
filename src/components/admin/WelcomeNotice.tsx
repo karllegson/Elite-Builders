@@ -30,7 +30,7 @@ export function WelcomeNotice() {
         onClick={dismiss}
         aria-label="Dismiss welcome notice"
       >
-        <X size={16} />
+        Dismiss <X size={14} aria-hidden />
       </button>
       <h2>{siteConfig.name}</h2>
       <p>
