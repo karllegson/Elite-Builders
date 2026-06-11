@@ -261,8 +261,8 @@ export default function HomePage() {
               {heroBullets.map(({ lead, text }) => (
                 <li key={lead} className="flex items-start gap-2.5">
                   <CheckCircle2 size={18} aria-hidden className="mt-0.5 shrink-0 text-brand-sky" />
-                  <p className="text-sm leading-snug sm:text-[0.9375rem]">
-                    <strong className="font-bold">{lead}</strong> {text}
+                  <p className="text-sm leading-snug text-white/85 sm:text-[0.9375rem]">
+                    <strong className="font-bold text-brand-sky">{lead}</strong> {text}
                   </p>
                 </li>
               ))}
