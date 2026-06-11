@@ -33,15 +33,15 @@ export const brandPillars = [
 export const heroBullets = [
   {
     lead: "Who We Are:",
-    text: "A Modesto-based framing contractor focused on structure first — not shortcuts, sales gimmicks, or hidden fees.",
+    text: "Structure first — no gimmicks or hidden fees.",
   },
   {
     lead: "How We're Different:",
-    text: "Framing specialists with clear communication, honest estimates, and experienced crews you can count on.",
+    text: "Honest estimates, clear communication, crews you trust.",
   },
   {
     lead: "What To Expect:",
-    text: "Straight answers, quality craftsmanship, and work we'd stand behind on our own homes.",
+    text: "Straight answers and work we'd stand behind.",
   },
 ] as const;
 

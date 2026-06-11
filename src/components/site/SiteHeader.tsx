@@ -45,7 +45,14 @@ export default function SiteHeader() {
   const [mobileSection, setMobileSection] = useState<OpenMenu>(null);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 12);
+    const onScroll = () => {
+      const y = window.scrollY;
+      setScrolled((current) => {
+        if (!current && y > 48) return true;
+        if (current && y < 8) return false;
+        return current;
+      });
+    };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -97,13 +104,13 @@ export default function SiteHeader() {
       }`}
     >
       <div className="h-0.5 bg-brand-red" aria-hidden />
-      {/* Top utility bar — collapses on scroll */}
+      {/* Top utility bar — collapses on scroll (hysteresis prevents jitter near top) */}
       <div
-        className={`overflow-hidden border-b border-solid border-gray-100 bg-white transition-all duration-300 ease-in-out ${
-          scrolled ? "max-h-0 opacity-0" : "max-h-11 opacity-100"
+        className={`overflow-hidden border-b border-solid bg-white transition-[height,border-color] duration-300 ease-in-out ${
+          scrolled ? "h-0 border-transparent" : "h-11 border-gray-100"
         }`}
       >
-        <div className="site-container flex items-center justify-between gap-4 py-2.5 text-[13px] font-medium text-site-text-muted">
+        <div className="site-container flex h-11 items-center justify-between gap-4 text-[13px] font-medium text-site-text-muted">
           <a
             href={business.phoneHref}
             className="flex items-center gap-2 transition-colors hover:text-site-text-dark"

@@ -236,7 +236,7 @@ export default function HomePage() {
       />
 
       {/* ── Hero with commercial video ───────────────────────── */}
-      <section className="relative overflow-hidden bg-brand-navy">
+      <section className="relative min-h-[75dvh] overflow-hidden bg-brand-navy">
         <HeroVideo />
         {/* Readability overlay — strong on the left, clear on the right */}
         <div
@@ -244,7 +244,7 @@ export default function HomePage() {
           className="absolute inset-0 bg-gradient-to-r from-brand-navy/60 via-brand-navy/25 to-transparent"
         />
 
-        <div className="site-container relative z-10 flex items-center py-16 sm:py-20 lg:min-h-[480px] lg:py-24">
+        <div className="site-container relative z-10 flex min-h-[75dvh] items-center py-10 sm:py-14">
           <div className="max-w-xl text-white [text-shadow:0_2px_16px_rgba(0,0,0,0.45)]">
             <p className="flex items-center gap-2 text-xs font-semibold italic text-brand-sky sm:text-sm">
               <MapPin size={14} aria-hidden className="shrink-0 sm:size-4" />
