@@ -1,6 +1,8 @@
 export const siteConfig = {
   name: "Elite Builders IX",
+  shortName: "Elite Builders IX",
   supportEmail: "support@elitebuildersco.com",
+  defaultUserRole: "Administrator",
 } as const;
 
 export type AdminNavItem = {
@@ -26,4 +28,17 @@ export const adminSettingsNav: AdminNavItem = {
   href: "/admin/settings",
   icon: "settings",
   phase: 1,
+};
+
+/** Page titles shown in the content header bar below the admin toolbar */
+export const adminPageTitles: Record<string, string> = {
+  "/admin": "Administration",
+  "/admin/posts": "Posts",
+  "/admin/pages": "Pages",
+  "/admin/gallery": "Gallery",
+  "/admin/service-areas": "Service Areas",
+  "/admin/faqs": "FAQs",
+  "/admin/reviews": "Reviews",
+  "/admin/media": "Media",
+  "/admin/settings": "Settings",
 };

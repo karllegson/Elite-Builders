@@ -3,7 +3,6 @@ import { WelcomeNotice } from "@/components/admin/WelcomeNotice";
 export default function AdminDashboardPage() {
   return (
     <>
-      <h1 className="admin-page-title">Administration</h1>
       <WelcomeNotice />
       <div className="admin-card">
         <h3>Dashboard</h3>
