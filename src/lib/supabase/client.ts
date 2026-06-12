@@ -8,6 +8,6 @@ export function createClient() {
     throw new Error("Supabase is not configured.");
   }
 
-  const { url, anonKey } = getSupabaseEnv();
-  return createBrowserClient(url, anonKey);
+  const { url, key } = getSupabaseEnv();
+  return createBrowserClient(url, key);
 }

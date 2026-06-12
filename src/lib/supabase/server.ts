@@ -8,9 +8,9 @@ export async function createClient() {
   }
 
   const cookieStore = await cookies();
-  const { url, anonKey } = getSupabaseEnv();
+  const { url, key } = getSupabaseEnv();
 
-  return createServerClient(url, anonKey, {
+  return createServerClient(url, key, {
     cookies: {
       getAll() {
         return cookieStore.getAll();

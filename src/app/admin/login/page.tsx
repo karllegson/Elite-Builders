@@ -22,7 +22,7 @@ export default async function AdminLoginPage({ searchParams }: LoginPageProps) {
             <strong>Supabase not configured yet.</strong>
             <br />
             Copy <code>.env.local.example</code> to <code>.env.local</code>, add
-            your Supabase URL and anon key, then create an admin user in the
+            your Supabase URL and publishable key, then create an admin user in the
             Supabase dashboard.
           </div>
         )}
