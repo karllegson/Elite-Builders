@@ -23,7 +23,7 @@ export default function HeroVideo() {
       <video
         ref={videoRef}
         className="absolute inset-0 h-full w-full object-cover"
-        src="/videos/elite-builders-hero-loop.mp4"
+        src="/videos/elite-builders-hero.mp4?v=3"
         autoPlay
         muted
         loop
