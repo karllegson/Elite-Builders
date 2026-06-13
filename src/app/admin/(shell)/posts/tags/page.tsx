@@ -1,5 +1,5 @@
-import { ComingSoon } from "@/components/admin/ComingSoon";
+import { TagsManager } from "@/components/admin/posts/TagsManager";
 
 export default function AdminPostTagsPage() {
-  return <ComingSoon phase={2} />;
+  return <TagsManager />;
 }
