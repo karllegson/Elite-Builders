@@ -21,6 +21,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { usePathname } from "next/navigation";
+import { useRef, useState, type CSSProperties } from "react";
 import {
   adminNavItems,
   adminSettingsNav,
@@ -47,16 +48,73 @@ const iconMap: Record<string, LucideIcon> = {
   settings: Settings,
 };
 
+function isNavItemActive(item: AdminNavItem, currentPath: string) {
+  if (item.href === "/admin") {
+    return currentPath === "/admin";
+  }
+
+  if (item.children?.length) {
+    return (
+      currentPath === item.href || currentPath.startsWith(`${item.href}/`)
+    );
+  }
+
+  return currentPath.startsWith(item.href);
+}
+
+function isSubNavItemActive(href: string, currentPath: string) {
+  if (href === "/admin/posts") {
+    return currentPath === "/admin/posts";
+  }
+
+  return currentPath.startsWith(href);
+}
+
 function NavLink({ item, currentPath }: { item: AdminNavItem; currentPath: string }) {
+  const itemRef = useRef<HTMLLIElement>(null);
+  const hideTimeoutRef = useRef<number | undefined>(undefined);
+  const [submenuOpen, setSubmenuOpen] = useState(false);
+  const [submenuStyle, setSubmenuStyle] = useState<CSSProperties>({});
   const Icon = iconMap[item.icon] ?? LayoutDashboard;
-  const isActive =
-    item.href === "/admin"
-      ? currentPath === "/admin"
-      : currentPath.startsWith(item.href);
+  const isActive = isNavItemActive(item, currentPath);
   const isSoon = item.phase > 1;
+  const hasChildren = Boolean(item.children?.length);
+
+  const showSubmenu = () => {
+    window.clearTimeout(hideTimeoutRef.current);
+
+    if (!hasChildren || !itemRef.current) {
+      return;
+    }
+
+    const rect = itemRef.current.getBoundingClientRect();
+    setSubmenuStyle({
+      top: rect.top,
+      left: rect.right,
+    });
+    setSubmenuOpen(true);
+  };
+
+  const scheduleHideSubmenu = () => {
+    window.clearTimeout(hideTimeoutRef.current);
+    hideTimeoutRef.current = window.setTimeout(() => {
+      setSubmenuOpen(false);
+    }, 120);
+  };
 
   return (
-    <li>
+    <li
+      ref={itemRef}
+      className={
+        hasChildren
+          ? `admin-sidebar-item admin-sidebar-item-has-children${submenuOpen ? " is-submenu-open" : ""}`
+          : "admin-sidebar-item"
+      }
+      onMouseEnter={showSubmenu}
+      onMouseLeave={scheduleHideSubmenu}
+      onFocus={showSubmenu}
+      onBlur={scheduleHideSubmenu}
+    >
       <a
         href={item.href}
         className={`admin-sidebar-link${isActive ? " is-active" : ""}${isSoon && !isActive ? " is-soon" : ""}`}
@@ -64,6 +122,30 @@ function NavLink({ item, currentPath }: { item: AdminNavItem; currentPath: strin
         <Icon size={18} strokeWidth={1.75} aria-hidden />
         <span>{item.label}</span>
       </a>
+      {hasChildren ? (
+        <ul
+          className={`admin-sidebar-submenu${submenuOpen ? " is-open" : ""}`}
+          style={submenuStyle}
+          aria-label={`${item.label} submenu`}
+          onMouseEnter={showSubmenu}
+          onMouseLeave={scheduleHideSubmenu}
+        >
+          {item.children!.map((child) => {
+            const isChildActive = isSubNavItemActive(child.href, currentPath);
+
+            return (
+              <li key={child.href}>
+                <a
+                  href={child.href}
+                  className={`admin-sidebar-submenu-link${isChildActive ? " is-active" : ""}`}
+                >
+                  {child.label}
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+      ) : null}
     </li>
   );
 }
