@@ -308,36 +308,6 @@
   color: var(--admin-text);
 }
 
-.admin-content-header-start {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-  min-width: 0;
-}
-
-.admin-page-title-action {
-  display: inline-flex;
-  align-items: center;
-  min-height: 30px;
-  padding: 0 10px;
-  border: 1px solid var(--admin-accent);
-  border-radius: 3px;
-  background: #f6f7f7;
-  color: var(--admin-accent);
-  font-size: 13px;
-  font-weight: 400;
-  line-height: 1;
-  text-decoration: none;
-  white-space: nowrap;
-}
-
-.admin-page-title-action:hover {
-  color: var(--admin-accent-hover);
-  border-color: var(--admin-accent-hover);
-  background: #fff;
-}
-
 .admin-screen-options {
   background: none;
   border: none;
