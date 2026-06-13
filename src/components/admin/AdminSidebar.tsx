@@ -1,15 +1,23 @@
 "use client";
 
 import {
+  CalendarCheck,
+  ClipboardList,
   FileText,
   Files,
   HelpCircle,
   Image,
-  Images,
   LayoutDashboard,
+  LayoutGrid,
   MapPin,
+  Palette,
+  Plug,
+  Search,
   Settings,
+  SlidersHorizontal,
   Star,
+  Users,
+  Wrench,
   type LucideIcon,
 } from "lucide-react";
 import { usePathname } from "next/navigation";
@@ -22,12 +30,20 @@ import {
 const iconMap: Record<string, LucideIcon> = {
   "layout-dashboard": LayoutDashboard,
   "file-text": FileText,
+  image: Image,
   files: Files,
-  images: Images,
+  "layout-grid": LayoutGrid,
+  "clipboard-list": ClipboardList,
+  "calendar-check": CalendarCheck,
   "map-pin": MapPin,
   "help-circle": HelpCircle,
   star: Star,
-  image: Image,
+  search: Search,
+  "sliders-horizontal": SlidersHorizontal,
+  palette: Palette,
+  plug: Plug,
+  users: Users,
+  wrench: Wrench,
   settings: Settings,
 };
 
