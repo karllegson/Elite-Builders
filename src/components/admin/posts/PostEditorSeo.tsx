@@ -36,6 +36,8 @@ type PostEditorSeoProps = {
   onSnippetChange: (snippet: PostSeoSnippet) => void;
   onSchemasChange: (schemas: SchemaItem[]) => void;
   onSchemaGeneratorConfigChange: (config: SchemaGeneratorConfig) => void;
+  buildPermalinkUrl?: (domain: string, slug: string) => string;
+  fallbackPreviewTitle?: string;
 };
 
 export function PostEditorSeo({
@@ -46,6 +48,8 @@ export function PostEditorSeo({
   onSnippetChange,
   onSchemasChange,
   onSchemaGeneratorConfigChange,
+  buildPermalinkUrl = buildBlogPermalinkUrl,
+  fallbackPreviewTitle = "Sample Post Title",
 }: PostEditorSeoProps) {
   const [activeTab, setActiveTab] = useState<SeoTab>("general");
   const [snippetModalOpen, setSnippetModalOpen] = useState(false);
@@ -53,8 +57,8 @@ export function PostEditorSeo({
   const [editSchema, setEditSchema] = useState<SchemaItem | null>(null);
   const [viewSchema, setViewSchema] = useState<SchemaItem | null>(null);
 
-  const previewTitle = snippet.seoTitle || postTitle || "Sample Post Title";
-  const previewPermalink = buildBlogPermalinkUrl(
+  const previewTitle = snippet.seoTitle || postTitle || fallbackPreviewTitle;
+  const previewPermalink = buildPermalinkUrl(
     business.domain,
     snippet.permalink || postTitle,
   );
@@ -240,6 +244,8 @@ export function PostEditorSeo({
         isOpen={snippetModalOpen}
         snippet={snippet}
         fallbackTitle={postTitle}
+        buildPermalinkUrl={buildPermalinkUrl}
+        fallbackPreviewTitle={fallbackPreviewTitle}
         onClose={() => setSnippetModalOpen(false)}
         onSave={onSnippetChange}
       />
