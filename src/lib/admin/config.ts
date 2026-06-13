@@ -5,16 +5,33 @@ export const siteConfig = {
   defaultUserRole: "Administrator",
 } as const;
 
+export type AdminNavSubItem = {
+  label: string;
+  href: string;
+};
+
 export type AdminNavItem = {
   label: string;
   href: string;
   icon: string;
   phase: 1 | 2 | 3;
+  children?: AdminNavSubItem[];
 };
 
 export const adminNavItems: AdminNavItem[] = [
   { label: "Dashboard", href: "/admin", icon: "layout-dashboard", phase: 1 },
-  { label: "Posts", href: "/admin/posts", icon: "file-text", phase: 2 },
+  {
+    label: "Posts",
+    href: "/admin/posts",
+    icon: "file-text",
+    phase: 2,
+    children: [
+      { label: "All Posts", href: "/admin/posts" },
+      { label: "Add Post", href: "/admin/posts/new" },
+      { label: "Categories", href: "/admin/posts/categories" },
+      { label: "Tags", href: "/admin/posts/tags" },
+    ],
+  },
   { label: "Media", href: "/admin/media", icon: "image", phase: 3 },
   { label: "Pages", href: "/admin/pages", icon: "files", phase: 2 },
   { label: "Post Widget", href: "/admin/post-widgets", icon: "layout-grid", phase: 3 },
@@ -42,6 +59,9 @@ export const adminSettingsNav: AdminNavItem = {
 export const adminPageTitles: Record<string, string> = {
   "/admin": "Administration",
   "/admin/posts": "Posts",
+  "/admin/posts/new": "Add Post",
+  "/admin/posts/categories": "Categories",
+  "/admin/posts/tags": "Tags",
   "/admin/media": "Media",
   "/admin/pages": "Pages",
   "/admin/post-widgets": "Post Widget",
