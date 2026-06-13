@@ -101,12 +101,28 @@ export function getSeoProgress(
   return "bad";
 }
 
+export function buildPermalinkUrl(
+  siteDomain: string,
+  slug: string,
+  basePath: string,
+): string {
+  const cleanSlug = slugify(slug) || "sample-post";
+  const base = siteDomain.replace(/\/$/, "");
+  const path = basePath.startsWith("/") ? basePath : `/${basePath}`;
+
+  return `${base}${path}${cleanSlug}/`;
+}
+
 export function buildBlogPermalinkUrl(
   siteDomain: string,
   slug: string,
 ): string {
-  const cleanSlug = slugify(slug) || "sample-post";
-  const base = siteDomain.replace(/\/$/, "");
+  return buildPermalinkUrl(siteDomain, slug, "/blog/");
+}
 
-  return `${base}/blog/${cleanSlug}/`;
+export function buildServiceAreaPermalinkUrl(
+  siteDomain: string,
+  slug: string,
+): string {
+  return buildPermalinkUrl(siteDomain, slug, "/service-areas/");
 }

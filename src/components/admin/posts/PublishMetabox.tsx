@@ -25,6 +25,7 @@ type PublishMetaboxProps = {
   postContent?: string;
   seoSnippet?: PostSeoSnippet;
   hasFeaturedImage?: boolean;
+  previewHref?: string;
 };
 
 type PublishDateDraft = {
@@ -50,6 +51,7 @@ export function PublishMetabox({
   postContent = "",
   seoSnippet = { seoTitle: "", permalink: "", metaDescription: "" },
   hasFeaturedImage = false,
+  previewHref = "/blog",
 }: PublishMetaboxProps) {
   const [settings, setSettings] = useState<PublishSettings>(() =>
     createDefaultPublishSettings(),
@@ -193,7 +195,9 @@ export function PublishMetabox({
           <button
             type="button"
             className="admin-btn-secondary"
-            onClick={() => window.open("/blog", "_blank", "noopener,noreferrer")}
+            onClick={() =>
+              window.open(previewHref, "_blank", "noopener,noreferrer")
+            }
           >
             Preview
           </button>

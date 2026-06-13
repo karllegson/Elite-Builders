@@ -1,4 +1,4 @@
-/** SEO-friendly homepage images for Elite Builders IX (Modesto, CA). */
+/** CMS-managed homepage/content images — migrate to Supabase Storage via `npm run seed:media`. */
 export const homeImages = {
   residentialRoofFraming: {
     src: "/images/home/modesto-residential-roof-framing.png",

@@ -19,6 +19,8 @@ type PostSnippetModalProps = {
   fallbackTitle: string;
   onClose: () => void;
   onSave: (snippet: PostSeoSnippet) => void;
+  buildPermalinkUrl?: (domain: string, slug: string) => string;
+  fallbackPreviewTitle?: string;
 };
 
 export function PostSnippetModal({
@@ -27,6 +29,8 @@ export function PostSnippetModal({
   fallbackTitle,
   onClose,
   onSave,
+  buildPermalinkUrl = buildBlogPermalinkUrl,
+  fallbackPreviewTitle = "Sample Post Title",
 }: PostSnippetModalProps) {
   const [activeTab, setActiveTab] = useState<"general" | "social">("general");
   const [previewMode, setPreviewMode] = useState<"desktop" | "mobile">(
@@ -46,8 +50,8 @@ export function PostSnippetModal({
     return null;
   }
 
-  const previewTitle = draft.seoTitle || fallbackTitle || "Sample Post Title";
-  const previewPermalink = buildBlogPermalinkUrl(
+  const previewTitle = draft.seoTitle || fallbackTitle || fallbackPreviewTitle;
+  const previewPermalink = buildPermalinkUrl(
     business.domain,
     draft.permalink || fallbackTitle,
   );
