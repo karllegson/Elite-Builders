@@ -2418,6 +2418,91 @@
   word-break: break-word;
 }
 
+.admin-media-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.admin-media-page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.admin-media-page-header h1 {
+  margin: 0 0 8px;
+  font-size: 1.5rem;
+}
+
+.admin-media-page-eyebrow {
+  margin: 0 0 4px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--admin-muted);
+}
+
+.admin-media-page-copy {
+  margin: 0;
+  max-width: 56ch;
+  color: var(--admin-muted);
+}
+
+.admin-media-page-status {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--admin-muted);
+}
+
+.admin-media-source-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.admin-media-source-pill.is-supabase {
+  color: #0f5132;
+  background: #d1e7dd;
+}
+
+.admin-media-source-pill.is-local {
+  color: #664d03;
+  background: #fff3cd;
+}
+
+.admin-media-page-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 20px;
+  align-items: start;
+}
+
+.admin-media-upload-zone-inline {
+  margin-bottom: 16px;
+  min-height: 120px;
+}
+
+.admin-media-attachment-url {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+@media (max-width: 960px) {
+  .admin-media-page-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 960px) {
   .admin-post-editor {
     flex-direction: column;

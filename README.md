@@ -21,9 +21,22 @@ npm install
 
 1. Create a project at [supabase.com](https://supabase.com)
 2. **Authentication → Providers** — enable Email
-3. **SQL Editor** — run [`supabase/migrations/001_auth_profiles.sql`](supabase/migrations/001_auth_profiles.sql)
+3. **SQL Editor** — run migrations in order:
+   - [`supabase/migrations/001_auth_profiles.sql`](supabase/migrations/001_auth_profiles.sql)
+   - [`supabase/migrations/002_media_storage.sql`](supabase/migrations/002_media_storage.sql)
 4. **Authentication → Users** — add your admin user
-5. Copy `.env.local.example` → `.env.local` and add your URL + anon key
+5. Copy `.env.local.example` → `.env.local` and add:
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+   - `SUPABASE_SERVICE_ROLE_KEY` (Settings → API → service_role — server only)
+6. Seed homepage content images to Supabase Storage:
+
+```bash
+npm run seed:media
+```
+
+**What stays in the repo (`public/`):** logo, favicon, and other fixed brand assets.  
+**What goes to Supabase Storage:** gallery/blog/homepage content photos managed from `/admin/media`.
 
 ### 3. Run locally
 
