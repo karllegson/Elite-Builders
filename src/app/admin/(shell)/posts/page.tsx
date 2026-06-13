@@ -1,5 +1,5 @@
-import { ComingSoon } from "@/components/admin/ComingSoon";
+import { PostsList } from "@/components/admin/posts/PostsList";
 
 export default function AdminPostsPage() {
-  return <ComingSoon phase={2} />;
+  return <PostsList />;
 }

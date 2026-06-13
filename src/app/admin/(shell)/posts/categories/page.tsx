@@ -1,5 +1,5 @@
-import { ComingSoon } from "@/components/admin/ComingSoon";
+import { CategoriesManager } from "@/components/admin/posts/CategoriesManager";
 
 export default function AdminPostCategoriesPage() {
-  return <ComingSoon phase={2} />;
+  return <CategoriesManager />;
 }
