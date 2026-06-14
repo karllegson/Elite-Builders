@@ -99,11 +99,22 @@ export default function SiteFooter() {
       </div>
 
       <div className="border-t border-solid border-white/10">
-        <div className="site-container flex flex-col items-center justify-between gap-2 py-5 text-xs text-white/50 sm:flex-row">
+        <div className="site-container flex flex-col items-center justify-between gap-3 py-5 text-xs text-white/50 sm:flex-row">
           <p>
             © {new Date().getFullYear()} {business.name}. All rights reserved.
           </p>
-          <p>Framing Contractor · Bay Area · Central Valley · Southern California</p>
+          <p className="text-center">Framing Contractor · Bay Area · Central Valley · Southern California</p>
+          <p>
+            Website by{" "}
+            <a
+              href="https://legsonmedia.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-white/70 transition-colors hover:text-white"
+            >
+              Legson Media
+            </a>
+          </p>
         </div>
       </div>
     </footer>

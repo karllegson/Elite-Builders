@@ -11,7 +11,7 @@ import {
 import ContentImage from "@/components/site/ContentImage";
 import EstimateForm from "@/components/site/EstimateForm";
 import HeroVideo from "@/components/site/HeroVideo";
-import BuilderPartnerCard from "@/components/site/BuilderPartnerCard";
+import BuilderPartnersSection from "@/components/site/BuilderPartnersSection";
 import BrandPillars from "@/components/site/BrandPillars";
 import TeamSection from "@/components/site/TeamSection";
 import {
@@ -23,7 +23,6 @@ import {
 } from "@/lib/site/config";
 import { heroBullets, heroIntro, homepageFaqs, integrityStatement } from "@/lib/site/messaging";
 import { homeImages, homepageGalleryImageKeys } from "@/lib/site/images";
-import { builders, buildersIntro } from "@/lib/site/builders";
 import { completedProjects, currentProjects, type Project } from "@/lib/site/projects";
 
 export const metadata: Metadata = {
@@ -399,26 +398,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Trusted by production builders ────────────────────── */}
-      <section className="bg-brand-navy py-20 text-white">
-        <div className="site-container">
-          <div className="mx-auto max-w-3xl text-center">
-            <p className="text-sm font-medium uppercase tracking-[0.18em] text-brand-sky">
-              Builders We Work With
-            </p>
-            <h2 className="mt-3 text-3xl font-bold text-white sm:text-4xl">
-              Trusted by Production Builders &amp; General Contractors
-            </h2>
-            <p className="mt-4 text-base leading-relaxed text-white/80">{buildersIntro}</p>
-          </div>
-
-          <ul className="mx-auto mt-12 grid max-w-5xl grid-cols-2 gap-4 sm:grid-cols-3">
-            {builders.map((builder) => (
-              <BuilderPartnerCard key={builder.name} builder={builder} />
-            ))}
-          </ul>
-        </div>
-      </section>
+      <BuilderPartnersSection />
 
       <TeamSection members={teamMembers} />
 
