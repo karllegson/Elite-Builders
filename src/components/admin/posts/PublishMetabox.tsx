@@ -26,6 +26,8 @@ type PublishMetaboxProps = {
   seoSnippet?: PostSeoSnippet;
   hasFeaturedImage?: boolean;
   previewHref?: string;
+  onPublish?: () => void;
+  onSaveDraft?: () => void;
 };
 
 type PublishDateDraft = {
@@ -52,6 +54,8 @@ export function PublishMetabox({
   seoSnippet = { seoTitle: "", permalink: "", metaDescription: "" },
   hasFeaturedImage = false,
   previewHref = "/blog",
+  onPublish,
+  onSaveDraft,
 }: PublishMetaboxProps) {
   const [settings, setSettings] = useState<PublishSettings>(() =>
     createDefaultPublishSettings(),
@@ -159,10 +163,12 @@ export function PublishMetabox({
           ? current.publishDate
           : new Date(),
     }));
+    onPublish?.();
   };
 
   const handleSaveDraft = () => {
     setSettings((current) => ({ ...current, status: "draft" }));
+    onSaveDraft?.();
   };
 
   const handleMoveToTrash = () => {

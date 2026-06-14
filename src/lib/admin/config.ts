@@ -81,7 +81,7 @@ export const adminPageTitles: Record<string, string> = {
   "/admin/service-areas": "All Service Area",
   "/admin/service-areas/new": "Add New Service Area",
   "/admin/service-areas/sorting": "Sorting",
-  "/admin/service-areas/nested": "Nested View",
+  "/admin/service-areas/nested": "Service Areas",
   "/admin/faqs": "FAQs",
   "/admin/reviews": "Reviews",
   "/admin/seo": "SEO",

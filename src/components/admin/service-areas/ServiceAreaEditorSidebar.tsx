@@ -18,6 +18,8 @@ type ServiceAreaEditorSidebarProps = {
   seoSnippet?: PostSeoSnippet;
   pageAttributes?: ServiceAreaPageAttributes;
   onPageAttributesChange?: (attributes: ServiceAreaPageAttributes) => void;
+  onPublish?: () => void;
+  onSaveDraft?: () => void;
 };
 
 export function ServiceAreaEditorSidebar({
@@ -26,17 +28,21 @@ export function ServiceAreaEditorSidebar({
   seoSnippet,
   pageAttributes: pageAttributesProp,
   onPageAttributesChange,
+  onPublish,
+  onSaveDraft,
 }: ServiceAreaEditorSidebarProps) {
-  const [pageAttributes, setPageAttributes] = useState<ServiceAreaPageAttributes>(
-    () => pageAttributesProp ?? createDefaultPageAttributes(),
-  );
+  const [internalPageAttributes, setInternalPageAttributes] =
+    useState<ServiceAreaPageAttributes>(createDefaultPageAttributes);
+  const pageAttributes = pageAttributesProp ?? internalPageAttributes;
   const [featuredImage, setFeaturedImage] = useState<MediaAttachment | null>(
     null,
   );
   const [featuredImageModalOpen, setFeaturedImageModalOpen] = useState(false);
 
   const handlePageAttributesChange = (next: ServiceAreaPageAttributes) => {
-    setPageAttributes(next);
+    if (pageAttributesProp === undefined) {
+      setInternalPageAttributes(next);
+    }
     onPageAttributesChange?.(next);
   };
 
@@ -49,6 +55,8 @@ export function ServiceAreaEditorSidebar({
           seoSnippet={seoSnippet}
           hasFeaturedImage={featuredImage !== null}
           previewHref="/service-areas"
+          onPublish={onPublish}
+          onSaveDraft={onSaveDraft}
         />
 
         <PageAttributesMetabox

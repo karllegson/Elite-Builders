@@ -20,8 +20,11 @@ import {
 } from "@/lib/admin/postSchemaGenerator";
 import {
   createDefaultExtraFields,
+  createDefaultPageAttributes,
   type ServiceAreaExtraFields,
+  type ServiceAreaPageAttributes,
 } from "@/lib/admin/serviceAreaEditor";
+import { upsertServiceArea } from "@/lib/admin/serviceAreasData";
 
 export function ServiceAreaEditor() {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -41,6 +44,10 @@ export function ServiceAreaEditor() {
   const [extraFields, setExtraFields] = useState<ServiceAreaExtraFields>(
     createDefaultExtraFields,
   );
+  const [pageAttributes, setPageAttributes] = useState<ServiceAreaPageAttributes>(
+    createDefaultPageAttributes,
+  );
+  const [saveMessage, setSaveMessage] = useState("");
   const snippetEditedRef = useRef({
     seoTitle: false,
     permalink: false,
@@ -98,8 +105,37 @@ export function ServiceAreaEditor() {
     );
   };
 
+  const persistServiceArea = (status: "published" | "draft") => {
+    if (!title.trim()) {
+      setSaveMessage("Add a title before saving (e.g. Stockton, CA).");
+      window.setTimeout(() => setSaveMessage(""), 3000);
+      return;
+    }
+
+    upsertServiceArea({
+      title,
+      slug: snippet.permalink || slugify(title),
+      sortOrder: pageAttributes.order,
+      status,
+      unused: extraFields.archiveOnly,
+      parentId: pageAttributes.parentId,
+    });
+
+    setSaveMessage(
+      status === "published"
+        ? "Service area published. Open Sorting to arrange display order."
+        : "Draft saved.",
+    );
+    window.setTimeout(() => setSaveMessage(""), 4000);
+  };
+
   return (
     <div className="admin-post-editor">
+      {saveMessage ? (
+        <p className="admin-categories-status-message admin-post-editor-status" role="status">
+          {saveMessage}
+        </p>
+      ) : null}
       <div className="admin-post-editor-main">
         <label className="admin-post-title-label" htmlFor="service-area-title">
           Add title
@@ -108,7 +144,7 @@ export function ServiceAreaEditor() {
           id="service-area-title"
           type="text"
           className="admin-post-title"
-          placeholder="Add title"
+          placeholder="City, ST (e.g. Stockton, CA)"
           value={title}
           onChange={(event) => setTitle(event.target.value)}
           autoComplete="off"
@@ -164,6 +200,10 @@ export function ServiceAreaEditor() {
         title={title}
         content={content}
         seoSnippet={snippet}
+        pageAttributes={pageAttributes}
+        onPageAttributesChange={setPageAttributes}
+        onPublish={() => persistServiceArea("published")}
+        onSaveDraft={() => persistServiceArea("draft")}
       />
     </div>
   );
