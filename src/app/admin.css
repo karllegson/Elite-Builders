@@ -1167,6 +1167,13 @@
   outline-offset: 0;
 }
 
+.admin-page-attributes-help {
+  margin: 0 0 12px;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--admin-text-muted);
+}
+
 .admin-map-embed-textarea {
   display: block;
   width: 100%;
@@ -3846,6 +3853,7 @@
   color: var(--admin-text);
   font-size: 13px;
   text-align: left;
+  text-decoration: none;
   cursor: pointer;
 }
 
@@ -3916,4 +3924,35 @@
     width: 100%;
     margin-left: 0;
   }
+}
+
+/* -------------------------------------------------------------------------- */
+/* Service Areas — All list                                                   */
+/* -------------------------------------------------------------------------- */
+.admin-sa-list-loading {
+  margin: 0;
+  font-size: 13px;
+  color: var(--admin-text-muted);
+}
+
+.admin-sa-table .admin-sa-col-featured,
+.admin-sa-table .admin-sa-col-archive {
+  width: 110px;
+  white-space: nowrap;
+}
+
+.admin-posts-seo-badge.is-good {
+  color: #008a20;
+}
+
+.admin-posts-seo-badge.is-ok {
+  color: #996800;
+}
+
+.admin-posts-seo-badge.is-bad {
+  color: #b32d2e;
+}
+
+.admin-posts-seo-badge.is-na {
+  color: var(--admin-text-muted);
 }

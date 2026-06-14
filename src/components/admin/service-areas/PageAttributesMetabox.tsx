@@ -8,13 +8,15 @@ import {
 type PageAttributesMetaboxProps = {
   attributes: ServiceAreaPageAttributes;
   onChange: (attributes: ServiceAreaPageAttributes) => void;
+  excludeParentId?: string;
 };
 
 export function PageAttributesMetabox({
   attributes,
   onChange,
+  excludeParentId,
 }: PageAttributesMetaboxProps) {
-  const parentOptions = buildServiceAreaParentOptions();
+  const parentOptions = buildServiceAreaParentOptions(excludeParentId);
 
   return (
     <div className="admin-metabox">
@@ -44,6 +46,12 @@ export function PageAttributesMetabox({
             ))}
           </select>
         </label>
+
+        <p className="admin-page-attributes-help">
+          Choose <strong>(no parent)</strong> for a service area that appears in Sorting. Choose a
+          parent (e.g. Stockton, CA) to create a sub-page — it appears under that parent in Nested
+          View only.
+        </p>
 
         <label className="admin-page-attributes-field">
           <span className="admin-page-attributes-label">Order</span>

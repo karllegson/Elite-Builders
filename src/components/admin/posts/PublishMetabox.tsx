@@ -28,6 +28,7 @@ type PublishMetaboxProps = {
   previewHref?: string;
   onPublish?: () => void;
   onSaveDraft?: () => void;
+  primaryActionLabel?: string;
 };
 
 type PublishDateDraft = {
@@ -56,6 +57,7 @@ export function PublishMetabox({
   previewHref = "/blog",
   onPublish,
   onSaveDraft,
+  primaryActionLabel = "Publish",
 }: PublishMetaboxProps) {
   const [settings, setSettings] = useState<PublishSettings>(() =>
     createDefaultPublishSettings(),
@@ -515,7 +517,7 @@ export function PublishMetabox({
             className="admin-btn-primary-inline"
             onClick={handlePublish}
           >
-            Publish
+            {primaryActionLabel}
           </button>
         </div>
       </div>

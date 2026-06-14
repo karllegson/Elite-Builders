@@ -1,4 +1,4 @@
-import { serviceAreas } from "@/lib/site/config";
+import { listAllServiceAreas, isTopLevelServiceArea } from "@/lib/admin/serviceAreasData";
 
 export type ServiceAreaParentOption = {
   id: string;
@@ -32,9 +32,15 @@ export function createDefaultExtraFields(): ServiceAreaExtraFields {
 }
 
 /** Existing service area pages available as parent options in Page Attributes. */
-export function buildServiceAreaParentOptions(): ServiceAreaParentOption[] {
-  return serviceAreas.map((area) => ({
-    id: area.slug,
-    label: `${area.city}, CA`,
-  }));
+export function buildServiceAreaParentOptions(excludeId?: string): ServiceAreaParentOption[] {
+  if (typeof window === "undefined") {
+    return [];
+  }
+
+  return listAllServiceAreas()
+    .filter((area) => !area.unused && isTopLevelServiceArea(area) && area.id !== excludeId)
+    .map((area) => ({
+      id: area.id,
+      label: area.title,
+    }));
 }

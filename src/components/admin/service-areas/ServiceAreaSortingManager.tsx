@@ -295,9 +295,9 @@ export function ServiceAreaSortingManager() {
       ) : null}
 
       <p className="admin-sa-sort-intro">
-        Sort the service areas by dragging and dropping them in the desired order.
-        Cities are grouped by state based on titles from Add New Service Area (e.g.{" "}
-        <strong>Stockton, CA</strong>).
+        Sort top-level service areas by dragging and dropping them in the desired order. Only pages
+        with <strong>(no parent)</strong> in Page Attributes appear here — sub-pages are managed in
+        Nested View under their parent.
       </p>
 
       <div className="admin-sa-sort-toolbar">

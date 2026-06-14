@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { PostEditorSeo } from "@/components/admin/posts/PostEditorSeo";
 import { PostEditorToolbar } from "@/components/admin/posts/PostEditorToolbar";
@@ -14,20 +15,31 @@ import {
   type PostSeoSnippet,
   type SchemaItem,
 } from "@/lib/admin/postSeo";
-import {
-  createDefaultSchemaGeneratorConfig,
-  type SchemaGeneratorConfig,
-} from "@/lib/admin/postSchemaGenerator";
+import { createDefaultSchemaGeneratorConfig } from "@/lib/admin/postSchemaGenerator";
 import {
   createDefaultExtraFields,
   createDefaultPageAttributes,
   type ServiceAreaExtraFields,
   type ServiceAreaPageAttributes,
 } from "@/lib/admin/serviceAreaEditor";
-import { upsertServiceArea } from "@/lib/admin/serviceAreasData";
+import {
+  getServiceAreaById,
+  upsertServiceArea,
+} from "@/lib/admin/serviceAreasData";
 
-export function ServiceAreaEditor() {
+type ServiceAreaEditorProps = {
+  serviceAreaId?: string;
+  defaultParentId?: string | null;
+};
+
+export function ServiceAreaEditor({
+  serviceAreaId,
+  defaultParentId = null,
+}: ServiceAreaEditorProps) {
+  const isEditing = Boolean(serviceAreaId);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [loaded, setLoaded] = useState(!isEditing);
+  const [missing, setMissing] = useState(false);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [snippet, setSnippet] = useState<PostSeoSnippet>({
@@ -44,9 +56,11 @@ export function ServiceAreaEditor() {
   const [extraFields, setExtraFields] = useState<ServiceAreaExtraFields>(
     createDefaultExtraFields,
   );
-  const [pageAttributes, setPageAttributes] = useState<ServiceAreaPageAttributes>(
-    createDefaultPageAttributes,
-  );
+  const [pageAttributes, setPageAttributes] = useState<ServiceAreaPageAttributes>(() => ({
+    ...createDefaultPageAttributes(),
+    parentId: defaultParentId,
+  }));
+  const [hasFeaturedImage, setHasFeaturedImage] = useState(false);
   const [saveMessage, setSaveMessage] = useState("");
   const snippetEditedRef = useRef({
     seoTitle: false,
@@ -57,6 +71,56 @@ export function ServiceAreaEditor() {
   const wordCount = countWords(content);
 
   useEffect(() => {
+    if (!serviceAreaId) {
+      return;
+    }
+
+    const record = getServiceAreaById(serviceAreaId);
+
+    if (!record) {
+      setMissing(true);
+      setLoaded(true);
+      return;
+    }
+
+    snippetEditedRef.current = {
+      seoTitle: true,
+      permalink: true,
+      metaDescription: Boolean(record.metaDescription),
+    };
+
+    setTitle(record.title);
+    setContent(record.content);
+    setSnippet({
+      seoTitle: record.seoTitle,
+      permalink: record.slug,
+      metaDescription: record.metaDescription,
+    });
+    setSchemas([
+      {
+        ...createSchemaItem(record.seoSchema === "service" ? "Service" : "WebPage"),
+        headline: record.seoTitle,
+        description: record.metaDescription,
+      },
+    ]);
+    setExtraFields({
+      mapEmbed: record.mapEmbed,
+      archiveOnly: record.archiveOnly,
+      breadcrumbsLinkInactive: record.breadcrumbsLinkInactive,
+    });
+    setPageAttributes({
+      parentId: record.parentId,
+      order: record.sortOrder,
+    });
+    setHasFeaturedImage(record.hasFeaturedImage);
+    setLoaded(true);
+  }, [serviceAreaId]);
+
+  useEffect(() => {
+    if (isEditing) {
+      return;
+    }
+
     setSnippet((current) => ({
       seoTitle: snippetEditedRef.current.seoTitle ? current.seoTitle : title,
       permalink: snippetEditedRef.current.permalink
@@ -64,7 +128,7 @@ export function ServiceAreaEditor() {
         : slugify(title),
       metaDescription: current.metaDescription,
     }));
-  }, [title]);
+  }, [isEditing, title]);
 
   useEffect(() => {
     setSchemas((current) => {
@@ -94,7 +158,7 @@ export function ServiceAreaEditor() {
 
     setSchemas((current) =>
       current.map((schema, index) =>
-        index === 0 && schema.type === "WebPage"
+        index === 0
           ? {
               ...schema,
               headline: nextSnippet.seoTitle,
@@ -112,22 +176,66 @@ export function ServiceAreaEditor() {
       return;
     }
 
-    upsertServiceArea({
-      title,
-      slug: snippet.permalink || slugify(title),
-      sortOrder: pageAttributes.order,
-      status,
-      unused: extraFields.archiveOnly,
-      parentId: pageAttributes.parentId,
-    });
+    const primarySchema = schemas[0]?.type ?? "WebPage";
+
+    try {
+      upsertServiceArea({
+        id: serviceAreaId,
+        title,
+        slug: snippet.permalink || slugify(title),
+        sortOrder: pageAttributes.order,
+        status,
+        unused: extraFields.archiveOnly,
+        parentId: pageAttributes.parentId,
+        content,
+        seoTitle: snippet.seoTitle || title,
+        metaDescription: snippet.metaDescription,
+        seoSchema: primarySchema,
+        hasFeaturedImage,
+        archiveOnly: extraFields.archiveOnly,
+        mapEmbed: extraFields.mapEmbed,
+        breadcrumbsLinkInactive: extraFields.breadcrumbsLinkInactive,
+      });
+    } catch (error) {
+      setSaveMessage(
+        error instanceof Error ? error.message : "Unable to save this service area.",
+      );
+      window.setTimeout(() => setSaveMessage(""), 4000);
+      return;
+    }
+
+    const isSubPage = pageAttributes.parentId !== null;
 
     setSaveMessage(
       status === "published"
-        ? "Service area published. Open Sorting to arrange display order."
-        : "Draft saved.",
+        ? isEditing
+          ? isSubPage
+            ? "Sub-page updated."
+            : "Service area updated."
+          : isSubPage
+            ? "Sub-page published. It will appear under its parent in Nested View."
+            : "Service area published. Open Sorting to arrange display order."
+        : isSubPage
+          ? "Sub-page draft saved."
+          : "Draft saved.",
     );
     window.setTimeout(() => setSaveMessage(""), 4000);
   };
+
+  if (!loaded) {
+    return <p className="admin-post-editor-status">Loading service area…</p>;
+  }
+
+  if (missing) {
+    return (
+      <div className="admin-post-editor">
+        <p className="admin-categories-status-message admin-post-editor-status" role="status">
+          Service area not found.{" "}
+          <Link href="/admin/service-areas">Return to all service areas</Link>.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="admin-post-editor">
@@ -138,13 +246,13 @@ export function ServiceAreaEditor() {
       ) : null}
       <div className="admin-post-editor-main">
         <label className="admin-post-title-label" htmlFor="service-area-title">
-          Add title
+          {isEditing ? "Edit title" : "Add title"}
         </label>
         <input
           id="service-area-title"
           type="text"
           className="admin-post-title"
-          placeholder="City, ST (e.g. Stockton, CA)"
+          placeholder={isEditing ? "" : "Add title"}
           value={title}
           onChange={(event) => setTitle(event.target.value)}
           autoComplete="off"
@@ -202,8 +310,12 @@ export function ServiceAreaEditor() {
         seoSnippet={snippet}
         pageAttributes={pageAttributes}
         onPageAttributesChange={setPageAttributes}
+        excludeParentId={serviceAreaId}
+        hasFeaturedImage={hasFeaturedImage}
+        onFeaturedImageChange={setHasFeaturedImage}
         onPublish={() => persistServiceArea("published")}
         onSaveDraft={() => persistServiceArea("draft")}
+        primaryActionLabel={isEditing ? "Update" : "Publish"}
       />
     </div>
   );

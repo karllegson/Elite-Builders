@@ -1,12 +1,16 @@
 import { serviceAreas as staticServiceAreas } from "@/lib/site/config";
+import { siteConfig } from "@/lib/admin/config";
+import { slugify } from "@/lib/admin/postSeo";
 
 export const SERVICE_AREAS_STORAGE_KEY = "elite-builders-service-areas-v1";
 export const UNUSED_SECTION_ID = "unused";
+export const DEFAULT_SERVICE_AREA_AUTHOR = siteConfig.defaultUserRole;
 
 export type ServiceAreaStatus = "published" | "draft";
 
 export type ServiceAreaRecord = {
   id: string;
+  numericId: number;
   title: string;
   city: string;
   stateCode: string;
@@ -16,6 +20,17 @@ export type ServiceAreaRecord = {
   unused: boolean;
   parentId: string | null;
   hidden: boolean;
+  content: string;
+  seoTitle: string;
+  metaDescription: string;
+  seoKeyword: string | null;
+  seoSchema: string;
+  hasFeaturedImage: boolean;
+  archiveOnly: boolean;
+  mapEmbed: string;
+  breadcrumbsLinkInactive: boolean;
+  author: string;
+  publishedAt: string | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -112,6 +127,20 @@ export function formatServiceAreaLabel(city: string, stateCode: string): string 
   return `${city}, ${stateCode.toUpperCase()}`;
 }
 
+export function isTopLevelServiceArea(area: Pick<ServiceAreaRecord, "parentId">): boolean {
+  return area.parentId === null;
+}
+
+export function isServiceAreaSubPage(area: Pick<ServiceAreaRecord, "parentId">): boolean {
+  return area.parentId !== null;
+}
+
+export function listSortableServiceAreas(): ServiceAreaRecord[] {
+  return readServiceAreasStore()
+    .areas.filter((area) => isTopLevelServiceArea(area))
+    .map(normalizeServiceAreaRecord);
+}
+
 export function normalizeServiceAreaRecord(
   area: Partial<ServiceAreaRecord> & Pick<ServiceAreaRecord, "id" | "title" | "slug">,
 ): ServiceAreaRecord {
@@ -119,6 +148,7 @@ export function normalizeServiceAreaRecord(
 
   return {
     id: area.id,
+    numericId: area.numericId ?? hashStringToNumericId(area.id),
     title: area.title ?? formatServiceAreaLabel(city, stateCode),
     city: area.city ?? city,
     stateCode: (area.stateCode ?? stateCode).toUpperCase(),
@@ -128,9 +158,40 @@ export function normalizeServiceAreaRecord(
     unused: area.unused ?? false,
     parentId: area.parentId ?? null,
     hidden: area.hidden ?? false,
+    content: area.content ?? "",
+    seoTitle: area.seoTitle ?? area.title ?? formatServiceAreaLabel(city, stateCode),
+    metaDescription: area.metaDescription ?? "",
+    seoKeyword: area.seoKeyword ?? null,
+    seoSchema: area.seoSchema ?? "WebPage",
+    hasFeaturedImage: area.hasFeaturedImage ?? false,
+    archiveOnly: area.archiveOnly ?? false,
+    mapEmbed: area.mapEmbed ?? "",
+    breadcrumbsLinkInactive: area.breadcrumbsLinkInactive ?? false,
+    author: area.author ?? DEFAULT_SERVICE_AREA_AUTHOR,
+    publishedAt: area.publishedAt ?? null,
     createdAt: area.createdAt ?? new Date(0).toISOString(),
     updatedAt: area.updatedAt ?? new Date(0).toISOString(),
   };
+}
+
+function hashStringToNumericId(value: string): number {
+  let hash = 0;
+
+  for (let index = 0; index < value.length; index += 1) {
+    hash = (hash << 5) - hash + value.charCodeAt(index);
+    hash |= 0;
+  }
+
+  return Math.abs(hash) + 1000;
+}
+
+function nextNumericId(areas: ServiceAreaRecord[]): number {
+  const highest = areas.reduce(
+    (max, area) => Math.max(max, area.numericId ?? 0),
+    1000,
+  );
+
+  return highest + 1;
 }
 
 export function parseServiceAreaTitle(title: string, fallbackStateCode = "CA"): {
@@ -198,6 +259,7 @@ export function createDefaultStore(): ServiceAreasStore {
 
     return {
       id: area.slug,
+      numericId: 1616 + index,
       title: formatServiceAreaLabel(city, stateCode),
       city,
       stateCode,
@@ -207,6 +269,17 @@ export function createDefaultStore(): ServiceAreasStore {
       unused: false,
       parentId: null,
       hidden: false,
+      content: "",
+      seoTitle: formatServiceAreaLabel(city, stateCode),
+      metaDescription: "",
+      seoKeyword: null,
+      seoSchema: "WebPage",
+      hasFeaturedImage: false,
+      archiveOnly: false,
+      mapEmbed: "",
+      breadcrumbsLinkInactive: false,
+      author: DEFAULT_SERVICE_AREA_AUTHOR,
+      publishedAt: new Date(0).toISOString(),
       createdAt: new Date(0).toISOString(),
       updatedAt: new Date(0).toISOString(),
     };
@@ -274,20 +347,69 @@ export type UpsertServiceAreaInput = {
   unused?: boolean;
   parentId?: string | null;
   hidden?: boolean;
+  content?: string;
+  seoTitle?: string;
+  metaDescription?: string;
+  seoKeyword?: string | null;
+  seoSchema?: string;
+  hasFeaturedImage?: boolean;
+  archiveOnly?: boolean;
+  mapEmbed?: string;
+  breadcrumbsLinkInactive?: boolean;
+  author?: string;
+  publishedAt?: string | null;
 };
+
+export function getServiceAreaById(id: string): ServiceAreaRecord | null {
+  const area = readServiceAreasStore().areas.find((item) => item.id === id);
+  return area ? normalizeServiceAreaRecord(area) : null;
+}
+
+export function listAllServiceAreas(): ServiceAreaRecord[] {
+  return readServiceAreasStore()
+    .areas.map(normalizeServiceAreaRecord)
+    .sort((left, right) => left.sortOrder - right.sortOrder || left.title.localeCompare(right.title));
+}
 
 export function upsertServiceArea(input: UpsertServiceAreaInput): ServiceAreaRecord {
   const store = readServiceAreasStore();
   const now = new Date().toISOString();
-  const { city, stateCode } = parseServiceAreaTitle(input.title);
-  const slug = input.slug.trim() || city.toLowerCase().replace(/\s+/g, "-");
+  const preliminaryExisting = input.id
+    ? store.areas.find((area) => area.id === input.id)
+    : null;
+  const resolvedParentId =
+    input.parentId !== undefined ? input.parentId : (preliminaryExisting?.parentId ?? null);
+  const parent = resolvedParentId
+    ? store.areas.find((area) => area.id === resolvedParentId)
+    : null;
+  const isSubPage = Boolean(resolvedParentId);
+
+  if (isSubPage && !parent) {
+    throw new Error("Selected parent service area was not found.");
+  }
+
+  if (isSubPage && parent && !isTopLevelServiceArea(parent)) {
+    throw new Error("Sub-pages can only be assigned to a top-level service area.");
+  }
+
+  const trimmedTitle = input.title.trim();
+  const parsed = parseServiceAreaTitle(trimmedTitle, parent?.stateCode ?? "CA");
+  const city = isSubPage ? trimmedTitle : parsed.city;
+  const stateCode = isSubPage ? (parent?.stateCode ?? parsed.stateCode) : parsed.stateCode;
+  const displayTitle = isSubPage ? trimmedTitle : formatServiceAreaLabel(parsed.city, stateCode);
+  const slug =
+    input.slug.trim() ||
+    (isSubPage ? slugify(trimmedTitle) : slugify(parsed.city));
   const id = input.id ?? slug;
-  const sectionId = stateCodeToSectionId(stateCode);
   const existingIndex = store.areas.findIndex((area) => area.id === id);
+  const existing = existingIndex >= 0 ? store.areas[existingIndex] : preliminaryExisting;
+  const sectionId = stateCodeToSectionId(stateCode);
+  const isPublished = (input.status ?? existing?.status ?? "draft") === "published";
 
   const nextRecord: ServiceAreaRecord = normalizeServiceAreaRecord({
     id,
-    title: formatServiceAreaLabel(city, stateCode),
+    numericId: existing?.numericId ?? nextNumericId(store.areas),
+    title: displayTitle,
     city,
     stateCode,
     slug,
@@ -297,17 +419,33 @@ export function upsertServiceArea(input: UpsertServiceAreaInput): ServiceAreaRec
         ? store.areas[existingIndex].sortOrder
         : store.areas.filter(
             (area) =>
-              area.parentId === (input.parentId ?? null) &&
+              area.parentId === resolvedParentId &&
               !area.unused,
           ).length),
     status: input.status ?? "draft",
-    unused: input.unused ?? false,
-    parentId:
-      input.parentId ??
-      (existingIndex >= 0 ? store.areas[existingIndex].parentId : null),
+    unused: input.unused ?? input.archiveOnly ?? false,
+    parentId: resolvedParentId,
     hidden:
       input.hidden ??
       (existingIndex >= 0 ? store.areas[existingIndex].hidden : false),
+    content: input.content ?? existing?.content ?? "",
+    seoTitle: input.seoTitle ?? existing?.seoTitle ?? displayTitle,
+    metaDescription: input.metaDescription ?? existing?.metaDescription ?? "",
+    seoKeyword:
+      input.seoKeyword !== undefined ? input.seoKeyword : (existing?.seoKeyword ?? null),
+    seoSchema: input.seoSchema ?? existing?.seoSchema ?? "WebPage",
+    hasFeaturedImage: input.hasFeaturedImage ?? existing?.hasFeaturedImage ?? false,
+    archiveOnly: input.archiveOnly ?? existing?.archiveOnly ?? false,
+    mapEmbed: input.mapEmbed ?? existing?.mapEmbed ?? "",
+    breadcrumbsLinkInactive:
+      input.breadcrumbsLinkInactive ?? existing?.breadcrumbsLinkInactive ?? false,
+    author: input.author ?? existing?.author ?? DEFAULT_SERVICE_AREA_AUTHOR,
+    publishedAt:
+      input.publishedAt !== undefined
+        ? input.publishedAt
+        : isPublished
+          ? (existing?.publishedAt ?? now)
+          : existing?.publishedAt ?? null,
     createdAt: existingIndex >= 0 ? store.areas[existingIndex].createdAt : now,
     updatedAt: now,
   });
@@ -318,7 +456,7 @@ export function upsertServiceArea(input: UpsertServiceAreaInput): ServiceAreaRec
     store.areas.push(nextRecord);
   }
 
-  if (!store.sectionOrder.includes(sectionId)) {
+  if (!isSubPage && !store.sectionOrder.includes(sectionId)) {
     store.sectionOrder = [...store.sectionOrder.filter((id) => id !== UNUSED_SECTION_ID), sectionId, UNUSED_SECTION_ID];
   }
 
@@ -359,17 +497,23 @@ export function saveSortingLayout(
   areasBySection: Record<string, ServiceAreaRecord[]>,
 ): void {
   const store = readServiceAreasStore();
+  const subPages = store.areas.filter((area) => isServiceAreaSubPage(area));
   const nextAreas: ServiceAreaRecord[] = [];
 
   for (const sectionId of sectionOrder) {
     const sectionAreas = areasBySection[sectionId] ?? [];
 
     sectionAreas.forEach((area, index) => {
+      if (isServiceAreaSubPage(area)) {
+        return;
+      }
+
       const stateCode = sectionIdToStateCode(sectionId);
       const isUnused = sectionId === UNUSED_SECTION_ID;
 
       nextAreas.push({
         ...area,
+        parentId: null,
         sortOrder: index,
         unused: isUnused,
         stateCode: isUnused ? area.stateCode : (stateCode ?? area.stateCode),
@@ -381,7 +525,7 @@ export function saveSortingLayout(
     });
   }
 
-  store.areas = nextAreas;
+  store.areas = [...nextAreas, ...subPages];
   store.sectionOrder = sectionOrder;
   writeServiceAreasStore(store);
 }
@@ -421,7 +565,7 @@ export function removeCustomSection(sectionId: string): void {
 
   if (stateCode) {
     store.areas = store.areas.map((area) =>
-      area.stateCode === stateCode && !area.unused
+      area.stateCode === stateCode && !area.unused && isTopLevelServiceArea(area)
         ? { ...area, unused: true, updatedAt: new Date().toISOString() }
         : area,
     );
@@ -440,7 +584,7 @@ export function buildSortingColumns(store: ServiceAreasStore): SortingColumn[] {
   sectionMap.set(UNUSED_SECTION_ID, createUnusedSection());
 
   for (const area of store.areas) {
-    if (area.unused) {
+    if (area.unused || isServiceAreaSubPage(area)) {
       continue;
     }
 
@@ -468,10 +612,14 @@ export function buildSortingColumns(store: ServiceAreasStore): SortingColumn[] {
     const areas = store.areas
       .filter((area) => {
         if (sectionId === UNUSED_SECTION_ID) {
-          return area.unused;
+          return area.unused && isTopLevelServiceArea(area);
         }
 
-        return !area.unused && stateCodeToSectionId(area.stateCode) === sectionId;
+        return (
+          !area.unused &&
+          isTopLevelServiceArea(area) &&
+          stateCodeToSectionId(area.stateCode) === sectionId
+        );
       })
       .sort((left, right) => left.sortOrder - right.sortOrder);
 

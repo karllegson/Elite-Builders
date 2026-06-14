@@ -38,16 +38,26 @@ type ContextMenuProps = {
 
 function RowContextMenu({ area, onClose, onAction }: ContextMenuProps) {
   const items = [
-    { label: "Add Child Service Area", message: "Child service areas will be available in a future update." },
     { label: "Insert Service Area Before", message: "Insert before is not connected yet." },
     { label: "Insert Service Area After", message: "Insert after is not connected yet." },
     { label: "Push to Top", message: "Push to top is not connected yet." },
     { label: "Push to Bottom", message: "Push to bottom is not connected yet." },
     { label: "Clone", message: "Clone is not connected yet." },
   ];
+  const canAddChild = area.parentId === null;
 
   return (
     <div className="admin-sa-nested-menu" role="menu">
+      {canAddChild ? (
+        <Link
+          href={`/admin/service-areas/new?parent=${area.id}`}
+          className="admin-sa-nested-menu-item"
+          role="menuitem"
+          onClick={onClose}
+        >
+          Add Child Service Area
+        </Link>
+      ) : null}
       {items.map((item) => (
         <button
           key={item.label}
@@ -114,8 +124,8 @@ function NestedServiceAreaRow({
         </button>
 
         <div className="admin-sa-nested-title-wrap">
-          <Link href={`/admin/service-areas/new?parent=${area.id}`} className="admin-sa-nested-title">
-            {area.title}
+          <Link href={`/admin/service-areas/${area.id}`} className="admin-sa-nested-title">
+            {depth > 0 ? `— ${area.title}` : area.title}
           </Link>
           {area.status === "draft" ? (
             <span className="admin-sa-nested-status"> — Draft</span>
@@ -395,8 +405,8 @@ export function ServiceAreaNestedViewManager() {
       </div>
 
       <p className="admin-sa-nested-footnote">
-        Sub-pages nest under their parent service area. Child pages will be manageable from here in a
-        future update.
+        Top-level service areas (no parent) appear in Sorting. Sub-pages with a parent appear
+        nested under that service area here.
       </p>
     </div>
   );
