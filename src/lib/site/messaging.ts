@@ -8,12 +8,12 @@ export const integrityStatement =
   "Integrity means doing the right thing even when you didn't have to — because it's the right thing to do.";
 
 export const differentiationIntro =
-  "Family-owned since 2012 and based in Modesto — we earn trust through the work, not sales pressure or empty promises.";
+  "Family-owned since 2012 — we earn trust through the work, not sales pressure or empty promises.";
 
 export const brandPillarsHeading = "No Cutting Corners. Integrity. Promises.";
 
 export const heroIntro =
-  "No cutting corners, real integrity, and promises we keep — residential and commercial framing across Northern California.";
+  "Family-owned since 2012 — trusted by homeowners and production builders for code-compliant structural work, dependable crews, and straight answers from estimate to inspection.";
 
 export const brandPillars = [
   {
@@ -49,17 +49,17 @@ export const homepageFaqs = [
   {
     question: "What areas does Elite Builders serve?",
     answer:
-      "We're based in Modesto, CA and serve the Central Valley — including Stockton, Manteca, Tracy, Turlock, Ceres, Oakdale, and Riverbank — plus the Bay Area: San Jose, Livermore, Fremont, Pleasanton, Dublin, Walnut Creek, and surrounding communities.",
+      "We serve the Bay Area — including San Jose, Livermore, Fremont, Pleasanton, Dublin, Walnut Creek, San Ramon, and San Bruno — the Central Valley (Stockton, Manteca, Tracy, Turlock, Ceres, Oakdale, Riverbank, and Mountain House), Southern California (Pasadena and surrounding communities), and the Eastern Sierra (Mammoth Lakes).",
   },
   {
-    question: "What makes Elite Builders different from other framing contractors in Modesto?",
+    question: "What makes Elite Builders different from other framing contractors?",
     answer:
       "We're framing-first specialists — not a general handyman throwing up walls. We communicate clearly, price honestly, and focus on power, precision, and passion on every job. We don't compete on gimmicks or being the cheapest; we compete on doing the work right.",
   },
   {
     question: "What does integrity mean at Elite Builders?",
     answer:
-      "Integrity means doing the right thing even when you didn't have to. If we see a structural issue, we fix it — we don't cover it up. If we're not the right fit for your project, we'll tell you. That's how we've earned trust across Modesto and Northern California since 2012.",
+      "Integrity means doing the right thing even when you didn't have to. If we see a structural issue, we fix it — we don't cover it up. If we're not the right fit for your project, we'll tell you. That's how we've earned trust across Northern California since 2012.",
   },
   {
     question: "Are you licensed and insured in California?",
@@ -67,14 +67,14 @@ export const homepageFaqs = [
       "Yes. Elite Builders IX is a fully licensed California contractor and carries complete liability insurance and workers' compensation coverage on every job.",
   },
   {
-    question: "Do you handle residential and commercial framing in Modesto?",
+    question: "Do you handle residential and commercial framing?",
     answer:
-      "Both. We frame custom homes, additions, and remodels as well as commercial buildings and multi-family projects throughout Modesto, the Central Valley, and select Bay Area communities.",
+      "Both. We frame custom homes, additions, and remodels as well as commercial buildings and multi-family projects throughout the Bay Area, Central Valley, and Southern California.",
   },
   {
-    question: "How much does house framing cost in Modesto, CA?",
+    question: "How much does house framing cost in Northern California?",
     answer:
-      "Framing costs depend on the size, complexity, and materials of your project. Most residential framing in the Modesto area is priced per square foot. Contact us for a free, no-obligation estimate tailored to your plans — no pressure, no games.",
+      "Framing costs depend on the size, complexity, and materials of your project. Most residential framing is priced per square foot. Contact us for a free, no-obligation estimate tailored to your plans — no pressure, no games.",
   },
   {
     question: "How long does residential framing take in the Central Valley?",

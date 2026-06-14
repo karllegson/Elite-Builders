@@ -2,11 +2,11 @@
 export const homeImages = {
   residentialRoofFraming: {
     src: "/images/home/modesto-residential-roof-framing.png",
-    alt: "Residential roof framing contractor leveling rafters in Modesto California",
+    alt: "Residential roof framing contractor leveling rafters in Northern California",
   },
   customKitchenRemodel: {
     src: "/images/home/modesto-custom-kitchen-remodel.png",
-    alt: "Custom kitchen cabinet installation during a Modesto home remodel",
+    alt: "Custom kitchen cabinet installation during a Northern California home remodel",
   },
   commercialRoofFramingAerial: {
     src: "/images/home/modesto-commercial-roof-framing-aerial.png",
@@ -14,7 +14,7 @@ export const homeImages = {
   },
   framingContractorPlanning: {
     src: "/images/home/modesto-framing-contractor-planning.png",
-    alt: "Framing contractor reviewing blueprints on a Modesto construction project",
+    alt: "Framing contractor reviewing blueprints on a Northern California construction project",
   },
   customHomeFramingCrew: {
     src: "/images/home/modesto-custom-home-framing-crew.png",
@@ -22,11 +22,11 @@ export const homeImages = {
   },
   patioDoorsOutdoorLiving: {
     src: "/images/home/modesto-patio-doors-outdoor-living.png",
-    alt: "Patio doors and outdoor living space installation in Modesto California",
+    alt: "Patio doors and outdoor living space installation in Northern California",
   },
   residentialWindowInstallation: {
     src: "/images/home/modesto-residential-window-installation.png",
-    alt: "Residential window and door installation on a new Modesto home build",
+    alt: "Residential window and door installation on a new Northern California home build",
   },
   luxuryHomeInterior: {
     src: "/images/home/modesto-luxury-home-interior.png",
@@ -42,11 +42,11 @@ export const homeImages = {
   },
   customHomeFramingInterior: {
     src: "/images/home/modesto-custom-home-framing-interior.webp",
-    alt: "Interior custom home framing contractor wall studs and joists in Modesto California",
+    alt: "Interior custom home framing contractor wall studs and joists in Northern California",
   },
   twoStoryHomeFramingExterior: {
     src: "/images/home/modesto-two-story-home-framing-exterior.webp",
-    alt: "Two-story residential home framing contractor project in Modesto California",
+    alt: "Two-story residential home framing contractor project in Northern California",
   },
 } as const;
 

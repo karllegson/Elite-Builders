@@ -4,7 +4,7 @@ import PagePlaceholder from "@/components/site/PagePlaceholder";
 export const metadata: Metadata = {
   title: "About Us | Elite Builders IX",
   description:
-    "Learn about Elite Builders IX — Modesto's trusted framing contractor serving the Central Valley and Bay Area.",
+    "Learn about Elite Builders IX — a trusted framing contractor serving the Bay Area, Central Valley, and Southern California.",
 };
 
 export default function AboutPage() {
@@ -16,7 +16,7 @@ export default function AboutPage() {
           <p className="text-sm font-medium uppercase tracking-[0.18em] text-site-accent">Owner</p>
           <h2 className="mt-2 text-2xl font-bold text-site-text-dark">Fernando Gradilla</h2>
           <p className="mt-4 leading-relaxed text-site-text">
-            Fernando founded Elite Builders in Modesto with a simple standard: communicate clearly,
+            Fernando founded Elite Builders with a simple standard: communicate clearly,
             frame with precision, and do the right thing even when it&apos;s the harder path. More of
             his story is coming soon.
           </p>

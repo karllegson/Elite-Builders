@@ -2,20 +2,16 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import {
   ArrowRight,
-  Award,
   CheckCircle2,
-  Clock,
-  HardHat,
   MapPin,
   Phone,
   Quote,
-  ShieldCheck,
   Star,
-  Users,
 } from "lucide-react";
 import ContentImage from "@/components/site/ContentImage";
 import EstimateForm from "@/components/site/EstimateForm";
 import HeroVideo from "@/components/site/HeroVideo";
+import BuilderPartnerCard from "@/components/site/BuilderPartnerCard";
 import BrandPillars from "@/components/site/BrandPillars";
 import TeamSection from "@/components/site/TeamSection";
 import {
@@ -26,17 +22,19 @@ import {
   teamMembers,
 } from "@/lib/site/config";
 import { heroBullets, heroIntro, homepageFaqs, integrityStatement } from "@/lib/site/messaging";
-import { homeImages, homepageGalleryImageKeys, type HomeImageKey } from "@/lib/site/images";
+import { homeImages, homepageGalleryImageKeys } from "@/lib/site/images";
+import { builders, buildersIntro } from "@/lib/site/builders";
+import { completedProjects, currentProjects, type Project } from "@/lib/site/projects";
 
 export const metadata: Metadata = {
-  title: "Framing Contractor Modesto CA | Elite Builders IX",
+  title: "Framing Contractor Bay Area & Northern California | Elite Builders IX",
   description:
-    "Modesto framing contractor since 2012. Residential and commercial framing, siding, decks, and general contracting across the Central Valley and Bay Area. Honest estimates — no gimmicks.",
+    "Bay Area framing contractor since 2012. Framing, remodeling, and siding for residential and commercial projects across the Bay Area, Central Valley, and Southern California. CSLB #970551.",
   alternates: { canonical: business.domain },
   openGraph: {
-    title: "Framing Contractor Modesto CA | Elite Builders IX",
+    title: "Framing Contractor Bay Area & Northern California | Elite Builders IX",
     description:
-      "Residential & commercial framing, siding, decks, and general contracting in Modesto and Northern California.",
+      "Framing, remodeling, and siding for residential & commercial projects across the Bay Area and Northern California.",
     url: business.domain,
     siteName: business.name,
     type: "website",
@@ -55,39 +53,32 @@ const trustStats = [
 
 const whyChooseUs = [
   {
-    icon: ShieldCheck,
     title: "Built On Integrity",
     body: integrityStatement,
   },
   {
-    icon: Users,
     title: "Experienced Team",
     body: "Our crews live and breathe framing. Decades of combined experience means clean lines, square walls, and structures that pass inspection the first time.",
   },
   {
-    icon: Award,
     title: "Licensed & Insured",
-    body: "Fully licensed California contractor with complete liability and workers' comp coverage — your project and property are protected.",
+    body: "Fully licensed California contractor (CSLB #970551) with complete liability and workers' comp coverage — your project and property are protected.",
   },
   {
-    icon: HardHat,
     title: "Quality Craftsmanship",
     body: "We don't cover up problems — we fix them. Every cut, nail, and connection is done to spec, because the frame is the backbone of the build.",
   },
   {
-    icon: Clock,
     title: "Reliable Scheduling",
     body: "We show up when we say we will and keep your project on the timeline. No ghosting, no excuses — just consistent progress you can see.",
   },
   {
-    icon: MapPin,
-    title: "Central Valley & Bay Area",
-    body: "Headquartered in Modesto with job sites across the Central Valley and select projects throughout the greater Bay Area.",
+    title: "Bay Area & Northern California",
+    body: "Job sites across the Bay Area, Central Valley, and Southern California — with the crews and capacity to keep multiple projects moving.",
   },
   {
-    icon: CheckCircle2,
     title: "Framing-First Expertise",
-    body: "Framing isn't a side service for us — it's our specialty. Siding, decks, and general contracting are built on that same structural know-how.",
+    body: "Framing isn't a side service for us — it's our specialty. Remodeling, siding, and decks are built on that same structural know-how.",
   },
 ];
 
@@ -114,37 +105,22 @@ const processSteps = [
   },
 ];
 
-// DUMMY project data — replace with real projects from the admin gallery.
-const featuredProjects: {
-  title: string;
-  location: string;
-  description: string;
-  tag: string;
-  image: HomeImageKey;
-}[] = [
+// Featured real projects — full portfolio lives on /projects.
+const featuredProjects: Project[] = [
+  currentProjects[0], // 6060 Minarets Rd — Durkin Inc
+  completedProjects[1], // Highland Ridge Condominiums — City Ventures
+  completedProjects[2], // Custom Homes — Thomas James Homes
+];
+
+// Dual-audience offerings — Elite Builders serves homeowners AND production builders.
+const audiences = [
   {
-    title: "Custom Home Framing",
-    location: "Modesto, CA",
-    description:
-      "Complete structural framing for a 2,800 sq ft custom home — walls, roof trusses, and shear panels.",
-    tag: "Residential Framing",
-    image: "customHomeFramingCrew",
+    title: "For Homeowners",
+    body: "Custom homes, additions, remodels, decks, and siding — framed and finished with honest estimates and clear communication from start to finish.",
   },
   {
-    title: "Multi-Family New Construction",
-    location: "Stockton, CA",
-    description:
-      "Commercial framing package for an 8-unit multi-family development, delivered on schedule.",
-    tag: "Commercial Framing",
-    image: "commercialRoofFramingAerial",
-  },
-  {
-    title: "Luxury Home Finish",
-    location: "Manteca, CA",
-    description:
-      "Full interior and exterior package — framing through windows, doors, and outdoor living spaces.",
-    tag: "General Contracting",
-    image: "luxuryHomeInterior",
+    title: "For Builders & General Contractors",
+    body: "A dependable rough-carpentry subcontractor with the manpower and resources to deliver multi-plan production communities and multi-family projects on schedule.",
   },
 ];
 
@@ -152,7 +128,7 @@ const featuredProjects: {
 const testimonials = [
   {
     name: "Michael R.",
-    city: "Modesto",
+    city: "Livermore",
     quote:
       "Elite Builders framed our custom home and the inspector said it was some of the cleanest work he'd seen all year. On time, on budget, zero drama.",
   },
@@ -191,7 +167,7 @@ const localBusinessSchema = {
   foundingDate: String(business.foundedYear),
   areaServed: serviceAreas.map((area) => ({ "@type": "City", name: `${area.city}, CA` })),
   description:
-    "Framing contractor in Modesto, CA providing residential framing, commercial framing, siding, deck construction, and general contracting across the Central Valley and Bay Area.",
+    "Framing contractor serving the Bay Area, Central Valley, and Southern California — rough framing, remodeling, siding, and deck construction for residential and commercial projects.",
 };
 
 const faqSchema = {
@@ -309,8 +285,8 @@ export default function HomePage() {
         <div className="site-container">
           <SectionIntro
             eyebrow="Our Services"
-            title="Modesto Framing Contractor Services — Residential & Commercial"
-            lede="The frame is the backbone of every build — and it's our specialty. Siding, decks, and general contracting with the same power, precision, and passion."
+            title="Framing, Remodeling & Siding — Residential & Commercial"
+            lede="The frame is the backbone of every build — and it's our specialty. Remodeling, siding, and decks with the same power, precision, and passion."
           />
 
           <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -354,12 +330,35 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ── Dual audience — homeowners + builders ────────────── */}
+      <section className="border-t border-solid border-gray-100 bg-gray-50/60 py-24">
+        <div className="site-container">
+          <SectionIntro
+            eyebrow="Who We Serve"
+            title="Two Ways We Build"
+            lede="From a single family's custom home to a production builder's multi-plan community, Elite Builders brings the same framing-first precision to every project."
+          />
+
+          <div className="mx-auto mt-14 grid max-w-4xl gap-6 md:grid-cols-2">
+            {audiences.map(({ title, body }) => (
+              <div
+                key={title}
+                className="rounded-xl border border-solid border-gray-200 border-l-4 border-l-brand-red bg-white p-8 transition-shadow hover:shadow-md"
+              >
+                <h3 className="text-xl font-bold text-brand-navy">{title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-gray-500">{body}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ── About + stats ────────────────────────────────────── */}
-      <section className="border-y border-solid border-gray-100 bg-gray-50/60 py-24">
+      <section className="border-y border-solid border-gray-100 bg-white py-24">
         <div className="site-container">
           <SectionIntro
             eyebrow="About Us"
-            title={`${business.displayName}: Modesto Framing Built On Craftsmanship, Not Shortcuts`}
+            title={`${business.displayName}: Framing Built On Craftsmanship, Not Shortcuts`}
             lede={`Family-owned since ${business.foundedYear}. ${business.companyStory} ${integrityStatement}`}
           />
 
@@ -378,8 +377,8 @@ export default function HomePage() {
               </p>
               <p className="leading-relaxed">
                 We coordinate permits, keep your timeline on track, and build structures that pass
-                inspection the first time. That&apos;s how we&apos;ve earned trust across Modesto,
-                Stockton, Manteca, and the greater Central Valley.
+                inspection the first time. That&apos;s how we&apos;ve earned trust across the Bay Area,
+                Central Valley, and Northern California.
               </p>
             </div>
           </div>
@@ -392,6 +391,32 @@ export default function HomePage() {
               </div>
             ))}
           </dl>
+
+          <p className="mt-10 text-center text-sm font-semibold text-gray-500">
+            Licensed California Contractor —{" "}
+            <span className="text-brand-navy">{business.license}</span>
+          </p>
+        </div>
+      </section>
+
+      {/* ── Trusted by production builders ────────────────────── */}
+      <section className="bg-brand-navy py-20 text-white">
+        <div className="site-container">
+          <div className="mx-auto max-w-3xl text-center">
+            <p className="text-sm font-medium uppercase tracking-[0.18em] text-brand-sky">
+              Builders We Work With
+            </p>
+            <h2 className="mt-3 text-3xl font-bold text-white sm:text-4xl">
+              Trusted by Production Builders &amp; General Contractors
+            </h2>
+            <p className="mt-4 text-base leading-relaxed text-white/80">{buildersIntro}</p>
+          </div>
+
+          <ul className="mx-auto mt-12 grid max-w-5xl grid-cols-2 gap-4 sm:grid-cols-3">
+            {builders.map((builder) => (
+              <BuilderPartnerCard key={builder.name} builder={builder} />
+            ))}
+          </ul>
         </div>
       </section>
 
@@ -405,22 +430,22 @@ export default function HomePage() {
               Why Choose Us
             </p>
             <h2 className="mt-3 text-3xl font-bold text-white sm:text-4xl">
-              Why Modesto Homeowners &amp; Builders Trust Elite Builders
+              Why Homeowners &amp; Builders Trust Elite Builders
             </h2>
             <p className="mt-4 text-base leading-relaxed text-white/80">
               When your build is on the line, you need straight answers and real craftsmanship —
-              not sales gimmicks or the cheapest bid. Here&apos;s why Central Valley homeowners call
-              us first.
+              not sales gimmicks or the cheapest bid. Here&apos;s why Northern California homeowners and
+              builders call us first.
             </p>
           </div>
 
           <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {whyChooseUs.map(({ icon: Icon, title, body }) => (
-              <div key={title} className="rounded-xl bg-brand-blue-dark/60 p-7">
-                <span className="inline-flex rounded-full border border-solid border-white/20 p-3 text-brand-sky">
-                  <Icon size={24} aria-hidden />
-                </span>
-                <h3 className="mt-4 text-lg font-semibold text-white">{title}</h3>
+            {whyChooseUs.map(({ title, body }) => (
+              <div
+                key={title}
+                className="rounded-xl border-t-4 border-solid border-t-brand-red bg-brand-blue-dark/60 p-7"
+              >
+                <h3 className="text-lg font-semibold text-white">{title}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-white/80">{body}</p>
               </div>
             ))}
@@ -433,7 +458,7 @@ export default function HomePage() {
         <div className="site-container">
           <SectionIntro
             eyebrow="How It Works"
-            title="Our Home Framing Process in Modesto, CA"
+            title="Our Home Framing Process"
             lede="A clear, predictable process — so you always know what's happening, when, and why."
           />
 
@@ -465,8 +490,8 @@ export default function HomePage() {
         <div className="site-container">
           <SectionIntro
             eyebrow="Recent Work"
-            title="Framing Projects Across Modesto & the Central Valley"
-            lede="A look at recent framing, siding, and deck projects across Modesto and Northern California."
+            title="Framing Projects Across Northern California"
+            lede="A look at recent framing, siding, and deck projects across the Bay Area and Northern California."
           />
 
           <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -474,21 +499,24 @@ export default function HomePage() {
               const img = homeImages[project.image];
               return (
               <article
-                key={project.title}
+                key={project.id}
                 className="overflow-hidden rounded-xl border border-solid border-gray-200 bg-white transition-shadow hover:shadow-lg"
               >
                 <ContentImage src={img.src} alt={img.alt} className="h-52" />
                 <div className="p-6">
                   <span className="text-xs font-bold uppercase tracking-wide text-brand-sky">
-                    {project.tag}
+                    {project.type}
                   </span>
-                  <h3 className="mt-2 text-lg font-bold text-brand-navy">{project.title}</h3>
+                  <h3 className="mt-2 text-lg font-bold text-brand-navy">{project.name}</h3>
                   <p className="mt-1 flex items-center gap-1.5 text-sm text-gray-400">
                     <MapPin size={14} aria-hidden />
                     {project.location}
                   </p>
                   <p className="mt-3 text-sm leading-relaxed text-gray-500">
-                    {project.description}
+                    {project.blurb}
+                  </p>
+                  <p className="mt-3 text-xs font-semibold text-brand-blue">
+                    Built for {project.builder}
                   </p>
                 </div>
               </article>
@@ -513,7 +541,7 @@ export default function HomePage() {
         <div className="site-container">
           <SectionIntro
             eyebrow="Our Reviews"
-            title="What Modesto & Central Valley Customers Say"
+            title="What Our Customers Say"
           />
 
           <div className="mt-14 grid gap-6 lg:grid-cols-3">
@@ -557,7 +585,7 @@ export default function HomePage() {
         <div className="site-container">
           <SectionIntro
             eyebrow="Where We Work"
-            title="Proudly Serving the Central Valley & Bay Area"
+            title="Proudly Serving the Bay Area, Central Valley & Southern California"
           />
 
           <ContentImage
@@ -607,7 +635,7 @@ export default function HomePage() {
           <div className="mx-auto max-w-3xl">
           <SectionIntro
             eyebrow="FAQ"
-            title="Framing Contractor FAQ — Modesto, CA"
+            title="Framing Contractor FAQ"
             lede="Straight answers about our services, service areas, and what makes Elite Builders different."
           />
 

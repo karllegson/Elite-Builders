@@ -1,17 +1,80 @@
 import type { Metadata } from "next";
-import PagePlaceholder from "@/components/site/PagePlaceholder";
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
+import ContentImage from "@/components/site/ContentImage";
+import { business } from "@/lib/site/config";
+import { homeImages } from "@/lib/site/images";
+import { serviceDetails, serviceOrder } from "@/lib/site/scope";
 
 export const metadata: Metadata = {
-  title: "Our Services | Elite Builders IX",
+  title: "Construction Services Bay Area & Northern California | Elite Builders IX",
   description:
-    "Framing, siding, deck construction, and general contracting services in Modesto and the Central Valley.",
+    "Rough framing, remodeling, siding, and deck construction across the Bay Area, Central Valley, and Southern California — for homeowners, production builders, and general contractors. CSLB #970551.",
 };
 
 export default function ServicesPage() {
   return (
-    <PagePlaceholder
-      title="Our Services"
-      description="Framing, siding, deck construction, and general contracting — detailed service pages are coming soon."
-    />
+    <>
+      <section className="bg-brand-navy py-20 text-white">
+        <div className="site-container">
+          <p className="text-sm font-medium uppercase tracking-[0.18em] text-brand-sky">
+            Our Services
+          </p>
+          <h1 className="mt-3 max-w-3xl text-3xl font-bold leading-tight sm:text-4xl lg:text-5xl">
+            Construction Services — Bay Area &amp; Northern California
+          </h1>
+          <p className="mt-5 max-w-2xl text-base leading-relaxed text-white/85">
+            Elite Builders IX specializes in rough framing, remodeling, and siding for both
+            residential and commercial projects — delivering strong, precise structural work in full
+            compliance with building codes and safety standards.
+          </p>
+          <p className="mt-4 text-sm font-semibold text-brand-sky">{business.license}</p>
+        </div>
+      </section>
+
+      <section className="bg-white py-20">
+        <div className="site-container">
+          <div className="grid gap-6 sm:grid-cols-2">
+            {serviceOrder.map((slug) => {
+              const detail = serviceDetails[slug];
+              const img = homeImages[detail.heroImage];
+              return (
+                <Link
+                  key={slug}
+                  href={`/services/${slug}`}
+                  className="group overflow-hidden rounded-xl border border-solid border-gray-200 bg-white transition-all hover:-translate-y-1 hover:border-brand-sky/60 hover:shadow-lg"
+                >
+                  <ContentImage src={img.src} alt={img.alt} className="h-52" />
+                  <div className="p-7">
+                    <h2 className="text-lg font-bold text-brand-navy">{detail.name}</h2>
+                    <p className="mt-2 text-sm leading-relaxed text-gray-500">
+                      {detail.intro[0]}
+                    </p>
+                    <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-bold text-brand-blue group-hover:text-brand-red">
+                      Learn More
+                      <ArrowRight
+                        size={15}
+                        aria-hidden
+                        className="transition-transform group-hover:translate-x-1"
+                      />
+                    </span>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+
+          <div className="mt-12 text-center">
+            <Link
+              href="/#estimate"
+              className="inline-flex items-center gap-2 rounded-full bg-brand-red px-7 py-3 text-sm font-bold text-white transition-colors hover:bg-brand-red-dark"
+            >
+              Request a Free Estimate
+              <ArrowRight size={16} aria-hidden />
+            </Link>
+          </div>
+        </div>
+      </section>
+    </>
   );
 }

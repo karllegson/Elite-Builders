@@ -103,7 +103,7 @@ export default function SiteFooter() {
           <p>
             © {new Date().getFullYear()} {business.name}. All rights reserved.
           </p>
-          <p>Framing Contractor · Modesto, CA · Central Valley · Bay Area</p>
+          <p>Framing Contractor · Bay Area · Central Valley · Southern California</p>
         </div>
       </div>
     </footer>

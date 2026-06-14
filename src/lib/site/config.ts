@@ -5,10 +5,10 @@ export const business = {
   legalName: "Elite Builders IX",
   displayName: "Elite Builders",
   slogan: "Build your dream",
-  heroLocationLine: "Proudly based in Modesto, CA",
-  heroHeadline: "Expert Home Framing in Modesto & Northern California",
+  heroLocationLine: "Bay Area · Central Valley · Southern California",
+  heroHeadline: "Framing, Remodeling & Siding",
   companyStory:
-    "Family-owned in Modesto since 2012, Elite Builders is known for integrity, straight answers, and experienced crews who treat every structure like their own.",
+    "Family-owned since 2012, Elite Builders is known for integrity, straight answers, and experienced crews who treat every structure like their own — serving the Bay Area, Central Valley, and Southern California.",
   phone: "1 (209) 484-2743",
   phoneHref: "tel:+12094842743",
   email: "support@elitebuildersco.com",
@@ -21,7 +21,8 @@ export const business = {
     region: "Central Valley",
     full: "450 Burney Street, Modesto, CA 95354",
   },
-  license: "Licensed California Contractor",
+  license: "CSLB #970551",
+  licenseNumber: "970551",
   domain: "https://elitebuildersco.com",
 } as const;
 
@@ -36,49 +37,40 @@ export type SiteService = {
 
 export const services: SiteService[] = [
   {
-    title: "Residential Framing",
+    title: "Rough Framing",
     slug: "framing",
     href: "/services/framing",
     shortDescription:
-      "Precision house framing for new construction, custom homes, additions, and remodels across the Central Valley.",
+      "Precision rough carpentry — walls, floors, roofs, trusses, shear panels, and structural hardware for residential and commercial builds.",
     icon: "hammer",
     image: "residentialRoofFraming",
   },
   {
-    title: "Commercial Framing",
-    slug: "framing",
-    href: "/services/framing",
+    title: "Remodeling",
+    slug: "remodeling",
+    href: "/services/remodeling",
     shortDescription:
-      "Structural framing for commercial buildings, multi-family projects, and tenant improvements — on schedule and to code.",
-    icon: "building",
-    image: "commercialRoofFramingAerial",
+      "Structural modifications, renovations, additions, and upgrades to existing residential and commercial spaces.",
+    icon: "clipboard",
+    image: "customKitchenRemodel",
   },
   {
-    title: "Siding Installation",
+    title: "Siding",
     slug: "siding",
     href: "/services/siding",
     shortDescription:
-      "Fiber cement, wood, and composite siding installation and repair that protects your home and boosts curb appeal.",
+      "Fiber cement, wood, and composite siding and trim installation that protects your building and boosts curb appeal.",
     icon: "layers",
     image: "residentialWindowInstallation",
   },
   {
-    title: "Deck Construction",
+    title: "Decks & Porches",
     slug: "decks",
     href: "/services/decks",
     shortDescription:
-      "Custom wood and composite decks built to last through California summers — design, build, and repair.",
+      "Custom wood and composite decks and porches built with the same structural precision we bring to framing.",
     icon: "fence",
     image: "patioDoorsOutdoorLiving",
-  },
-  {
-    title: "General Contracting",
-    slug: "general-contracting",
-    href: "/services/general-contracting",
-    shortDescription:
-      "Full project management from plans and permits to final walkthrough for new builds and remodels.",
-    icon: "clipboard",
-    image: "customKitchenRemodel",
   },
 ];
 
@@ -87,17 +79,10 @@ export type ServiceArea = {
   slug: string;
   href: string;
   blurb: string;
-  region: "Central Valley" | "Bay Area";
+  region: "Central Valley" | "Bay Area" | "Southern California" | "Eastern Sierra";
 };
 
 export const serviceAreas: ServiceArea[] = [
-  {
-    city: "Modesto",
-    slug: "modesto",
-    href: "/service-areas/modesto",
-    blurb: "Our home base — framing, siding, and decks across every Modesto neighborhood.",
-    region: "Central Valley",
-  },
   {
     city: "Stockton",
     slug: "stockton",
@@ -130,7 +115,7 @@ export const serviceAreas: ServiceArea[] = [
     city: "Ceres",
     slug: "ceres",
     href: "/service-areas/ceres",
-    blurb: "Framing and general contracting for Ceres homeowners and builders.",
+    blurb: "Rough framing and remodeling for Ceres homeowners and builders.",
     region: "Central Valley",
   },
   {
@@ -145,6 +130,13 @@ export const serviceAreas: ServiceArea[] = [
     slug: "riverbank",
     href: "/service-areas/riverbank",
     blurb: "Residential framing and deck construction for Riverbank families.",
+    region: "Central Valley",
+  },
+  {
+    city: "Mountain House",
+    slug: "mountain-house",
+    href: "/service-areas/mountain-house",
+    blurb: "Production-builder framing for Mountain House's fast-growing master-planned communities.",
     region: "Central Valley",
   },
   {
@@ -165,7 +157,7 @@ export const serviceAreas: ServiceArea[] = [
     city: "Fremont",
     slug: "fremont",
     href: "/service-areas/fremont",
-    blurb: "Structural framing and general contracting across Fremont and the East Bay.",
+    blurb: "Structural framing and remodeling across Fremont and the East Bay.",
     region: "Bay Area",
   },
   {
@@ -190,11 +182,39 @@ export const serviceAreas: ServiceArea[] = [
     region: "Bay Area",
   },
   {
+    city: "San Ramon",
+    slug: "san-ramon",
+    href: "/service-areas/san-ramon",
+    blurb: "Framing and production-builder partnerships across San Ramon and the Tri-Valley.",
+    region: "Bay Area",
+  },
+  {
+    city: "San Bruno",
+    slug: "san-bruno",
+    href: "/service-areas/san-bruno",
+    blurb: "Residential and multi-family framing for San Bruno and the Peninsula.",
+    region: "Bay Area",
+  },
+  {
     city: "Bay Area",
     slug: "bay-area",
     href: "/service-areas/bay-area",
     blurb: "Greater Bay Area coverage — from the Tri-Valley to the South Bay and beyond.",
     region: "Bay Area",
+  },
+  {
+    city: "Pasadena",
+    slug: "pasadena",
+    href: "/service-areas/pasadena",
+    blurb: "Rough framing, remodeling, and siding for Pasadena and the greater Southern California region.",
+    region: "Southern California",
+  },
+  {
+    city: "Mammoth Lakes",
+    slug: "mammoth-lakes",
+    href: "/service-areas/mammoth-lakes",
+    blurb: "Mountain-region framing and custom builds serving Mammoth Lakes and the Eastern Sierra.",
+    region: "Eastern Sierra",
   },
 ];
 
@@ -206,22 +226,22 @@ function pickServiceAreas(slugs: string[]): ServiceArea[] {
 
 /** Curated subset for the homepage grid — full list lives on /service-areas */
 export const featuredHomeServiceAreas = pickServiceAreas([
-  "modesto",
-  "stockton",
-  "manteca",
-  "tracy",
   "san-jose",
   "livermore",
+  "fremont",
+  "stockton",
+  "tracy",
+  "pasadena",
 ]);
 
 /** Curated subset for the footer — no scroll list */
 export const featuredFooterServiceAreas = pickServiceAreas([
-  "modesto",
-  "stockton",
   "san-jose",
   "livermore",
   "fremont",
+  "stockton",
   "tracy",
+  "pasadena",
 ]);
 
 export type TeamMemberTestimonial = {
@@ -255,7 +275,7 @@ export const teamMembers: TeamMember[] = [
     initials: "FG",
     profile: {
       experience: "Construction & framing background",
-      bio: "Fernando built his career in construction long before Elite Builders — learning the trade on job sites across the Central Valley. During a difficult time in his life, he met the Lord, and his Christian faith became the foundation for how he leads today. He founded Elite Builders in Modesto on no cutting corners, real integrity, and promises kept — treating every residential and commercial project with the honesty and care he'd want on his own home.",
+      bio: "Fernando built his career in construction long before Elite Builders — learning the trade on job sites across Northern California. During a difficult time in his life, he met the Lord, and his Christian faith became the foundation for how he leads today. He founded Elite Builders on no cutting corners, real integrity, and promises kept — treating every residential and commercial project with the honesty and care he'd want on his own home.",
       testimonial: {
         quote:
           "Cleanest framing work the inspector had seen all year. Fernando's crew was professional from start to finish — zero drama.",
@@ -295,36 +315,36 @@ export const utilityNavLinks = [
 
 export const serviceMenuGroups = [
   {
-    title: "Residential Framing",
+    title: "Rough Framing",
     description:
-      "Precision house framing for new construction, custom homes, additions, and remodels.",
+      "Precision rough carpentry — walls, floors, roofs, trusses, shear panels, and structural hardware.",
     href: "/services/framing",
     links: [
-      { label: "New Home Framing", href: "/services/framing" },
-      { label: "Custom Home Framing", href: "/services/framing" },
-      { label: "Additions & Remodels", href: "/services/framing" },
+      { label: "Residential Framing", href: "/services/framing" },
+      { label: "Commercial & Multi-Family", href: "/services/framing" },
+      { label: "Production-Builder Framing", href: "/services/framing" },
     ],
   },
   {
-    title: "Commercial Framing",
+    title: "Remodeling",
     description:
-      "Structural framing for commercial buildings, multi-family projects, and tenant improvements.",
-    href: "/services/framing",
+      "Structural modifications, renovations, additions, and upgrades to existing spaces.",
+    href: "/services/remodeling",
     links: [
-      { label: "Commercial Framing", href: "/services/framing" },
-      { label: "Multi-Family Projects", href: "/services/framing" },
-      { label: "Tenant Improvements", href: "/services/framing" },
+      { label: "Home Remodels & Additions", href: "/services/remodeling" },
+      { label: "Structural Modifications", href: "/services/remodeling" },
+      { label: "Renovations & Upgrades", href: "/services/remodeling" },
     ],
   },
   {
-    title: "Siding, Decks & More",
+    title: "Siding & Decks",
     description:
-      "Siding, deck construction, and full general contracting — built with framing-first precision.",
+      "Siding, trim, decks, and porches — built with framing-first precision.",
     href: "/services",
     links: [
       { label: "Siding Installation", href: "/services/siding" },
-      { label: "Deck Construction", href: "/services/decks" },
-      { label: "General Contracting", href: "/services/general-contracting" },
+      { label: "Decks & Porches", href: "/services/decks" },
+      { label: "All Services", href: "/services" },
     ],
   },
 ] as const;

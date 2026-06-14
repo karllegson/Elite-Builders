@@ -4,7 +4,7 @@ import PagePlaceholder from "@/components/site/PagePlaceholder";
 export const metadata: Metadata = {
   title: "Blog | Elite Builders IX",
   description:
-    "Framing, siding, and construction tips for homeowners in Modesto and the Central Valley.",
+    "Framing, siding, and construction tips for homeowners across the Bay Area and Northern California.",
 };
 
 export default function BlogPage() {

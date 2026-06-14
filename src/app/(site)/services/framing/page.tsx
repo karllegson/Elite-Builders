@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
-import PagePlaceholder from "@/components/site/PagePlaceholder";
+import ServicePageTemplate from "@/components/site/ServicePageTemplate";
+import { serviceDetails } from "@/lib/site/scope";
+
+const detail = serviceDetails.framing;
 
 export const metadata: Metadata = {
-  title: "Framing Contractor Modesto CA | Elite Builders IX",
-  description:
-    "Residential and commercial framing services in Modesto, the Central Valley, and the Bay Area.",
+  title: detail.metaTitle,
+  description: detail.metaDescription,
 };
 
 export default function FramingPage() {
-  return <PagePlaceholder title="Framing Services" />;
+  return <ServicePageTemplate detail={detail} />;
 }

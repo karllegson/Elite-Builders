@@ -1,7 +1,5 @@
-import { Hammer, Handshake, ShieldCheck } from "lucide-react";
+import { CardAccentBar, CardIndex } from "@/components/site/CardAccent";
 import { brandPillars, brandPillarsHeading, differentiationIntro } from "@/lib/site/messaging";
-
-const pillarIcons = [Hammer, ShieldCheck, Handshake] as const;
 
 export default function BrandPillars() {
   return (
@@ -18,21 +16,16 @@ export default function BrandPillars() {
         </div>
 
         <div className="mt-14 grid gap-6 sm:grid-cols-3">
-          {brandPillars.map(({ title, body }, index) => {
-            const Icon = pillarIcons[index] ?? Hammer;
-            return (
-              <article
-                key={title}
-                className="rounded-2xl border border-solid border-white bg-white px-7 py-8 shadow-sm"
-              >
-                <span className="inline-flex rounded-full bg-site-accent/10 p-3 text-site-accent">
-                  <Icon size={22} strokeWidth={2} aria-hidden />
-                </span>
-                <h3 className="mt-5 text-lg font-semibold text-site-text-dark">{title}</h3>
-                <p className="mt-3 text-sm leading-relaxed text-site-text">{body}</p>
-              </article>
-            );
-          })}
+          {brandPillars.map(({ title, body }, index) => (
+            <article
+              key={title}
+              className="rounded-2xl border border-solid border-gray-100 border-t-4 border-t-brand-red bg-white px-7 py-8 shadow-sm"
+            >
+              <CardIndex index={index} />
+              <h3 className="mt-4 text-lg font-semibold text-site-text-dark">{title}</h3>
+              <p className="mt-3 text-sm leading-relaxed text-site-text">{body}</p>
+            </article>
+          ))}
         </div>
       </div>
     </section>

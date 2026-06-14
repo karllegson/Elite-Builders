@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
-import PagePlaceholder from "@/components/site/PagePlaceholder";
+import ServicePageTemplate from "@/components/site/ServicePageTemplate";
+import { serviceDetails } from "@/lib/site/scope";
+
+const detail = serviceDetails.siding;
 
 export const metadata: Metadata = {
-  title: "Siding Contractor Modesto CA | Elite Builders IX",
-  description:
-    "Fiber cement, wood, and composite siding installation and repair in Modesto and the Central Valley.",
+  title: detail.metaTitle,
+  description: detail.metaDescription,
 };
 
 export default function SidingPage() {
-  return <PagePlaceholder title="Siding Services" />;
+  return <ServicePageTemplate detail={detail} />;
 }

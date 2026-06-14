@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
-import PagePlaceholder from "@/components/site/PagePlaceholder";
+import ServicePageTemplate from "@/components/site/ServicePageTemplate";
+import { serviceDetails } from "@/lib/site/scope";
+
+const detail = serviceDetails.decks;
 
 export const metadata: Metadata = {
-  title: "Deck Builder Modesto CA | Elite Builders IX",
-  description:
-    "Custom wood and composite deck construction and repair in Modesto and the Central Valley.",
+  title: detail.metaTitle,
+  description: detail.metaDescription,
 };
 
 export default function DecksPage() {
-  return <PagePlaceholder title="Deck Construction" />;
+  return <ServicePageTemplate detail={detail} />;
 }

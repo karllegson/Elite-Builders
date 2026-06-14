@@ -4,7 +4,7 @@ import PagePlaceholder from "@/components/site/PagePlaceholder";
 export const metadata: Metadata = {
   title: "Contact Us | Elite Builders IX",
   description:
-    "Contact Elite Builders IX for a free framing, siding, or deck construction estimate in Modesto, CA.",
+    "Contact Elite Builders IX for a free framing, remodeling, siding, or deck estimate across the Bay Area and Northern California.",
 };
 
 export default function ContactPage() {

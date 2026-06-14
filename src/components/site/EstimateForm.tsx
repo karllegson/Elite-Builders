@@ -70,7 +70,7 @@ export default function EstimateForm({ variant = "card" }: EstimateFormProps) {
               type="text"
               name="city"
               autoComplete="address-level2"
-              placeholder="Modesto"
+              placeholder="San Jose"
               className="rounded-md border border-solid border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 placeholder:text-gray-400"
             />
           </label>
@@ -86,11 +86,10 @@ export default function EstimateForm({ variant = "card" }: EstimateFormProps) {
               <option value="" disabled>
                 Select a service…
               </option>
-              <option value="residential-framing">Residential Framing</option>
-              <option value="commercial-framing">Commercial Framing</option>
+              <option value="rough-framing">Rough Framing</option>
+              <option value="remodeling">Remodeling</option>
               <option value="siding">Siding</option>
-              <option value="decks">Deck Construction</option>
-              <option value="general-contracting">General Contracting</option>
+              <option value="decks">Decks &amp; Porches</option>
               <option value="other">Other</option>
             </select>
           </label>

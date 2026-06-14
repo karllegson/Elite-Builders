@@ -4,13 +4,10 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  Building2,
   ChevronDown,
   ChevronRight,
   ClipboardCheck,
   FolderOpen,
-  Hammer,
-  Layers,
   MapPin,
   Menu,
   MessageSquare,
@@ -33,8 +30,6 @@ const utilityIcons = {
   Reviews: MessageSquare,
   Projects: FolderOpen,
 } as const;
-
-const serviceIcons = [Hammer, Building2, Layers] as const;
 
 export default function SiteHeader() {
   const pathname = usePathname();
@@ -253,15 +248,9 @@ export default function SiteHeader() {
         {openMenu === "services" && (
           <div className="absolute inset-x-0 top-full z-50 hidden border-t border-solid border-gray-100 bg-white shadow-lg lg:block">
             <div className="site-container grid gap-8 py-8 lg:grid-cols-3">
-              {serviceMenuGroups.map((group, index) => {
-                const Icon = serviceIcons[index] ?? Hammer;
-                return (
+              {serviceMenuGroups.map((group) => (
                   <div key={group.title}>
-                    <div className="flex items-start gap-3">
-                      <span className="rounded-full bg-brand-red/10 p-2.5 text-brand-red">
-                        <Icon size={22} aria-hidden />
-                      </span>
-                      <div>
+                    <div>
                         <Link
                           href={group.href}
                           className="text-base font-semibold text-site-nav-cta hover:text-brand-navy"
@@ -272,9 +261,8 @@ export default function SiteHeader() {
                         <p className="mt-2 text-sm leading-relaxed text-gray-500">
                           {group.description}
                         </p>
-                      </div>
                     </div>
-                    <ul className="mt-4 space-y-2 pl-12">
+                    <ul className="mt-4 space-y-2">
                       {group.links.map((link) => (
                         <li key={link.label}>
                           <Link
@@ -293,8 +281,7 @@ export default function SiteHeader() {
                       ))}
                     </ul>
                   </div>
-                );
-              })}
+              ))}
             </div>
           </div>
         )}
