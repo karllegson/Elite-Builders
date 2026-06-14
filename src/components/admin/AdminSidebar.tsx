@@ -21,7 +21,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { usePathname } from "next/navigation";
-import { useRef, useState, type CSSProperties } from "react";
+import { useLayoutEffect, useRef, useState, type CSSProperties } from "react";
 import {
   adminNavItems,
   adminSettingsNav,
@@ -63,7 +63,11 @@ function isNavItemActive(item: AdminNavItem, currentPath: string) {
 }
 
 function isSubNavItemActive(href: string, currentPath: string) {
-  if (href === "/admin/posts" || href === "/admin/service-areas") {
+  if (
+    href === "/admin/posts" ||
+    href === "/admin/service-areas" ||
+    href === "/admin/pages"
+  ) {
     return currentPath === href;
   }
 
@@ -72,6 +76,7 @@ function isSubNavItemActive(href: string, currentPath: string) {
 
 function NavLink({ item, currentPath }: { item: AdminNavItem; currentPath: string }) {
   const itemRef = useRef<HTMLLIElement>(null);
+  const submenuRef = useRef<HTMLUListElement>(null);
   const hideTimeoutRef = useRef<number | undefined>(undefined);
   const [submenuOpen, setSubmenuOpen] = useState(false);
   const [submenuStyle, setSubmenuStyle] = useState<CSSProperties>({});
@@ -79,6 +84,21 @@ function NavLink({ item, currentPath }: { item: AdminNavItem; currentPath: strin
   const isActive = isNavItemActive(item, currentPath);
   const isSoon = item.phase > 1;
   const hasChildren = Boolean(item.children?.length);
+  const childCount = item.children?.length ?? 0;
+
+  const positionSubmenu = () => {
+    if (!itemRef.current || !submenuRef.current) {
+      return;
+    }
+
+    const itemRect = itemRef.current.getBoundingClientRect();
+    const submenuHeight = submenuRef.current.offsetHeight;
+
+    setSubmenuStyle({
+      top: itemRect.top + itemRect.height / 2 - submenuHeight / 2,
+      left: itemRect.right,
+    });
+  };
 
   const showSubmenu = () => {
     window.clearTimeout(hideTimeoutRef.current);
@@ -87,13 +107,24 @@ function NavLink({ item, currentPath }: { item: AdminNavItem; currentPath: strin
       return;
     }
 
-    const rect = itemRef.current.getBoundingClientRect();
-    setSubmenuStyle({
-      top: rect.top,
-      left: rect.right,
-    });
     setSubmenuOpen(true);
   };
+
+  useLayoutEffect(() => {
+    if (!submenuOpen) {
+      return;
+    }
+
+    positionSubmenu();
+
+    window.addEventListener("scroll", positionSubmenu, true);
+    window.addEventListener("resize", positionSubmenu);
+
+    return () => {
+      window.removeEventListener("scroll", positionSubmenu, true);
+      window.removeEventListener("resize", positionSubmenu);
+    };
+  }, [submenuOpen, childCount]);
 
   const scheduleHideSubmenu = () => {
     window.clearTimeout(hideTimeoutRef.current);
@@ -124,6 +155,7 @@ function NavLink({ item, currentPath }: { item: AdminNavItem; currentPath: strin
       </a>
       {hasChildren ? (
         <ul
+          ref={submenuRef}
           className={`admin-sidebar-submenu${submenuOpen ? " is-open" : ""}`}
           style={submenuStyle}
           aria-label={`${item.label} submenu`}
