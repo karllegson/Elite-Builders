@@ -12,9 +12,9 @@ const pageActions: Record<string, { href: string; label: string }[]> = {
     { href: "/admin/pages/new?mode=link", label: "Add Link" },
   ],
   "/admin/pages/default": [{ href: "/admin/pages/new", label: "Add Page" }],
-const pageActions: Record<string, { href: string; label: string }> = {
-  "/admin/posts": { href: "/admin/posts/new", label: "Add Post" },
-  "/admin/service-areas": { href: "/admin/service-areas/new", label: "Add New Service Area" },
+  "/admin/service-areas": [
+    { href: "/admin/service-areas/new", label: "Add New Service Area" },
+  ],
 };
 
 function resolvePageTitle(pathname: string): string {
@@ -29,12 +29,12 @@ function resolvePageTitle(pathname: string): string {
   return adminPageTitles[pathname] ?? "Administration";
 }
 
-function resolvePageAction(pathname: string): { href: string; label: string } | undefined {
+function resolvePageAction(pathname: string): { href: string; label: string }[] | undefined {
   if (pathname.startsWith("/admin/service-areas/") && pathname !== "/admin/service-areas/new") {
     const segment = pathname.split("/").pop();
 
     if (segment && segment !== "sorting" && segment !== "nested") {
-      return { href: "/admin/service-areas/new", label: "Add New Service Area" };
+      return [{ href: "/admin/service-areas/new", label: "Add New Service Area" }];
     }
   }
 

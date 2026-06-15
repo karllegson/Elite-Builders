@@ -4595,6 +4595,8 @@
 
   .admin-pages-search-wrap {
     justify-content: flex-start;
+  }
+
   .admin-post-widget-form-table th {
     width: auto;
     display: block;
