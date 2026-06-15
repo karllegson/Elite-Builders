@@ -103,15 +103,10 @@ export const adminPageTitles: Record<string, string> = {
   "/admin/service-areas": "Service Areas",
   "/admin/service-areas/new": "Add New Service Area",
   "/admin/service-areas/sorting": "Sorting",
-<<<<<<< HEAD
-  "/admin/service-areas/nested": "Service Areas",
-  "/admin/faqs": "FAQs",
-=======
   "/admin/service-areas/nested": "Nested View",
   "/admin/faqs": "All FAQs",
   "/admin/faqs/new": "Add New FAQ",
   "/admin/faqs/categories": "Categories",
->>>>>>> 041dc2c (feat(admin): added functions on FAQ Section)
   "/admin/reviews": "Reviews",
   "/admin/seo": "SEO",
   "/admin/site-config": "Site Config",

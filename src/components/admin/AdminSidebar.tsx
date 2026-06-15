@@ -66,11 +66,8 @@ function isSubNavItemActive(href: string, currentPath: string) {
   if (
     href === "/admin/posts" ||
     href === "/admin/service-areas" ||
-<<<<<<< HEAD
-    href === "/admin/pages"
-=======
+    href === "/admin/pages" ||
     href === "/admin/faqs"
->>>>>>> 041dc2c (feat(admin): added functions on FAQ Section)
   ) {
     return currentPath === href;
   }
