@@ -3295,6 +3295,233 @@
   line-height: 1.5;
 }
 
+/* Post Widget Settings */
+.admin-post-widget-settings {
+  max-width: 980px;
+}
+
+.admin-post-widget-status-message {
+  margin: 0 0 12px;
+  padding: 8px 12px;
+  background: #fff;
+  border: 1px solid var(--admin-border);
+  border-left: 4px solid var(--admin-accent);
+  font-size: 13px;
+  color: var(--admin-text);
+}
+
+.admin-post-widget-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+  margin: 0 0 -1px;
+  padding: 0;
+  border-bottom: 1px solid var(--admin-border);
+}
+
+.admin-post-widget-nav-tab {
+  margin: 0;
+  padding: 8px 14px;
+  border: 1px solid transparent;
+  border-bottom: none;
+  background: #dcdcde;
+  color: var(--admin-text);
+  font: inherit;
+  font-size: 13px;
+  line-height: 1.4;
+  cursor: pointer;
+}
+
+.admin-post-widget-nav-tab:hover {
+  color: var(--admin-accent);
+}
+
+.admin-post-widget-nav-tab.is-active {
+  background: var(--admin-card-bg);
+  border-color: var(--admin-border);
+  border-bottom-color: var(--admin-card-bg);
+  position: relative;
+  z-index: 1;
+}
+
+.admin-post-widget-panel {
+  padding: 16px 0 0;
+}
+
+.admin-post-widget-form-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  color: var(--admin-text);
+}
+
+.admin-post-widget-form-table th {
+  width: 220px;
+  padding: 14px 10px 14px 0;
+  font-weight: 600;
+  text-align: left;
+  vertical-align: top;
+}
+
+.admin-post-widget-form-table td {
+  padding: 10px 0;
+  vertical-align: top;
+}
+
+.admin-post-widget-form-table-secondary {
+  margin-top: 8px;
+  border-top: 1px solid var(--admin-border);
+}
+
+.admin-post-widget-input,
+.admin-post-widget-select {
+  box-sizing: border-box;
+  padding: 4px 8px;
+  border: 1px solid #8c8f94;
+  border-radius: 3px;
+  background: #fff;
+  color: var(--admin-text);
+  font: inherit;
+  font-size: 13px;
+}
+
+.admin-post-widget-input-small {
+  width: 64px;
+}
+
+.admin-post-widget-input-wide {
+  width: min(100%, 420px);
+}
+
+.admin-post-widget-input:focus,
+.admin-post-widget-select:focus {
+  border-color: var(--admin-accent);
+  outline: 2px solid rgba(34, 113, 177, 0.25);
+  outline-offset: 0;
+}
+
+.admin-post-widget-inline-field {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-post-widget-inline-actions {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.admin-post-widget-query-time {
+  font-size: 13px;
+  color: var(--admin-text);
+}
+
+.admin-post-widget-help {
+  margin: 6px 0 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--admin-text-muted);
+}
+
+.admin-post-widget-checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--admin-text);
+  cursor: pointer;
+}
+
+.admin-post-widget-checkbox input {
+  margin: 0;
+}
+
+.admin-post-widget-submit-wrap {
+  margin: 8px 0 0;
+  padding-left: 0;
+}
+
+.admin-post-widget-submit-wrap-row {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.admin-post-widget-add-tab-wrap {
+  margin: 0 0 16px;
+}
+
+.admin-post-widget-card-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.admin-post-widget-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px;
+  background: var(--admin-card-bg);
+  border: 1px solid var(--admin-border);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+}
+
+.admin-post-widget-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.admin-post-widget-card-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--admin-text-muted);
+  cursor: pointer;
+}
+
+.admin-post-widget-card-remove:hover {
+  color: var(--admin-text);
+}
+
+.admin-post-widget-card-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--admin-text);
+}
+
+.admin-post-widget-card-field > span {
+  font-weight: 600;
+}
+
+.admin-post-widget-icon-preview {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  color: #d63638;
+  background: #fff;
+  border: 1px solid var(--admin-border);
+}
+
+.admin-post-widget-card-edit {
+  width: 100%;
+  justify-content: center;
+}
+
 @media (max-width: 960px) {
   .admin-media-page-layout {
     grid-template-columns: 1fr;
@@ -3342,6 +3569,27 @@
   .admin-categories-search-wrap-end {
     width: 100%;
     justify-content: flex-end;
+  }
+
+  .admin-post-widget-form-table th {
+    width: auto;
+    display: block;
+    padding-bottom: 4px;
+  }
+
+  .admin-post-widget-form-table td {
+    display: block;
+    padding-top: 0;
+    padding-bottom: 14px;
+  }
+
+  .admin-post-widget-form-table tr {
+    display: block;
+    border-bottom: 1px solid #f0f0f1;
+  }
+
+  .admin-post-widget-card-grid {
+    grid-template-columns: 1fr;
   }
 }
 

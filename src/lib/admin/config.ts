@@ -75,7 +75,7 @@ export const adminPageTitles: Record<string, string> = {
   "/admin/posts/tags": "Tags",
   "/admin/media": "Media",
   "/admin/pages": "Pages",
-  "/admin/post-widgets": "Post Widget",
+  "/admin/post-widgets": "Post Widget Settings",
   "/admin/forms": "Forms",
   "/admin/bookings": "Bookings",
   "/admin/service-areas": "All Service Area",
