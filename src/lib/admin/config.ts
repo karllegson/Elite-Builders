@@ -59,7 +59,17 @@ export const adminNavItems: AdminNavItem[] = [
       { label: "Nested View", href: "/admin/service-areas/nested" },
     ],
   },
-  { label: "FAQs", href: "/admin/faqs", icon: "help-circle", phase: 3 },
+  {
+    label: "FAQs",
+    href: "/admin/faqs",
+    icon: "help-circle",
+    phase: 1,
+    children: [
+      { label: "All FAQs", href: "/admin/faqs" },
+      { label: "Add New FAQ", href: "/admin/faqs/new" },
+      { label: "Categories", href: "/admin/faqs/categories" },
+    ],
+  },
   { label: "Reviews", href: "/admin/reviews", icon: "star", phase: 3 },
   { label: "SEO", href: "/admin/seo", icon: "search", phase: 3 },
   { label: "Site Config", href: "/admin/site-config", icon: "sliders-horizontal", phase: 3 },
@@ -93,8 +103,15 @@ export const adminPageTitles: Record<string, string> = {
   "/admin/service-areas": "Service Areas",
   "/admin/service-areas/new": "Add New Service Area",
   "/admin/service-areas/sorting": "Sorting",
+<<<<<<< HEAD
   "/admin/service-areas/nested": "Service Areas",
   "/admin/faqs": "FAQs",
+=======
+  "/admin/service-areas/nested": "Nested View",
+  "/admin/faqs": "All FAQs",
+  "/admin/faqs/new": "Add New FAQ",
+  "/admin/faqs/categories": "Categories",
+>>>>>>> 041dc2c (feat(admin): added functions on FAQ Section)
   "/admin/reviews": "Reviews",
   "/admin/seo": "SEO",
   "/admin/site-config": "Site Config",

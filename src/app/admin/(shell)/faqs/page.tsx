@@ -1,5 +1,10 @@
-import { ComingSoon } from "@/components/admin/ComingSoon";
+import { Suspense } from "react";
+import { FaqsList } from "@/components/admin/faqs/FaqsList";
 
 export default function AdminFaqsPage() {
-  return <ComingSoon phase={3} />;
+  return (
+    <Suspense fallback={<p className="admin-faqs-loading">Loading FAQs…</p>}>
+      <FaqsList />
+    </Suspense>
+  );
 }
