@@ -12,12 +12,39 @@ const pageActions: Record<string, { href: string; label: string }[]> = {
     { href: "/admin/pages/new?mode=link", label: "Add Link" },
   ],
   "/admin/pages/default": [{ href: "/admin/pages/new", label: "Add Page" }],
+const pageActions: Record<string, { href: string; label: string }> = {
+  "/admin/posts": { href: "/admin/posts/new", label: "Add Post" },
+  "/admin/service-areas": { href: "/admin/service-areas/new", label: "Add New Service Area" },
 };
+
+function resolvePageTitle(pathname: string): string {
+  if (pathname.startsWith("/admin/service-areas/") && pathname !== "/admin/service-areas/new") {
+    const segment = pathname.split("/").pop();
+
+    if (segment && segment !== "sorting" && segment !== "nested") {
+      return "Edit Service Area";
+    }
+  }
+
+  return adminPageTitles[pathname] ?? "Administration";
+}
+
+function resolvePageAction(pathname: string): { href: string; label: string } | undefined {
+  if (pathname.startsWith("/admin/service-areas/") && pathname !== "/admin/service-areas/new") {
+    const segment = pathname.split("/").pop();
+
+    if (segment && segment !== "sorting" && segment !== "nested") {
+      return { href: "/admin/service-areas/new", label: "Add New Service Area" };
+    }
+  }
+
+  return pageActions[pathname];
+}
 
 export function AdminContentHeader() {
   const pathname = usePathname();
-  const title = adminPageTitles[pathname] ?? "Administration";
-  const action = pageActions[pathname];
+  const title = resolvePageTitle(pathname);
+  const action = resolvePageAction(pathname);
 
   return (
     <div className="admin-content-header">

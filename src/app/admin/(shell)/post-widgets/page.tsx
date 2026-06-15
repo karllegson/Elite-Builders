@@ -1,5 +1,5 @@
-import { ComingSoon } from "@/components/admin/ComingSoon";
+import { PostWidgetSettings } from "@/components/admin/post-widgets/PostWidgetSettings";
 
 export default function AdminPostWidgetsPage() {
-  return <ComingSoon phase={3} />;
+  return <PostWidgetSettings />;
 }
