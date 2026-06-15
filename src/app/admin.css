@@ -3246,6 +3246,57 @@
   cursor: pointer;
 }
 
+.admin-categories-name-text {
+  color: var(--admin-accent);
+  font-weight: 600;
+}
+
+.admin-categories-row-actions {
+  visibility: hidden;
+  margin-top: 4px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.admin-categories-table tbody tr:hover .admin-categories-row-actions,
+.admin-categories-table tbody tr:focus-within .admin-categories-row-actions,
+.admin-faqs-table tbody tr:hover .admin-categories-row-actions,
+.admin-faqs-table tbody tr:focus-within .admin-categories-row-actions {
+  visibility: visible;
+}
+
+.admin-categories-row-action {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--admin-accent);
+  font: inherit;
+  font-size: 13px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.admin-categories-row-action:hover {
+  color: var(--admin-accent-hover);
+}
+
+.admin-categories-row-action-delete {
+  color: #b32d2e;
+}
+
+.admin-categories-row-action-delete:hover {
+  color: #8a2424;
+}
+
+.admin-categories-row-action-sep {
+  margin: 0 4px;
+  color: #c3c4c7;
+}
+
+.admin-categories-cancel-edit {
+  margin-top: 8px;
+}
+
 .admin-categories-name-link:hover,
 .admin-categories-count-link:hover {
   color: var(--admin-accent-hover);
@@ -3380,4 +3431,234 @@
   .admin-main {
     margin-left: 48px;
   }
+}
+
+/* -------------------------------------------------------------------------- */
+/* FAQs admin                                                                 */
+/* -------------------------------------------------------------------------- */
+.admin-faqs-loading {
+  margin: 0;
+  font-size: 13px;
+  color: var(--admin-text-muted);
+}
+
+.admin-faqs-category-filter {
+  margin: 0 0 12px;
+  padding: 8px 12px;
+  background: #fff;
+  border: 1px solid var(--admin-border);
+  border-left: 4px solid var(--admin-accent);
+  font-size: 13px;
+  color: var(--admin-text);
+}
+
+.admin-faqs-table .admin-faqs-col-categories {
+  width: 220px;
+}
+
+.admin-categories-count-link {
+  text-decoration: none;
+}
+
+.admin-categories-count-link:hover {
+  text-decoration: underline;
+}
+
+.admin-categories-count-empty {
+  color: var(--admin-text-muted);
+}
+
+a.admin-posts-taxonomy-link {
+  text-decoration: none;
+}
+
+/* FAQ Quick Edit (inline row) */
+.admin-quick-edit-row td {
+  padding: 12px 10px 14px;
+  background: #f6f7f7;
+  border-top: 1px solid #c3c4c7;
+  border-bottom: 1px solid #c3c4c7;
+  vertical-align: top;
+}
+
+.admin-quick-edit-form {
+  display: grid;
+  grid-template-columns: minmax(220px, 1.2fr) minmax(200px, 0.9fr) minmax(120px, 0.5fr);
+  gap: 12px 20px;
+  align-items: start;
+}
+
+.admin-quick-edit-col-main {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.admin-quick-edit-heading {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--admin-text);
+}
+
+.admin-quick-edit-field {
+  margin: 0;
+  border: 0;
+  padding: 0;
+  min-width: 0;
+}
+
+.admin-quick-edit-field-label {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--admin-text);
+}
+
+.admin-quick-edit-input {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 4px 8px;
+  border: 1px solid #8c8f94;
+  border-radius: 0;
+  background: #fff;
+  font: inherit;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.admin-quick-edit-date {
+  margin-top: 2px;
+}
+
+.admin-quick-edit-date-fields {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+
+.admin-quick-edit-date-part {
+  padding: 3px 6px;
+  border: 1px solid #8c8f94;
+  border-radius: 0;
+  background: #fff;
+  font: inherit;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.admin-quick-edit-date-part.is-day {
+  width: 2.5em;
+}
+
+.admin-quick-edit-date-part.is-month {
+  min-width: 4.5em;
+}
+
+.admin-quick-edit-date-part.is-year {
+  width: 4em;
+}
+
+.admin-quick-edit-date-part.is-hour,
+.admin-quick-edit-date-part.is-minute {
+  width: 2.5em;
+}
+
+.admin-quick-edit-date-at,
+.admin-quick-edit-date-colon {
+  font-size: 13px;
+  color: var(--admin-text-muted);
+}
+
+.admin-quick-edit-password-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 8px 10px;
+}
+
+.admin-quick-edit-password {
+  flex: 1 1 140px;
+  min-width: 120px;
+}
+
+.admin-quick-edit-or {
+  padding-bottom: 6px;
+  font-size: 12px;
+  color: var(--admin-text-muted);
+}
+
+.admin-quick-edit-private {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding-bottom: 6px;
+  font-size: 13px;
+  color: var(--admin-text);
+  cursor: pointer;
+}
+
+.admin-quick-edit-col-categories {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.admin-quick-edit-category-list {
+  max-height: 180px;
+  overflow: auto;
+  padding: 8px 10px;
+  border: 1px solid #c3c4c7;
+  background: #fff;
+}
+
+.admin-quick-edit-category-list .admin-category-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin: 0 0 6px;
+  font-size: 13px;
+  line-height: 1.35;
+  cursor: pointer;
+}
+
+.admin-quick-edit-category-list .admin-category-item:last-child {
+  margin-bottom: 0;
+}
+
+.admin-quick-edit-col-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.admin-quick-edit-order {
+  width: 72px;
+}
+
+.admin-quick-edit-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.admin-faqs-table .admin-quick-edit-row:hover {
+  background: transparent;
+}
+
+@media (max-width: 960px) {
+  .admin-quick-edit-form {
+    grid-template-columns: 1fr;
+  }
+}
+
+a.admin-posts-taxonomy-link:hover {
+  text-decoration: underline;
 }
