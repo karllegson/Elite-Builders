@@ -1,5 +1,5 @@
-import { ComingSoon } from "@/components/admin/ComingSoon";
+import { PagesManager } from "@/components/admin/pages/PagesManager";
 
 export default function AdminPagesPage() {
-  return <ComingSoon phase={2} />;
+  return <PagesManager />;
 }

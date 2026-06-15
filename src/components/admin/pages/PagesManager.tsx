@@ -1,0 +1,515 @@
+"use client";
+
+import {
+  ArrowDown,
+  ArrowDownToLine,
+  ArrowUp,
+  ArrowUpToLine,
+  ChevronDown,
+  ChevronRight,
+  Copy,
+  FilePlus2,
+  GripVertical,
+  Link2,
+  MoreHorizontal,
+  Trash2,
+} from "lucide-react";
+import { PageQuickEdit } from "@/components/admin/pages/PageQuickEdit";
+import {
+  getDefaultQuickEditValues,
+  type PageQuickEditTab,
+  type PageQuickEditValues,
+} from "@/lib/admin/pageQuickEdit";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import {
+  countPages,
+  filterPageRows,
+  flattenPageTree,
+  getDefaultExpandedPageIds,
+  getPlaceholderPages,
+  getViewLabel,
+  PAGE_LIST_VIEWS,
+  PAGE_ROW_MORE_MENU_ITEMS,
+  type FlatPageRow,
+  type PageListView,
+  type PageRowMoreMenuAction,
+  type PageTreeItem,
+} from "@/lib/admin/pagesList";
+
+const PAGE_ROW_MENU_ICONS: Record<
+  PageRowMoreMenuAction,
+  ReactNode
+> = {
+  "add-child-link": <Link2 size={16} aria-hidden />,
+  "add-child-page": <FilePlus2 size={16} aria-hidden />,
+  "insert-before": <ArrowUpToLine size={16} aria-hidden />,
+  "insert-after": <ArrowDownToLine size={16} aria-hidden />,
+  "push-top": <ArrowUp size={16} aria-hidden />,
+  "push-bottom": <ArrowDown size={16} aria-hidden />,
+  clone: <Copy size={16} aria-hidden />,
+};
+
+function PageRowMoreMenu({
+  row,
+  isOpen,
+  onToggle,
+  onClose,
+  onSelect,
+}: {
+  row: FlatPageRow;
+  isOpen: boolean;
+  onToggle: () => void;
+  onClose: () => void;
+  onSelect: (action: PageRowMoreMenuAction) => void;
+}) {
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    const handlePointerDown = (event: MouseEvent) => {
+      if (!menuRef.current?.contains(event.target as Node)) {
+        onClose();
+      }
+    };
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        onClose();
+      }
+    };
+
+    document.addEventListener("mousedown", handlePointerDown);
+    document.addEventListener("keydown", handleEscape);
+
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, [isOpen, onClose]);
+
+  return (
+    <div
+      ref={menuRef}
+      className={`admin-pages-more-menu-wrap${isOpen ? " is-open" : ""}`}
+    >
+      <button
+        type="button"
+        className="admin-pages-icon-btn"
+        aria-label={`More actions for ${row.title}`}
+        aria-expanded={isOpen}
+        aria-haspopup="menu"
+        onClick={(event) => {
+          event.stopPropagation();
+          onToggle();
+        }}
+      >
+        <MoreHorizontal size={16} aria-hidden />
+      </button>
+      {isOpen ? (
+        <ul className="admin-pages-more-menu" role="menu">
+          {PAGE_ROW_MORE_MENU_ITEMS.map((item) => {
+            const isDisabled = item.disabled?.(row) ?? false;
+
+            return (
+              <li key={item.id} role="none">
+                <button
+                  type="button"
+                  role="menuitem"
+                  className="admin-pages-more-menu-item"
+                  disabled={isDisabled}
+                  onClick={() => {
+                    if (isDisabled) {
+                      return;
+                    }
+
+                    onSelect(item.id);
+                    onClose();
+                  }}
+                >
+                  <span className="admin-pages-more-menu-icon">
+                    {PAGE_ROW_MENU_ICONS[item.id]}
+                  </span>
+                  <span>{item.label}</span>
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      ) : null}
+    </div>
+  );
+}
+
+function PageRow({
+  row,
+  isExpanded,
+  isSelected,
+  isMoreMenuOpen,
+  isQuickEditOpen,
+  onToggleExpand,
+  onToggleSelect,
+  onToggleMoreMenu,
+  onCloseMoreMenu,
+  onMoreMenuAction,
+  onQuickEdit,
+}: {
+  row: FlatPageRow;
+  isExpanded: boolean;
+  isSelected: boolean;
+  isMoreMenuOpen: boolean;
+  isQuickEditOpen: boolean;
+  onToggleExpand: (id: string) => void;
+  onToggleSelect: (id: string) => void;
+  onToggleMoreMenu: (id: string) => void;
+  onCloseMoreMenu: () => void;
+  onMoreMenuAction: (row: FlatPageRow, action: PageRowMoreMenuAction) => void;
+  onQuickEdit: () => void;
+}) {
+  return (
+    <div
+      className={`admin-pages-row${isMoreMenuOpen ? " is-more-menu-open" : ""}${isQuickEditOpen ? " is-quick-edit-active" : ""}`}
+    >
+      <div
+        className="admin-pages-row-main"
+        style={{ paddingLeft: `${12 + row.depth * 24}px` }}
+      >
+        {row.hasChildren ? (
+          <button
+            type="button"
+            className="admin-pages-expand-btn"
+            aria-label={isExpanded ? "Collapse section" : "Expand section"}
+            aria-expanded={isExpanded}
+            onClick={() => onToggleExpand(row.id)}
+          >
+            {isExpanded ? (
+              <ChevronDown size={14} aria-hidden />
+            ) : (
+              <ChevronRight size={14} aria-hidden />
+            )}
+          </button>
+        ) : (
+          <span className="admin-pages-expand-spacer" aria-hidden />
+        )}
+
+        <span className="admin-pages-drag-handle" aria-hidden>
+          <GripVertical size={14} />
+        </span>
+
+        <div className="admin-pages-row-title-wrap">
+          <button type="button" className="admin-pages-title-link">
+            {row.title}
+          </button>
+          {row.suffix ? (
+            <span className="admin-pages-title-suffix"> — {row.suffix}</span>
+          ) : null}
+          <span className="admin-pages-row-hover-actions admin-pages-inline-actions">
+            <button type="button" className="admin-inline-link">
+              Download
+            </button>
+            <button type="button" className="admin-inline-link">
+              Duplicate
+            </button>
+          </span>
+        </div>
+      </div>
+
+      <div className="admin-pages-row-actions">
+        <div className="admin-pages-row-hover-actions admin-pages-row-hover-actions-end">
+          <PageRowMoreMenu
+            row={row}
+            isOpen={isMoreMenuOpen}
+            onToggle={() => onToggleMoreMenu(row.id)}
+            onClose={onCloseMoreMenu}
+            onSelect={(action) => onMoreMenuAction(row, action)}
+          />
+          <button
+            type="button"
+            className="admin-btn-secondary admin-pages-action-btn"
+            onClick={onQuickEdit}
+          >
+            Quick Edit
+          </button>
+          <button type="button" className="admin-btn-secondary admin-pages-action-btn">
+            View
+          </button>
+          <button
+            type="button"
+            className="admin-pages-trash-btn"
+            aria-label={`Trash ${row.title}`}
+          >
+            <Trash2 size={14} aria-hidden />
+          </button>
+        </div>
+        <label className="admin-pages-checkbox">
+          <input
+            type="checkbox"
+            checked={isSelected}
+            onChange={() => onToggleSelect(row.id)}
+            aria-label={`Select ${row.title}`}
+          />
+        </label>
+      </div>
+    </div>
+  );
+}
+
+export function PagesManager({ initialView = "all" }: { initialView?: PageListView }) {
+  const [pages] = useState<PageTreeItem[]>(() => getPlaceholderPages());
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(
+    () => new Set(getDefaultExpandedPageIds(getPlaceholderPages())),
+  );
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [view, setView] = useState<PageListView>(initialView);
+  const [searchInput, setSearchInput] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [syncMenu, setSyncMenu] = useState(false);
+  const [statusMessage, setStatusMessage] = useState("");
+  const [openMoreMenuId, setOpenMoreMenuId] = useState<string | null>(null);
+  const [quickEditRowId, setQuickEditRowId] = useState<string | null>(null);
+  const [quickEditTab, setQuickEditTab] = useState<PageQuickEditTab>("page");
+  const [quickEditDraft, setQuickEditDraft] = useState<PageQuickEditValues | null>(
+    null,
+  );
+
+  const counts = useMemo(() => countPages(pages), [pages]);
+
+  const flatRows = useMemo(
+    () => flattenPageTree(pages, expandedIds),
+    [expandedIds, pages],
+  );
+
+  const visibleRows = useMemo(
+    () => filterPageRows(flatRows, view, searchQuery),
+    [flatRows, searchQuery, view],
+  );
+
+  const quickEditRow = useMemo(
+    () => flatRows.find((item) => item.id === quickEditRowId) ?? null,
+    [flatRows, quickEditRowId],
+  );
+
+  const toggleExpand = (id: string) => {
+    setExpandedIds((current) => {
+      const next = new Set(current);
+
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+
+      return next;
+    });
+  };
+
+  const expandAll = () => {
+    setExpandedIds(new Set(getDefaultExpandedPageIds(pages)));
+    setStatusMessage("All sections expanded.");
+    window.setTimeout(() => setStatusMessage(""), 2000);
+  };
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds((current) => {
+      const next = new Set(current);
+
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+
+      return next;
+    });
+  };
+
+  const handleSearch = () => {
+    setSearchQuery(searchInput);
+  };
+
+  const toggleMoreMenu = (id: string) => {
+    setOpenMoreMenuId((current) => (current === id ? null : id));
+  };
+
+  const handleMoreMenuAction = (
+    row: FlatPageRow,
+    action: PageRowMoreMenuAction,
+  ) => {
+    const label =
+      PAGE_ROW_MORE_MENU_ITEMS.find((item) => item.id === action)?.label ??
+      action;
+
+    setStatusMessage(`${label} — ${row.title}`);
+    window.setTimeout(() => setStatusMessage(""), 2000);
+  };
+
+  const openQuickEdit = (row: FlatPageRow) => {
+    setOpenMoreMenuId(null);
+    setQuickEditRowId(row.id);
+    setQuickEditTab("page");
+    setQuickEditDraft(getDefaultQuickEditValues(row));
+  };
+
+  const closeQuickEdit = () => {
+    setQuickEditRowId(null);
+    setQuickEditDraft(null);
+    setQuickEditTab("page");
+  };
+
+  useEffect(() => {
+    if (!quickEditRowId) {
+      return;
+    }
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        closeQuickEdit();
+      }
+    };
+
+    document.addEventListener("keydown", handleEscape);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, [quickEditRowId]);
+
+  const handleQuickEditUpdate = () => {
+    const row = flatRows.find((item) => item.id === quickEditRowId);
+
+    if (row) {
+      setStatusMessage(`Page updated — ${row.title}`);
+      window.setTimeout(() => setStatusMessage(""), 2000);
+    }
+
+    closeQuickEdit();
+  };
+
+  return (
+    <div className="admin-pages-manager">
+      <div className="admin-pages-toolbar-top">
+        <label className="admin-pages-sync-menu">
+          <input
+            type="checkbox"
+            checked={syncMenu}
+            onChange={(event) => setSyncMenu(event.target.checked)}
+          />
+          <span>Sync Menu</span>
+        </label>
+        <button type="button" className="admin-btn-secondary" onClick={expandAll}>
+          Expand All
+        </button>
+      </div>
+
+      {statusMessage ? (
+        <p className="admin-pages-status-message" role="status">
+          {statusMessage}
+        </p>
+      ) : null}
+
+      <ul className="admin-pages-views">
+        {PAGE_LIST_VIEWS.map((item, index) => {
+          const isActive = view === item.value;
+          const label =
+            item.value === "hidden"
+              ? getViewLabel("hidden", counts)
+              : item.label;
+
+          return (
+            <li key={item.value}>
+              {index > 0 ? <span className="admin-pages-view-sep"> | </span> : null}
+              <button
+                type="button"
+                className={`admin-pages-view-link${isActive ? " is-current" : ""}`}
+                onClick={() => setView(item.value)}
+              >
+                {label}
+              </button>
+            </li>
+          );
+        })}
+      </ul>
+
+      <div className="admin-pages-search-wrap">
+        <label className="screen-reader-text" htmlFor="pages-search">
+          Search Pages
+        </label>
+        <input
+          id="pages-search"
+          type="search"
+          className="admin-pages-search-input"
+          placeholder=""
+          value={searchInput}
+          onChange={(event) => setSearchInput(event.target.value)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") {
+              event.preventDefault();
+              handleSearch();
+            }
+          }}
+        />
+        <button type="button" className="admin-btn-secondary" onClick={handleSearch}>
+          Search Pages
+        </button>
+      </div>
+
+      <div className="admin-pages-list-wrap">
+        {visibleRows.length === 0 ? (
+          <p className="admin-pages-empty">No pages found.</p>
+        ) : (
+          visibleRows.map((row) => (
+            <PageRow
+              key={row.id}
+              row={row}
+              isExpanded={expandedIds.has(row.id)}
+              isSelected={selectedIds.has(row.id)}
+              isMoreMenuOpen={openMoreMenuId === row.id}
+              isQuickEditOpen={quickEditRowId === row.id}
+              onToggleExpand={toggleExpand}
+              onToggleSelect={toggleSelect}
+              onToggleMoreMenu={toggleMoreMenu}
+              onCloseMoreMenu={() => setOpenMoreMenuId(null)}
+              onMoreMenuAction={handleMoreMenuAction}
+              onQuickEdit={() => openQuickEdit(row)}
+            />
+          ))
+        )}
+      </div>
+
+      {quickEditRow && quickEditDraft ? (
+        <div
+          className="admin-pages-quick-edit-overlay"
+          role="presentation"
+          onClick={closeQuickEdit}
+        >
+          <div
+            className="admin-pages-quick-edit-floating"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={`page-quick-edit-title-${quickEditRow.id}`}
+            onClick={(event) => event.stopPropagation()}
+          >
+            <span id={`page-quick-edit-title-${quickEditRow.id}`} className="screen-reader-text">
+              Quick edit {quickEditRow.title}
+            </span>
+            <PageQuickEdit
+              row={quickEditRow}
+              values={quickEditDraft}
+              activeTab={quickEditTab}
+              onTabChange={setQuickEditTab}
+              onChange={setQuickEditDraft}
+              onCancel={closeQuickEdit}
+              onUpdate={handleQuickEditUpdate}
+            />
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}

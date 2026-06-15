@@ -4,6 +4,14 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { adminPageTitles } from "@/lib/admin/config";
 
+const pageActions: Record<string, { href: string; label: string }[]> = {
+  "/admin/posts": [{ href: "/admin/posts/new", label: "Add Post" }],
+  "/admin/pages": [
+    { href: "/admin/pages/new", label: "Add" },
+    { href: "/admin/pages/new?mode=multiple", label: "Add Multiple" },
+    { href: "/admin/pages/new?mode=link", label: "Add Link" },
+  ],
+  "/admin/pages/default": [{ href: "/admin/pages/new", label: "Add Page" }],
 const pageActions: Record<string, { href: string; label: string }> = {
   "/admin/posts": { href: "/admin/posts/new", label: "Add Post" },
   "/admin/service-areas": { href: "/admin/service-areas/new", label: "Add New Service Area" },
@@ -43,9 +51,13 @@ export function AdminContentHeader() {
       <div className="admin-content-header-start">
         <h1 className="admin-content-header-title">{title}</h1>
         {action ? (
-          <Link href={action.href} className="admin-page-title-action">
-            {action.label}
-          </Link>
+          <div className="admin-page-title-actions">
+            {action.map((item) => (
+              <Link key={item.label} href={item.href} className="admin-page-title-action">
+                {item.label}
+              </Link>
+            ))}
+          </div>
         ) : null}
       </div>
       <button type="button" className="admin-screen-options">
