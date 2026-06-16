@@ -926,6 +926,63 @@
   font-size: 12px;
 }
 
+.admin-review-editor .admin-post-editor-sidebar {
+  align-self: flex-start;
+}
+
+.admin-review-toolbar-wrap {
+  position: relative;
+}
+
+.admin-review-toolbar-fullscreen {
+  position: absolute;
+  top: 44px;
+  right: 10px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  color: var(--admin-text-muted);
+  background: #fff;
+  border: 1px solid #c3c4c7;
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.admin-review-toolbar-fullscreen:hover {
+  color: var(--admin-accent);
+  border-color: var(--admin-accent);
+}
+
+.admin-review-editor-footer-start {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.admin-review-attributes-empty {
+  margin: 0;
+  font-size: 13px;
+  color: var(--admin-text-muted);
+}
+
+.admin-review-editor.is-editor-fullscreen .admin-post-editor-main {
+  position: relative;
+  z-index: 30;
+}
+
+.admin-review-editor.is-editor-fullscreen .admin-page-content-shell {
+  min-height: 70vh;
+}
+
+.admin-review-editor.is-editor-fullscreen .admin-page-content {
+  min-height: 70vh;
+}
+
 .admin-page-metabox {
   margin-top: 16px;
 }
@@ -3334,6 +3391,61 @@
   color: var(--admin-accent-hover);
 }
 
+/* Reviews list */
+.admin-reviews-list {
+  margin-top: 4px;
+}
+
+.admin-reviews-toolbar-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.admin-reviews-search-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.admin-reviews-table .admin-reviews-col-title {
+  width: 28%;
+  min-width: 180px;
+}
+
+.admin-reviews-col-reviewer {
+  width: 16%;
+  min-width: 130px;
+}
+
+.admin-reviews-col-categories {
+  width: 22%;
+  min-width: 160px;
+}
+
+.admin-reviews-table .admin-posts-col-date {
+  width: 14%;
+  min-width: 120px;
+}
+
+@media (max-width: 960px) {
+  .admin-reviews-toolbar-top {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .admin-reviews-search-wrap {
+    width: 100%;
+    margin-left: 0;
+    justify-content: flex-end;
+  }
+}
+
 /* -------------------------------------------------------------------------- */
 /* Categories & Tags taxonomy manager (shared layout)                           */
 /* -------------------------------------------------------------------------- */
@@ -3492,15 +3604,44 @@
 
 .admin-categories-tablenav-actions {
   display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 4px;
+}
+
+.admin-categories-tablenav-actions .admin-categories-select {
+  width: auto;
+  min-width: 120px;
+  min-height: 30px;
+  padding: 0 8px;
+  line-height: 1.2;
+  flex-shrink: 0;
+}
+
+.admin-categories-pagination {
+  display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 6px;
+  gap: 10px;
+  margin-left: auto;
+}
+
+.admin-review-categories-page .admin-categories-tablenav-bottom {
+  justify-content: space-between;
+}
+
+.admin-review-categories-table .admin-categories-col-name {
+  width: 28%;
 }
 
 .admin-categories-apply-btn {
   min-height: 30px;
+  height: 30px;
   padding: 0 10px;
   font-size: 13px;
+  line-height: 1;
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .admin-categories-search-wrap {

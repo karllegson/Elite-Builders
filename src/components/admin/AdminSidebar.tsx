@@ -67,7 +67,8 @@ function isSubNavItemActive(href: string, currentPath: string) {
     href === "/admin/posts" ||
     href === "/admin/service-areas" ||
     href === "/admin/pages" ||
-    href === "/admin/faqs"
+    href === "/admin/faqs" ||
+    href === "/admin/reviews"
   ) {
     return currentPath === href;
   }

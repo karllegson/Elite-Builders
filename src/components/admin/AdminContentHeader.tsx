@@ -18,6 +18,7 @@ const pageActions: Record<string, { href: string; label: string }[]> = {
     { href: "/admin/service-areas/new", label: "Add New Service Area" },
   ],
   "/admin/faqs": [{ href: "/admin/faqs/new", label: "Add New FAQ" }],
+  "/admin/reviews": [{ href: "/admin/reviews/new", label: "Add New Review" }],
 };
 
 function resolvePageTitle(pathname: string): string {
