@@ -1,5 +1,5 @@
-import { ComingSoon } from "@/components/admin/ComingSoon";
+import { FormsPageClient } from "@/components/admin/forms/FormsPageClient";
 
 export default function AdminFormsPage() {
-  return <ComingSoon phase={3} />;
+  return <FormsPageClient />;
 }
