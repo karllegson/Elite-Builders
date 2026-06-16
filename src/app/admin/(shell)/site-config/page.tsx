@@ -1,5 +1,5 @@
-import { ComingSoon } from "@/components/admin/ComingSoon";
+import { SiteConfigSettings } from "@/components/admin/site-config/SiteConfigSettings";
 
 export default function AdminSiteConfigPage() {
-  return <ComingSoon phase={3} />;
+  return <SiteConfigSettings />;
 }

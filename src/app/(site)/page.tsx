@@ -2,15 +2,14 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import {
   ArrowRight,
-  CheckCircle2,
   MapPin,
-  Phone,
   Quote,
   Star,
 } from "lucide-react";
 import ContentImage from "@/components/site/ContentImage";
 import EstimateForm from "@/components/site/EstimateForm";
 import HeroVideo from "@/components/site/HeroVideo";
+import HomeHeroContent from "@/components/site/HomeHeroContent";
 import BuilderPartnersSection from "@/components/site/BuilderPartnersSection";
 import BrandPillars from "@/components/site/BrandPillars";
 import TeamSection from "@/components/site/TeamSection";
@@ -21,7 +20,7 @@ import {
   services,
   teamMembers,
 } from "@/lib/site/config";
-import { heroBullets, heroIntro, homepageFaqs, integrityStatement } from "@/lib/site/messaging";
+import { homepageFaqs, integrityStatement } from "@/lib/site/messaging";
 import { homeImages, homepageGalleryImageKeys } from "@/lib/site/images";
 import { completedProjects, currentProjects, type Project } from "@/lib/site/projects";
 
@@ -220,45 +219,7 @@ export default function HomePage() {
         />
 
         <div className="site-container relative z-10 flex min-h-[75dvh] items-center py-10 sm:py-14">
-          <div className="max-w-xl text-white [text-shadow:0_2px_16px_rgba(0,0,0,0.45)]">
-            <p className="flex items-center gap-2 text-xs font-semibold italic text-brand-sky sm:text-sm">
-              <MapPin size={14} aria-hidden className="shrink-0 sm:size-4" />
-              {business.heroLocationLine}
-            </p>
-            <h1 className="mt-2 text-2xl font-bold leading-tight text-white sm:text-3xl lg:text-4xl">
-              {business.heroHeadline}
-            </h1>
-            <p className="mt-3 text-sm leading-relaxed text-white/90 sm:text-base">
-              {heroIntro}
-            </p>
-
-            <ul className="mt-5 space-y-2">
-              {heroBullets.map(({ lead, text }) => (
-                <li key={lead} className="flex items-start gap-2.5">
-                  <CheckCircle2 size={18} aria-hidden className="mt-0.5 shrink-0 text-brand-sky" />
-                  <p className="text-sm leading-snug text-white/85 sm:text-[0.9375rem]">
-                    <strong className="font-bold text-brand-sky">{lead}</strong> {text}
-                  </p>
-                </li>
-              ))}
-            </ul>
-
-            <div className="mt-7 flex flex-wrap items-center gap-3">
-              <Link
-                href="#estimate"
-                className="rounded-full bg-brand-red px-6 py-2.5 text-sm font-bold text-white transition-colors hover:bg-brand-red-dark sm:px-7 sm:py-3 sm:text-base"
-              >
-                Request a Free Estimate
-              </Link>
-              <a
-                href={business.phoneHref}
-                className="flex items-center gap-2 rounded-full border border-solid border-white/40 px-5 py-2.5 text-sm font-bold backdrop-blur-sm transition-colors hover:bg-white/10 sm:px-6 sm:py-3 sm:text-base"
-              >
-                <Phone size={18} aria-hidden />
-                {business.phone}
-              </a>
-            </div>
-          </div>
+          <HomeHeroContent />
         </div>
 
         {/* Floating review card — Arlington signature accent */}
