@@ -4,10 +4,12 @@ const audienceImages = [
   {
     src: "/images/who-we-serve/homeowners.png",
     alt: "Homeowner standing in front of a finished custom home built by Elite Builders",
+    objectFit: "contain" as const,
   },
   {
-    src: "/images/who-we-serve/builders-gc.png",
-    alt: "General contractor with blueprints on a residential construction job site",
+    src: "/images/who-we-serve/builders-tract-framing-aerial.png",
+    alt: "Aerial view of a large residential framing project with multiple homes under construction for production builders",
+    objectFit: "contain" as const,
   },
 ] as const;
 
@@ -31,7 +33,7 @@ export default function WhoWeServeCards({ items }: { items: readonly AudienceCar
               src={image.src}
               alt={image.alt}
               className="aspect-[16/10] sm:aspect-[3/2]"
-              objectFit="contain"
+              objectFit={image.objectFit}
               sizes="(max-width: 768px) 100vw, 560px"
               quality={88}
             />

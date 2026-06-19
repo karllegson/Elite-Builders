@@ -10,6 +10,8 @@ type ContentImageProps = {
   sizes?: string;
   quality?: number;
   objectFit?: "cover" | "contain";
+  /** Focal point when using cover, e.g. "center 30%" */
+  objectPosition?: string;
 };
 
 const defaultSizes = "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw";
@@ -22,6 +24,7 @@ export default function ContentImage({
   sizes = defaultSizes,
   quality = 85,
   objectFit = "cover",
+  objectPosition,
 }: ContentImageProps) {
   return (
     <div
@@ -37,6 +40,7 @@ export default function ContentImage({
         quality={quality}
         sizes={sizes}
         className={objectFit === "contain" ? "object-contain" : "object-cover"}
+        style={objectPosition ? { objectPosition } : undefined}
       />
     </div>
   );
