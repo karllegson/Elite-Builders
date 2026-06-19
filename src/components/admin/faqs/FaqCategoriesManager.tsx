@@ -13,6 +13,7 @@ import {
   type FaqCategorySortDirection,
   type FaqCategorySortKey,
 } from "@/lib/admin/faqCategoriesList";
+import { useAdminToast } from "@/components/admin/toast/useAdminToast";
 import {
   createFaqCategory,
   deleteFaqCategories,
@@ -145,6 +146,7 @@ function FaqCategoriesTablenav({
 }
 
 export function FaqCategoriesManager() {
+  const toast = useAdminToast();
   const [ready, setReady] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
 
@@ -172,7 +174,6 @@ export function FaqCategoriesManager() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [sortKey, setSortKey] = useState<FaqCategorySortKey>("name");
   const [sortDirection, setSortDirection] = useState<FaqCategorySortDirection>("asc");
-  const [statusMessage, setStatusMessage] = useState("");
   const [editingCategoryId, setEditingCategoryId] = useState<string | null>(null);
 
   const parentOptions = useMemo(() => {
@@ -227,7 +228,7 @@ export function FaqCategoriesManager() {
         description,
         parentId: parentId || null,
       });
-      setStatusMessage(`Category "${trimmedName}" updated.`);
+      toast.success(`Category "${trimmedName}" updated.`);
     } else {
       createFaqCategory({
         name: trimmedName,
@@ -235,12 +236,11 @@ export function FaqCategoriesManager() {
         description,
         parentId: parentId || null,
       });
-      setStatusMessage(`Category "${trimmedName}" added.`);
+      toast.success(`Category "${trimmedName}" added.`);
     }
 
     setRefreshKey((current) => current + 1);
     resetCategoryForm();
-    window.setTimeout(() => setStatusMessage(""), 2500);
   };
 
   const resetCategoryForm = () => {
@@ -274,8 +274,7 @@ export function FaqCategoriesManager() {
       resetCategoryForm();
     }
 
-    setStatusMessage(`Category "${category.name}" deleted.`);
-    window.setTimeout(() => setStatusMessage(""), 2500);
+    toast.success(`Category "${category.name}" deleted.`);
   };
 
   const handleSort = (key: FaqCategorySortKey) => {
@@ -320,8 +319,7 @@ export function FaqCategoriesManager() {
     }
 
     if (selectedIds.size === 0) {
-      setStatusMessage("Select at least one category.");
-      window.setTimeout(() => setStatusMessage(""), 2500);
+      toast.info("Select at least one category.");
       return;
     }
 
@@ -329,8 +327,7 @@ export function FaqCategoriesManager() {
       deleteFaqCategories([...selectedIds]);
       setRefreshKey((current) => current + 1);
       setSelectedIds(new Set());
-      setStatusMessage("Selected categories deleted.");
-      window.setTimeout(() => setStatusMessage(""), 2500);
+      toast.info("Selected categories deleted.");
     }
 
     setBulkAction("");
@@ -342,12 +339,6 @@ export function FaqCategoriesManager() {
 
   return (
     <div className="admin-categories-page">
-      {statusMessage ? (
-        <p className="admin-categories-status-message" role="status">
-          {statusMessage}
-        </p>
-      ) : null}
-
       <div className="admin-categories-layout">
         <section className="admin-categories-form-panel">
           <h2 className="admin-categories-form-title">
@@ -531,7 +522,7 @@ export function FaqCategoriesManager() {
                             type="button"
                             className="admin-categories-row-action"
                             onClick={() =>
-                              setStatusMessage("Quick Edit will be available in a future update.")
+                              toast.info("Quick Edit will be available in a future update.")
                             }
                           >
                             Quick Edit
@@ -562,7 +553,7 @@ export function FaqCategoriesManager() {
                             type="button"
                             className="admin-categories-row-action"
                             onClick={() =>
-                              setStatusMessage("Download will be available in a future update.")
+                              toast.info("Download will be available in a future update.")
                             }
                           >
                             Download

@@ -2,6 +2,7 @@
 
 import { GripVertical } from "lucide-react";
 import { useState } from "react";
+import { useAdminToast } from "@/components/admin/toast/useAdminToast";
 import { DEFAULT_POST_CREATION_FEEDS, type PostCreationFeedItem } from "@/lib/admin/formPostCreation";
 
 function PostCreationTableHead() {
@@ -25,27 +26,19 @@ function PostCreationTableHead() {
 }
 
 export function FormPostCreationList() {
+  const toast = useAdminToast();
   const [feeds] = useState<PostCreationFeedItem[]>(DEFAULT_POST_CREATION_FEEDS);
-  const [statusMessage, setStatusMessage] = useState("");
 
   const handleAddNew = () => {
-    setStatusMessage("Add New post creation feed is coming soon.");
-    window.setTimeout(() => setStatusMessage(""), 2500);
+    toast.info("Add New post creation feed is coming soon.");
   };
 
   const handleCreateOne = () => {
-    setStatusMessage("Create post creation feed is coming soon.");
-    window.setTimeout(() => setStatusMessage(""), 2500);
+    toast.info("Create post creation feed is coming soon.");
   };
 
   return (
     <div className="admin-form-post-creation">
-      {statusMessage ? (
-        <p className="admin-posts-status-message" role="status">
-          {statusMessage}
-        </p>
-      ) : null}
-
       <section className="admin-form-post-creation-panel">
         <header className="admin-form-post-creation-header">
           <h2 className="admin-form-post-creation-title">Post Creation Feeds</h2>

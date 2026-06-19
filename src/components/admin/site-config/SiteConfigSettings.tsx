@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState, type ChangeEvent, type FormEvent } from "react";
+import { useAdminToast } from "@/components/admin/toast/useAdminToast";
 import {
   readSiteConfigValues,
   siteConfigSections,
@@ -87,10 +88,10 @@ function SectionForm({
 }
 
 export function SiteConfigSettings() {
+  const toast = useAdminToast();
   const [activeSectionId, setActiveSectionId] = useState(siteConfigSections[0]?.id ?? "");
   const [values, setValues] = useState<SiteConfigValues>({});
   const [ready, setReady] = useState(false);
-  const [statusMessage, setStatusMessage] = useState("");
 
   useEffect(() => {
     setValues(readSiteConfigValues());
@@ -104,8 +105,7 @@ export function SiteConfigSettings() {
 
   const handleSave = () => {
     writeSiteConfigValues(values);
-    setStatusMessage(`Saved ${activeSection.label} settings.`);
-    window.setTimeout(() => setStatusMessage(""), 2200);
+    toast.success(`Saved ${activeSection.label} settings.`);
   };
 
   const handleChange = (key: string, value: string) => {
@@ -121,12 +121,6 @@ export function SiteConfigSettings() {
       <p className="admin-site-config-description">
         Configure the information displayed on your site.
       </p>
-
-      {statusMessage ? (
-        <p className="admin-site-config-status" role="status">
-          {statusMessage}
-        </p>
-      ) : null}
 
       <nav className="admin-site-config-tabs" aria-label="Site config sections">
         {siteConfigSections.map((section) => (

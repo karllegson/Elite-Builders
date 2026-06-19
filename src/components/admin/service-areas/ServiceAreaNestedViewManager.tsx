@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { useAdminToast } from "@/components/admin/toast/useAdminToast";
 import {
   buildFilteredServiceAreaTree,
   collectExpandableIds,
@@ -184,6 +185,7 @@ function NestedServiceAreaRow({
 }
 
 export function ServiceAreaNestedViewManager() {
+  const toast = useAdminToast();
   const [areas, setAreas] = useState<ServiceAreaRecord[]>(() => listNestedServiceAreas());
   const [view, setView] = useState<NestedListView>("all");
   const [showHidden, setShowHidden] = useState(false);
@@ -192,7 +194,6 @@ export function ServiceAreaNestedViewManager() {
   const [expandedIds, setExpandedIds] = useState<Set<string>>(() => new Set());
   const [selectedIds, setSelectedIds] = useState<Set<string>>(() => new Set());
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
-  const [statusMessage, setStatusMessage] = useState("");
 
   const counts = useMemo(() => getNestedViewCounts(areas), [areas]);
 
@@ -217,8 +218,7 @@ export function ServiceAreaNestedViewManager() {
   );
 
   const showStatus = (message: string) => {
-    setStatusMessage(message);
-    window.setTimeout(() => setStatusMessage(""), 3500);
+    toast.success(message);
   };
 
   const refreshAreas = () => {
@@ -278,12 +278,6 @@ export function ServiceAreaNestedViewManager() {
 
   return (
     <div className="admin-sa-nested-page">
-      {statusMessage ? (
-        <p className="admin-categories-status-message" role="status">
-          {statusMessage}
-        </p>
-      ) : null}
-
       <div className="admin-sa-nested-header">
         <div className="admin-sa-nested-header-actions">
           <Link href="/admin/service-areas/new" className="admin-btn-primary-inline">

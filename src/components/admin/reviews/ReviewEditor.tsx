@@ -4,13 +4,14 @@ import { Maximize2, Settings2 } from "lucide-react";
 import { useMemo, useRef, useState } from "react";
 import { PageEditorToolbar } from "@/components/admin/pages/PageEditorToolbar";
 import { ReviewEditorSidebar } from "@/components/admin/reviews/ReviewEditorSidebar";
+import { useAdminToast } from "@/components/admin/toast/useAdminToast";
 import { countWords } from "@/lib/admin/postEditor";
 
 export function ReviewEditor() {
+  const toast = useAdminToast();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [toolbarMessage, setToolbarMessage] = useState("");
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   const wordCount = countWords(content);
@@ -20,8 +21,7 @@ export function ReviewEditor() {
   }, [content]);
 
   const handleMediaAction = (label: string) => {
-    setToolbarMessage(label);
-    window.setTimeout(() => setToolbarMessage(""), 2000);
+    toast.info(label);
   };
 
   return (
@@ -39,12 +39,6 @@ export function ReviewEditor() {
           onChange={(event) => setTitle(event.target.value)}
           autoComplete="off"
         />
-
-        {toolbarMessage ? (
-          <p className="admin-page-toolbar-message" role="status">
-            {toolbarMessage}
-          </p>
-        ) : null}
 
         <div className="admin-review-toolbar-wrap">
           <PageEditorToolbar

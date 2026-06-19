@@ -1,4 +1,5 @@
 import { AdminContentHeader } from "@/components/admin/AdminContentHeader";
+import { AdminShellProviders } from "@/components/admin/AdminShellProviders";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { AdminToolbar } from "@/components/admin/AdminToolbar";
 import { bypassAdminUser, isAuthBypassEnabled } from "@/lib/admin/auth";
@@ -35,18 +36,20 @@ export default async function AdminShellLayout({
   }
 
   return (
-    <div className="admin-shell">
-      <AdminToolbar
-        userEmail={userEmail}
-        displayName={displayName}
-        userRole={siteConfig.defaultUserRole}
-        authBypass={bypass}
-      />
-      <AdminSidebar />
-      <main className="admin-main">
-        <AdminContentHeader />
-        <div className="admin-content">{children}</div>
-      </main>
-    </div>
+    <AdminShellProviders>
+      <div className="admin-shell">
+        <AdminToolbar
+          userEmail={userEmail}
+          displayName={displayName}
+          userRole={siteConfig.defaultUserRole}
+          authBypass={bypass}
+        />
+        <AdminSidebar />
+        <main className="admin-main">
+          <AdminContentHeader />
+          <div className="admin-content">{children}</div>
+        </main>
+      </div>
+    </AdminShellProviders>
   );
 }

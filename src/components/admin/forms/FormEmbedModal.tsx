@@ -2,6 +2,7 @@
 
 import { Copy, ExternalLink, X } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useAdminToast } from "@/components/admin/toast/useAdminToast";
 import { getFormShortcode, type EmbedContentType } from "@/lib/admin/formEmbed";
 
 export type FormEmbedModalProps = {
@@ -11,11 +12,11 @@ export type FormEmbedModalProps = {
 };
 
 export function FormEmbedModal({ isOpen, formId, onClose }: FormEmbedModalProps) {
+  const toast = useAdminToast();
   const [existingType, setExistingType] = useState<EmbedContentType>("page");
   const [createType, setCreateType] = useState<EmbedContentType>("page");
   const [selectedPage, setSelectedPage] = useState("");
   const [newPageName, setNewPageName] = useState("");
-  const [statusMessage, setStatusMessage] = useState("");
 
   const shortcode = getFormShortcode(formId);
 
@@ -47,7 +48,6 @@ export function FormEmbedModal({ isOpen, formId, onClose }: FormEmbedModalProps)
       setCreateType("page");
       setSelectedPage("");
       setNewPageName("");
-      setStatusMessage("");
     }
   }, [isOpen]);
 
@@ -56,8 +56,7 @@ export function FormEmbedModal({ isOpen, formId, onClose }: FormEmbedModalProps)
   }
 
   const showStatus = (message: string) => {
-    setStatusMessage(message);
-    window.setTimeout(() => setStatusMessage(""), 2500);
+    toast.success(message);
   };
 
   const handleInsertForm = () => {
@@ -109,12 +108,6 @@ export function FormEmbedModal({ isOpen, formId, onClose }: FormEmbedModalProps)
         </div>
 
         <div className="admin-link-modal-body admin-form-embed-body">
-          {statusMessage ? (
-            <p className="admin-form-embed-status" role="status">
-              {statusMessage}
-            </p>
-          ) : null}
-
           <div className="admin-form-embed-id">Form ID: {formId}</div>
 
           <section className="admin-form-embed-section">

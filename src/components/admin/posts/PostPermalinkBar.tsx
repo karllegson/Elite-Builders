@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { buildBlogPermalinkUrl, slugify } from "@/lib/admin/postSeo";
-import { business } from "@/lib/site/config";
+import { useAdminSiteUrl } from "@/lib/admin/siteUrl";
 
 type PostPermalinkBarProps = {
   slug: string;
@@ -10,10 +10,11 @@ type PostPermalinkBarProps = {
 };
 
 export function PostPermalinkBar({ slug, onSlugChange }: PostPermalinkBarProps) {
+  const siteUrl = useAdminSiteUrl();
   const [isEditing, setIsEditing] = useState(false);
   const [draftSlug, setDraftSlug] = useState(slug);
-  const permalinkUrl = buildBlogPermalinkUrl(business.domain, slug);
-  const permalinkBase = `${business.domain.replace(/\/$/, "")}/blog/`;
+  const permalinkUrl = buildBlogPermalinkUrl(siteUrl, slug);
+  const permalinkBase = `${siteUrl}/blog/`;
 
   useEffect(() => {
     if (!isEditing) {

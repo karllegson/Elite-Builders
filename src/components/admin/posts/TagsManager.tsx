@@ -1,9 +1,14 @@
 "use client";
 
 import { ArrowDown, ArrowUp } from "lucide-react";
-import { useMemo, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
+import { useAdminToast } from "@/components/admin/toast/useAdminToast";
 import {
-  createTagListItem,
+  createTagAction,
+  deleteTagsAction,
+  fetchTagsWithCountsAction,
+} from "@/app/admin/(shell)/posts/actions";
+import {
   filterTags,
   slugifyTagName,
   sortTags,
@@ -196,6 +201,7 @@ function TagsTableHead({
 
 export function TagsManager() {
   const [tags, setTags] = useState<TagListItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
   const [slugTouched, setSlugTouched] = useState(false);
@@ -206,7 +212,26 @@ export function TagsManager() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [sortKey, setSortKey] = useState<TagSortKey>("name");
   const [sortDirection, setSortDirection] = useState<TagSortDirection>("asc");
-  const [statusMessage, setStatusMessage] = useState("");
+  const toast = useAdminToast();
+
+  const loadTags = useCallback(async () => {
+    setIsLoading(true);
+    const items = await fetchTagsWithCountsAction();
+    setTags(
+      items.map((tag) => ({
+        id: tag.id,
+        name: tag.name,
+        slug: tag.slug,
+        description: tag.description,
+        postCount: tag.postCount,
+      })),
+    );
+    setIsLoading(false);
+  }, []);
+
+  useEffect(() => {
+    void loadTags();
+  }, [loadTags]);
 
   const filteredTags = useMemo(
     () => filterTags(tags, searchQuery),
@@ -235,7 +260,7 @@ export function TagsManager() {
     setSlug(value);
   };
 
-  const handleAddTag = (event: FormEvent) => {
+  const handleAddTag = async (event: FormEvent) => {
     event.preventDefault();
 
     const trimmedName = name.trim();
@@ -244,15 +269,23 @@ export function TagsManager() {
       return;
     }
 
-    const tag = createTagListItem(trimmedName, { slug, description });
+    const result = await createTagAction({
+      name: trimmedName,
+      slug,
+      description,
+    });
 
-    setTags((current) => [...current, tag]);
+    if (result.error || !result.tag) {
+      toast.error(result.error ?? "Could not create tag.");
+      return;
+    }
+
+    await loadTags();
     setName("");
     setSlug("");
     setSlugTouched(false);
     setDescription("");
-    setStatusMessage(`Tag "${tag.name}" added.`);
-    window.setTimeout(() => setStatusMessage(""), 2500);
+    toast.success(`Tag "${result.tag.name}" added.`);
   };
 
   const handleSort = (key: TagSortKey) => {
@@ -303,34 +336,37 @@ export function TagsManager() {
     });
   };
 
-  const handleApplyBulkAction = () => {
+  const handleApplyBulkAction = async () => {
     if (!bulkAction) {
       return;
     }
 
     if (selectedIds.size === 0) {
-      setStatusMessage("Select at least one tag.");
-      window.setTimeout(() => setStatusMessage(""), 2500);
+      toast.info("Select at least one tag.");
       return;
     }
 
     if (bulkAction === "delete") {
-      setTags((current) => current.filter((tag) => !selectedIds.has(tag.id)));
-      setSelectedIds(new Set());
-      setStatusMessage("Selected tags deleted.");
-      window.setTimeout(() => setStatusMessage(""), 2500);
+      const result = await deleteTagsAction(Array.from(selectedIds));
+
+      if (result.error) {
+        toast.error(result.error);
+      } else {
+        setSelectedIds(new Set());
+        toast.success("Selected tags deleted.");
+        await loadTags();
+      }
     }
 
     setBulkAction("");
   };
 
+  if (isLoading) {
+    return <p className="admin-post-editor-loading">Loading tags…</p>;
+  }
+
   return (
     <div className="admin-categories-page admin-tags-page">
-      {statusMessage ? (
-        <p className="admin-categories-status-message" role="status">
-          {statusMessage}
-        </p>
-      ) : null}
 
       <div className="admin-categories-layout">
         <section className="admin-categories-form-panel">

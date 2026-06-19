@@ -2,6 +2,7 @@
 
 import { ArrowDown, ArrowUp } from "lucide-react";
 import { useMemo, useState } from "react";
+import { useAdminToast } from "@/components/admin/toast/useAdminToast";
 import {
   DEFAULT_FORM_NOTIFICATIONS,
   sortNotifications,
@@ -98,10 +99,10 @@ function NotificationStatusBadge({ isActive }: { isActive: boolean }) {
 }
 
 export function FormNotificationsList() {
+  const toast = useAdminToast();
   const [notifications] = useState<FormNotificationItem[]>(DEFAULT_FORM_NOTIFICATIONS);
   const [sortKey, setSortKey] = useState<NotificationSortKey>("name");
   const [sortDirection, setSortDirection] = useState<NotificationSortDirection>("asc");
-  const [statusMessage, setStatusMessage] = useState("");
 
   const visibleNotifications = useMemo(
     () => sortNotifications(notifications, sortKey, sortDirection),
@@ -119,18 +120,11 @@ export function FormNotificationsList() {
   };
 
   const handleAddNew = () => {
-    setStatusMessage("Add New notification is coming soon.");
-    window.setTimeout(() => setStatusMessage(""), 2500);
+    toast.info("Add New notification is coming soon.");
   };
 
   return (
     <div className="admin-form-notifications">
-      {statusMessage ? (
-        <p className="admin-posts-status-message" role="status">
-          {statusMessage}
-        </p>
-      ) : null}
-
       <section className="admin-form-notifications-panel">
         <header className="admin-form-notifications-header">
           <h2 className="admin-form-notifications-title">Notifications</h2>

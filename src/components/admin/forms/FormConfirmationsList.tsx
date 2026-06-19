@@ -2,6 +2,7 @@
 
 import { ArrowDown, ArrowUp } from "lucide-react";
 import { useMemo, useState } from "react";
+import { useAdminToast } from "@/components/admin/toast/useAdminToast";
 import {
   CONFIRMATION_TYPE_LABELS,
   DEFAULT_FORM_CONFIRMATIONS,
@@ -94,10 +95,10 @@ function ConfirmationsTableHead({
 }
 
 export function FormConfirmationsList() {
+  const toast = useAdminToast();
   const [confirmations] = useState<FormConfirmationItem[]>(DEFAULT_FORM_CONFIRMATIONS);
   const [sortKey, setSortKey] = useState<ConfirmationSortKey>("name");
   const [sortDirection, setSortDirection] = useState<ConfirmationSortDirection>("asc");
-  const [statusMessage, setStatusMessage] = useState("");
 
   const visibleConfirmations = useMemo(
     () => sortConfirmations(confirmations, sortKey, sortDirection),
@@ -115,18 +116,11 @@ export function FormConfirmationsList() {
   };
 
   const handleAddNew = () => {
-    setStatusMessage("Add New confirmation is coming soon.");
-    window.setTimeout(() => setStatusMessage(""), 2500);
+    toast.info("Add New confirmation is coming soon.");
   };
 
   return (
     <div className="admin-form-confirmations">
-      {statusMessage ? (
-        <p className="admin-posts-status-message" role="status">
-          {statusMessage}
-        </p>
-      ) : null}
-
       <section className="admin-form-confirmations-panel">
         <header className="admin-form-confirmations-header">
           <h2 className="admin-form-confirmations-title">Confirmations</h2>

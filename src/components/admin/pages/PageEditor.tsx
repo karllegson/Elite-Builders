@@ -14,12 +14,14 @@ import {
   type PostSeoSnippet,
   type SchemaItem,
 } from "@/lib/admin/postSeo";
+import { useAdminToast } from "@/components/admin/toast/useAdminToast";
 import {
   createDefaultSchemaGeneratorConfig,
   type SchemaGeneratorConfig,
 } from "@/lib/admin/postSchemaGenerator";
 
 export function PageEditor() {
+  const toast = useAdminToast();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
@@ -27,7 +29,6 @@ export function PageEditor() {
   const [breadcrumbLinkInactive, setBreadcrumbLinkInactive] = useState(false);
   const [ctaOverrideTitle, setCtaOverrideTitle] = useState("");
   const [ctaOverrideBody, setCtaOverrideBody] = useState("");
-  const [toolbarMessage, setToolbarMessage] = useState("");
   const [snippet, setSnippet] = useState<PostSeoSnippet>({
     seoTitle: "",
     permalink: "",
@@ -101,8 +102,7 @@ export function PageEditor() {
   };
 
   const handleMediaAction = (label: string) => {
-    setToolbarMessage(label);
-    window.setTimeout(() => setToolbarMessage(""), 2000);
+    toast.info(label);
   };
 
   return (
@@ -127,12 +127,6 @@ export function PageEditor() {
             handleSnippetChange({ ...snippet, permalink })
           }
         />
-
-        {toolbarMessage ? (
-          <p className="admin-page-toolbar-message" role="status">
-            {toolbarMessage}
-          </p>
-        ) : null}
 
         <PageEditorToolbar
           textareaRef={textareaRef}

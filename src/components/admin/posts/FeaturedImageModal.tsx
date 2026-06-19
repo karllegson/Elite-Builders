@@ -1,9 +1,11 @@
 "use client";
 
-import { Check, X } from "lucide-react";
+import { Check } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState, type ChangeEvent, type DragEvent } from "react";
 import type { MediaAttachment } from "@/lib/admin/mediaLibrary";
+import { MediaAttachmentDetailsPanel } from "@/components/admin/media/MediaAttachmentDetailsPanel";
+import { useAdminToast } from "@/components/admin/toast/useAdminToast";
 import { useMediaLibrary } from "@/components/admin/media/useMediaLibrary";
 
 type FeaturedImageModalTab = "upload" | "library";
@@ -19,6 +21,7 @@ export function FeaturedImageModal({
   onClose,
   onSetFeaturedImage,
 }: FeaturedImageModalProps) {
+  const toast = useAdminToast();
   const [activeTab, setActiveTab] = useState<FeaturedImageModalTab>("library");
   const {
     fileInputRef,
@@ -44,7 +47,7 @@ export function FeaturedImageModal({
     handleDeleteAttachment,
     formatFileSize,
     formatMediaDate,
-  } = useMediaLibrary(isOpen);
+  } = useMediaLibrary(isOpen, (message) => toast.success(message));
 
   useEffect(() => {
     if (!isOpen) {
@@ -250,60 +253,16 @@ export function FeaturedImageModal({
             </div>
 
             {selectedAttachment ? (
-              <aside className="admin-media-attachment-details">
-                <div className="admin-media-attachment-details-header">
-                  <h3>Attachment Details</h3>
-                  <button
-                    type="button"
-                    className="admin-media-attachment-details-close"
-                    aria-label="Close attachment details"
-                    onClick={() => setSelectedId(null)}
-                  >
-                    <X size={16} strokeWidth={2} aria-hidden />
-                  </button>
-                </div>
-                <div className="admin-media-attachment-preview">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={selectedAttachment.src}
-                    alt={selectedAttachment.alt || selectedAttachment.title}
-                  />
-                </div>
-                <p className="admin-media-attachment-meta">
-                  {formatMediaDate(selectedAttachment.uploadedAt)}
-                  <br />
-                  {formatFileSize(selectedAttachment.fileSize)}
-                </p>
-                <div className="admin-media-attachment-actions">
-                  <button
-                    type="button"
-                    className="admin-inline-link"
-                    onClick={() => persistAttachment(selectedAttachment)}
-                  >
-                    Save details
-                  </button>
-                  <button
-                    type="button"
-                    className="admin-media-delete-link"
-                    onClick={() => handleDeleteAttachment(selectedAttachment.id)}
-                  >
-                    Delete permanently
-                  </button>
-                </div>
-                <label className="admin-media-field">
-                  <span>Alt Text</span>
-                  <textarea
-                    rows={3}
-                    value={selectedAttachment.alt}
-                    onChange={(event) =>
-                      handleAttachmentChange({
-                        ...selectedAttachment,
-                        alt: event.target.value,
-                      })
-                    }
-                  />
-                </label>
-              </aside>
+              <MediaAttachmentDetailsPanel
+                attachment={selectedAttachment}
+                onChange={handleAttachmentChange}
+                onClose={() => setSelectedId(null)}
+                onSave={persistAttachment}
+                onDelete={handleDeleteAttachment}
+                formatFileSize={formatFileSize}
+                formatMediaDate={formatMediaDate}
+                onCopyUrl={() => toast.success("URL copied to clipboard.")}
+              />
             ) : (
               <div className="admin-media-attachment-placeholder" aria-hidden />
             )}

@@ -2,6 +2,7 @@
 
 import { ArrowRight } from "lucide-react";
 import { type ReactNode, useState } from "react";
+import { useAdminToast } from "@/components/admin/toast/useAdminToast";
 import { FormToggle } from "@/components/admin/forms/FormToggle";
 import {
   DEFAULT_FORM_SETTINGS,
@@ -48,8 +49,8 @@ function SettingsField({
 }
 
 export function FormSettingsEditor() {
+  const toast = useAdminToast();
   const [settings, setSettings] = useState<FormSettingsState>(DEFAULT_FORM_SETTINGS);
-  const [statusMessage, setStatusMessage] = useState("");
 
   const updateSettings = <K extends keyof FormSettingsState>(
     key: K,
@@ -59,18 +60,11 @@ export function FormSettingsEditor() {
   };
 
   const handleSave = () => {
-    setStatusMessage("Form settings saved.");
-    window.setTimeout(() => setStatusMessage(""), 2500);
+    toast.success("Form settings saved.");
   };
 
   return (
     <div className="admin-form-settings-editor">
-      {statusMessage ? (
-        <p className="admin-posts-status-message" role="status">
-          {statusMessage}
-        </p>
-      ) : null}
-
       <SettingsMetabox title="Form Basics">
         <SettingsField label="Form Title" required>
           <input

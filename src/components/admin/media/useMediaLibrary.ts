@@ -16,7 +16,7 @@ import {
   type MediaAttachment,
 } from "@/lib/admin/mediaLibrary";
 
-export function useMediaLibrary(isActive = true) {
+export function useMediaLibrary(isActive = true, onNotify?: (message: string) => void) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [libraryItems, setLibraryItems] = useState<MediaAttachment[]>([]);
   const [source, setSource] = useState<"supabase" | "local">("local");
@@ -27,7 +27,6 @@ export function useMediaLibrary(isActive = true) {
   const [isDragging, setIsDragging] = useState(false);
   const [uploadError, setUploadError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [statusMessage, setStatusMessage] = useState("");
 
   const loadLibrary = useCallback(async () => {
     setIsLoading(true);
@@ -114,10 +113,9 @@ export function useMediaLibrary(isActive = true) {
       setLibraryItems((items) =>
         items.map((item) => (item.id === saved.id ? saved : item)),
       );
-      setStatusMessage("Saved.");
-      window.setTimeout(() => setStatusMessage(""), 2000);
+      onNotify?.("Saved.");
     }
-  }, []);
+  }, [onNotify]);
 
   const handleAttachmentChange = useCallback((attachment: MediaAttachment) => {
     setLibraryItems((items) =>
@@ -160,10 +158,9 @@ export function useMediaLibrary(isActive = true) {
       setLibraryItems((items) => [attachment, ...items]);
       setSelectedId(attachment.id);
       setSource("supabase");
-      setStatusMessage("Uploaded to Supabase.");
-      window.setTimeout(() => setStatusMessage(""), 2000);
+      onNotify?.("Uploaded to Supabase.");
     },
-    [],
+    [onNotify],
   );
 
   const handleDeleteAttachment = useCallback(async (id: string) => {
@@ -176,9 +173,8 @@ export function useMediaLibrary(isActive = true) {
 
     setLibraryItems((items) => items.filter((item) => item.id !== id));
     setSelectedId(null);
-    setStatusMessage("Deleted.");
-    window.setTimeout(() => setStatusMessage(""), 2000);
-  }, []);
+    onNotify?.("Deleted.");
+  }, [onNotify]);
 
   return {
     fileInputRef,
@@ -197,7 +193,6 @@ export function useMediaLibrary(isActive = true) {
     setIsDragging,
     uploadError,
     isLoading,
-    statusMessage,
     dateOptions,
     filteredLibraryItems,
     loadLibrary,

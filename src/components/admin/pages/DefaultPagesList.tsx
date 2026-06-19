@@ -3,6 +3,7 @@
 import { CornerDownLeft, ExternalLink, Link2, Pencil } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { useAdminToast } from "@/components/admin/toast/useAdminToast";
 import {
   DEFAULT_PAGE_BULK_ACTIONS,
   DEFAULT_PAGE_LIST_VIEWS,
@@ -217,6 +218,7 @@ function DefaultPagesTablenav({
 }
 
 export function DefaultPagesList() {
+  const toast = useAdminToast();
   const allPages = useMemo<DefaultPageListItem[]>(() => [], []);
   const viewCounts = useMemo(() => getDefaultPageViewCounts(allPages), [allPages]);
   const dateOptions = useMemo(() => getDefaultPageDateOptions(allPages), [allPages]);
@@ -228,7 +230,6 @@ export function DefaultPagesList() {
   const [page, setPage] = useState(1);
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [bulkAction, setBulkAction] = useState("");
-  const [statusMessage, setStatusMessage] = useState("");
 
   const filteredPages = useMemo(
     () =>
@@ -305,17 +306,15 @@ export function DefaultPagesList() {
     }
 
     if (selectedIds.size === 0) {
-      setStatusMessage("Select at least one page.");
-      window.setTimeout(() => setStatusMessage(""), 2500);
+      toast.info("Select at least one page.");
       return;
     }
 
-    setStatusMessage(
+    toast.success(
       `Applied "${bulkAction}" to ${selectedIds.size} page${selectedIds.size === 1 ? "" : "s"}.`,
     );
     setSelectedIds(new Set());
     setBulkAction("");
-    window.setTimeout(() => setStatusMessage(""), 2500);
   };
 
   return (
@@ -342,12 +341,6 @@ export function DefaultPagesList() {
           );
         })}
       </ul>
-
-      {statusMessage ? (
-        <p className="admin-posts-status-message" role="status">
-          {statusMessage}
-        </p>
-      ) : null}
 
       <DefaultPagesTablenav
         position="top"

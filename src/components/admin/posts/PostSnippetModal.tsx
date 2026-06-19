@@ -11,7 +11,7 @@ import {
   SEO_TITLE_MAX,
   type PostSeoSnippet,
 } from "@/lib/admin/postSeo";
-import { business } from "@/lib/site/config";
+import { useAdminSiteUrl } from "@/lib/admin/siteUrl";
 
 type PostSnippetModalProps = {
   isOpen: boolean;
@@ -32,6 +32,7 @@ export function PostSnippetModal({
   buildPermalinkUrl = buildBlogPermalinkUrl,
   fallbackPreviewTitle = "Sample Post Title",
 }: PostSnippetModalProps) {
+  const siteUrl = useAdminSiteUrl();
   const [activeTab, setActiveTab] = useState<"general" | "social">("general");
   const [previewMode, setPreviewMode] = useState<"desktop" | "mobile">(
     "desktop",
@@ -52,7 +53,7 @@ export function PostSnippetModal({
 
   const previewTitle = draft.seoTitle || fallbackTitle || fallbackPreviewTitle;
   const previewPermalink = buildPermalinkUrl(
-    business.domain,
+    siteUrl,
     draft.permalink || fallbackTitle,
   );
   const previewDescription =

@@ -3,7 +3,7 @@ import "./globals.css";
 import "./admin.css";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://elitebuildersco.com"),
+  metadataBase: new URL("https://www.elitebuildersco.com"),
   title: "Elite Builders IX",
   description: "Elite Builders contractor administration and website",
 };

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { AdminPostContentEditor } from "@/components/admin/posts/AdminPostContentEditor";
 import { PostEditorSeo } from "@/components/admin/posts/PostEditorSeo";
 import { PostEditorToolbar } from "@/components/admin/posts/PostEditorToolbar";
 import { ServiceAreaExtraMetaboxes } from "@/components/admin/service-areas/ServiceAreaExtraMetaboxes";
@@ -22,6 +23,7 @@ import {
   type ServiceAreaExtraFields,
   type ServiceAreaPageAttributes,
 } from "@/lib/admin/serviceAreaEditor";
+import { useAdminToast } from "@/components/admin/toast/useAdminToast";
 import {
   getServiceAreaById,
   upsertServiceArea,
@@ -36,6 +38,7 @@ export function ServiceAreaEditor({
   serviceAreaId,
   defaultParentId = null,
 }: ServiceAreaEditorProps) {
+  const toast = useAdminToast();
   const isEditing = Boolean(serviceAreaId);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [loaded, setLoaded] = useState(!isEditing);
@@ -61,7 +64,6 @@ export function ServiceAreaEditor({
     parentId: defaultParentId,
   }));
   const [hasFeaturedImage, setHasFeaturedImage] = useState(false);
-  const [saveMessage, setSaveMessage] = useState("");
   const snippetEditedRef = useRef({
     seoTitle: false,
     permalink: false,
@@ -171,8 +173,7 @@ export function ServiceAreaEditor({
 
   const persistServiceArea = (status: "published" | "draft") => {
     if (!title.trim()) {
-      setSaveMessage("Add a title before saving (e.g. Stockton, CA).");
-      window.setTimeout(() => setSaveMessage(""), 3000);
+      toast.error("Add a title before saving (e.g. Stockton, CA).");
       return;
     }
 
@@ -197,16 +198,15 @@ export function ServiceAreaEditor({
         breadcrumbsLinkInactive: extraFields.breadcrumbsLinkInactive,
       });
     } catch (error) {
-      setSaveMessage(
+      toast.error(
         error instanceof Error ? error.message : "Unable to save this service area.",
       );
-      window.setTimeout(() => setSaveMessage(""), 4000);
       return;
     }
 
     const isSubPage = pageAttributes.parentId !== null;
 
-    setSaveMessage(
+    toast.success(
       status === "published"
         ? isEditing
           ? isSubPage
@@ -219,7 +219,6 @@ export function ServiceAreaEditor({
           ? "Sub-page draft saved."
           : "Draft saved.",
     );
-    window.setTimeout(() => setSaveMessage(""), 4000);
   };
 
   if (!loaded) {
@@ -239,11 +238,6 @@ export function ServiceAreaEditor({
 
   return (
     <div className="admin-post-editor">
-      {saveMessage ? (
-        <p className="admin-categories-status-message admin-post-editor-status" role="status">
-          {saveMessage}
-        </p>
-      ) : null}
       <div className="admin-post-editor-main">
         <label className="admin-post-title-label" htmlFor="service-area-title">
           {isEditing ? "Edit title" : "Add title"}
@@ -270,17 +264,13 @@ export function ServiceAreaEditor({
           onContentChange={setContent}
         />
 
-        <div className="admin-post-content-wrap">
-          <textarea
-            ref={textareaRef}
-            id="service-area-content"
-            className="admin-post-content"
-            value={content}
-            onChange={(event) => setContent(event.target.value)}
-            spellCheck={false}
-            aria-label="Service area content"
-          />
-        </div>
+        <AdminPostContentEditor
+          id="service-area-content"
+          value={content}
+          onChange={setContent}
+          textareaRef={textareaRef}
+          ariaLabel="Service area content"
+        />
 
         <div className="admin-post-editor-footer">
           <span>Word count: {wordCount}</span>

@@ -2,6 +2,7 @@
 
 import { ArrowRight } from "lucide-react";
 import { type ReactNode, useState } from "react";
+import { useAdminToast } from "@/components/admin/toast/useAdminToast";
 import { FormToggle } from "@/components/admin/forms/FormToggle";
 import {
   DEFAULT_FORM_PERSONAL_DATA,
@@ -26,8 +27,8 @@ function SettingsMetabox({
 }
 
 export function FormPersonalDataSettings() {
+  const toast = useAdminToast();
   const [settings, setSettings] = useState<FormPersonalDataState>(DEFAULT_FORM_PERSONAL_DATA);
-  const [statusMessage, setStatusMessage] = useState("");
 
   const updateSettings = <K extends keyof FormPersonalDataState>(
     key: K,
@@ -37,18 +38,11 @@ export function FormPersonalDataSettings() {
   };
 
   const handleSave = () => {
-    setStatusMessage("Personal data settings saved.");
-    window.setTimeout(() => setStatusMessage(""), 2500);
+    toast.success("Personal data settings saved.");
   };
 
   return (
     <div className="admin-form-settings-editor admin-form-personal-data">
-      {statusMessage ? (
-        <p className="admin-posts-status-message" role="status">
-          {statusMessage}
-        </p>
-      ) : null}
-
       <SettingsMetabox title="General Settings">
         <FormToggle
           id="prevent-ip-storage"

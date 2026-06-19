@@ -2,7 +2,12 @@
 
 import { Link2, ExternalLink, CornerDownLeft } from "lucide-react";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  bulkPostsAction,
+  fetchPostsForAdmin,
+} from "@/app/admin/(shell)/posts/actions";
 import {
   BULK_ACTIONS,
   filterPosts,
@@ -15,6 +20,7 @@ import {
   type PostListItem,
   type PostListView,
 } from "@/lib/admin/postsList";
+import { useAdminToast } from "@/components/admin/toast/useAdminToast";
 
 const PER_PAGE = 20;
 
@@ -24,6 +30,15 @@ function PostStatusLabel({ post }: { post: PostListItem }) {
       <>
         {" "}
         — <span className="admin-post-status-draft">Draft</span>
+      </>
+    );
+  }
+
+  if (post.status === "scheduled") {
+    return (
+      <>
+        {" "}
+        — <span className="admin-post-status-draft">Scheduled</span>
       </>
     );
   }
@@ -236,7 +251,9 @@ function PostsTablenav({
 }
 
 export function PostsList() {
-  const allPosts = useMemo<PostListItem[]>(() => [], []);
+  const router = useRouter();
+  const [allPosts, setAllPosts] = useState<PostListItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const viewCounts = useMemo(() => getPostViewCounts(allPosts), [allPosts]);
   const dateOptions = useMemo(() => getPostDateOptions(allPosts), [allPosts]);
   const categoryOptions = useMemo(() => getPostCategoryOptions(allPosts), [allPosts]);
@@ -247,9 +264,20 @@ export function PostsList() {
   const [dateFilter, setDateFilter] = useState("all");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [page, setPage] = useState(1);
-  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkAction, setBulkAction] = useState("");
-  const [statusMessage, setStatusMessage] = useState("");
+  const toast = useAdminToast();
+
+  const loadPosts = useCallback(async () => {
+    setIsLoading(true);
+    const result = await fetchPostsForAdmin();
+    setAllPosts(result.items);
+    setIsLoading(false);
+  }, []);
+
+  useEffect(() => {
+    void loadPosts();
+  }, [loadPosts]);
 
   const filteredPosts = useMemo(
     () =>
@@ -309,7 +337,7 @@ export function PostsList() {
     });
   };
 
-  const toggleSelect = (id: number) => {
+  const toggleSelect = (id: string) => {
     setSelectedIds((current) => {
       const next = new Set(current);
       if (next.has(id)) {
@@ -321,24 +349,76 @@ export function PostsList() {
     });
   };
 
-  const handleApplyBulkAction = () => {
+  const handleApplyBulkAction = async () => {
     if (!bulkAction) {
       return;
     }
 
     if (selectedIds.size === 0) {
-      setStatusMessage("Select at least one post.");
-      window.setTimeout(() => setStatusMessage(""), 2500);
+      toast.info("Select at least one post.");
       return;
     }
 
-    setStatusMessage(
-      `Applied "${bulkAction}" to ${selectedIds.size} post${selectedIds.size === 1 ? "" : "s"}.`,
-    );
-    setSelectedIds(new Set());
-    setBulkAction("");
-    window.setTimeout(() => setStatusMessage(""), 2500);
+    const ids = Array.from(selectedIds);
+
+    if (bulkAction === "edit") {
+      if (ids.length === 1) {
+        router.push(`/admin/posts/new?post=${ids[0]}`);
+        return;
+      }
+
+      toast.info("Select only one post to edit.");
+      return;
+    }
+
+    if (bulkAction === "trash") {
+      const result = await bulkPostsAction(ids, "trash");
+      if (result.error) {
+        toast.error(result.error);
+      } else {
+        toast.success(
+          `Moved ${result.updated} post${result.updated === 1 ? "" : "s"} to trash.`,
+        );
+      }
+      setSelectedIds(new Set());
+      setBulkAction("");
+      await loadPosts();
+      return;
+    }
+
+    if (bulkAction === "restore") {
+      const result = await bulkPostsAction(ids, "restore");
+      if (result.error) {
+        toast.error(result.error);
+      } else {
+        toast.success(
+          `Restored ${result.updated} post${result.updated === 1 ? "" : "s"}.`,
+        );
+      }
+      setSelectedIds(new Set());
+      setBulkAction("");
+      await loadPosts();
+      return;
+    }
+
+    if (bulkAction === "delete") {
+      const result = await bulkPostsAction(ids, "delete");
+      if (result.error) {
+        toast.error(result.error);
+      } else {
+        toast.success(
+          `Deleted ${result.updated} post${result.updated === 1 ? "" : "s"} permanently.`,
+        );
+      }
+      setSelectedIds(new Set());
+      setBulkAction("");
+      await loadPosts();
+    }
   };
+
+  if (isLoading) {
+    return <p className="admin-post-editor-loading">Loading posts…</p>;
+  }
 
   return (
     <div className="admin-posts-list">
@@ -362,12 +442,6 @@ export function PostsList() {
           );
         })}
       </ul>
-
-      {statusMessage ? (
-        <p className="admin-posts-status-message" role="status">
-          {statusMessage}
-        </p>
-      ) : null}
 
       <PostsTablenav
         position="top"
@@ -480,7 +554,7 @@ export function PostsList() {
                     <br />
                     {formatPostListDate(post.date)}
                   </td>
-                  <td className="admin-posts-col-id">{post.id}</td>
+                  <td className="admin-posts-col-id">{post.numericId}</td>
                   <td className="admin-posts-col-seo">
                     <SeoDetailsCell post={post} />
                   </td>

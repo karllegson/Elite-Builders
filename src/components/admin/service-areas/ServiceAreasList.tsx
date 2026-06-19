@@ -3,6 +3,7 @@
 import { CornerDownLeft, ExternalLink, Link2 } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { useAdminToast } from "@/components/admin/toast/useAdminToast";
 import {
   DEFAULT_SERVICE_AREA_AUTHOR,
   deleteServiceArea,
@@ -207,6 +208,7 @@ function ServiceAreasTablenav({
 }
 
 export function ServiceAreasList() {
+  const toast = useAdminToast();
   const [refreshKey, setRefreshKey] = useState(0);
   const allItems = useMemo(
     () =>
@@ -226,7 +228,6 @@ export function ServiceAreasList() {
   const [page, setPage] = useState(1);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkAction, setBulkAction] = useState("");
-  const [statusMessage, setStatusMessage] = useState("");
 
   const filteredItems = useMemo(
     () =>
@@ -248,8 +249,7 @@ export function ServiceAreasList() {
     pagination.items.every((item) => selectedIds.has(item.id));
 
   const showStatus = (message: string) => {
-    setStatusMessage(message);
-    window.setTimeout(() => setStatusMessage(""), 3000);
+    toast.success(message);
   };
 
   const handleViewChange = (nextView: ServiceAreaListView) => {
@@ -345,12 +345,6 @@ export function ServiceAreasList() {
           </Link>
         </li>
       </ul>
-
-      {statusMessage ? (
-        <p className="admin-posts-status-message" role="status">
-          {statusMessage}
-        </p>
-      ) : null}
 
       <ServiceAreasTablenav
         position="top"
