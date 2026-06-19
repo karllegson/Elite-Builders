@@ -5366,6 +5366,147 @@
 }
 
 /* -------------------------------------------------------------------------- */
+/* Site Config settings                                                       */
+/* -------------------------------------------------------------------------- */
+.admin-site-config-page {
+  background: #fff;
+  border: 1px solid var(--admin-border);
+}
+
+.admin-site-config-description {
+  margin: 0;
+  padding: 10px 12px 8px;
+  font-size: 12px;
+  color: var(--admin-text);
+}
+
+.admin-site-config-status {
+  margin: 0 12px 10px;
+  padding: 8px 10px;
+  border-left: 4px solid var(--admin-accent);
+  background: #f0f6fc;
+  font-size: 13px;
+  color: var(--admin-text);
+}
+
+.admin-site-config-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 10px 12px 12px;
+  background: #f0f0f1;
+  border-top: 1px solid var(--admin-border);
+  border-bottom: 1px solid var(--admin-border);
+}
+
+.admin-site-config-tab {
+  min-height: 34px;
+  padding: 7px 12px;
+  border: 1px solid #c3c4c7;
+  border-radius: 4px;
+  background: #fff;
+  color: #1d2327;
+  font-size: 13px;
+  line-height: 1.25;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.admin-site-config-tab:hover {
+  border-color: #8c8f94;
+  background: #fff;
+}
+
+.admin-site-config-tab.is-active {
+  background: #2271b1;
+  border-color: #2271b1;
+  color: #fff;
+}
+
+.admin-site-config-tab.is-active:hover {
+  background: #135e96;
+  border-color: #135e96;
+  color: #fff;
+}
+
+.admin-site-config-form {
+  padding: 12px;
+}
+
+.admin-site-config-heading {
+  margin: 0 0 10px;
+  font-size: 28px;
+  line-height: 1.2;
+  color: var(--admin-text);
+}
+
+.admin-site-config-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+}
+
+.admin-site-config-table th,
+.admin-site-config-table td {
+  padding: 10px 0;
+  border-top: 1px solid #f0f0f1;
+  vertical-align: top;
+}
+
+.admin-site-config-table th {
+  width: 260px;
+  padding-right: 16px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--admin-text);
+  text-align: left;
+}
+
+.admin-site-config-input {
+  width: min(520px, 100%);
+  min-height: 30px;
+  padding: 5px 8px;
+  border: 1px solid #8c8f94;
+  border-radius: 0;
+  background: #fff;
+  font: inherit;
+  font-size: 12px;
+  color: var(--admin-text);
+}
+
+.admin-site-config-textarea {
+  min-height: 68px;
+  resize: vertical;
+}
+
+.admin-site-config-help {
+  margin: 5px 0 0;
+  font-size: 11px;
+  color: var(--admin-text-muted);
+}
+
+.admin-site-config-submit-wrap {
+  margin: 12px 0 0;
+}
+
+@media (max-width: 960px) {
+  .admin-site-config-table th,
+  .admin-site-config-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .admin-site-config-table th {
+    padding-bottom: 4px;
+  }
+
+  .admin-site-config-input {
+    width: 100%;
+  }
+}
+
+/* -------------------------------------------------------------------------- */
 /* FAQ categories + list row actions                                          */
 /* -------------------------------------------------------------------------- */
 .admin-categories-row-actions {

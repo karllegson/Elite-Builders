@@ -22,6 +22,8 @@ import {
   utilityNavLinks,
   whyUsNavLinks,
 } from "@/lib/site/config";
+import { phoneToHref, readRuntimeSiteConfig } from "@/lib/site/runtimeSiteConfig";
+import { SITE_CONFIG_UPDATED_EVENT } from "@/lib/admin/siteConfigSettings";
 
 type OpenMenu = "services" | "why-us" | "about" | null;
 
@@ -38,6 +40,26 @@ export default function SiteHeader() {
   const [scrolled, setScrolled] = useState(false);
   const [openMenu, setOpenMenu] = useState<OpenMenu>(null);
   const [mobileSection, setMobileSection] = useState<OpenMenu>(null);
+  const [runtimePhone, setRuntimePhone] = useState<string>(business.phone);
+  const [runtimePhoneHref, setRuntimePhoneHref] = useState<string>(business.phoneHref);
+  const [runtimeBusinessName, setRuntimeBusinessName] = useState<string>(business.displayName);
+  const [runtimePrimaryCtaText, setRuntimePrimaryCtaText] = useState("Get A Free Quote");
+  const [runtimePrimaryCtaHref, setRuntimePrimaryCtaHref] = useState("/#estimate");
+
+  useEffect(() => {
+    const applyRuntime = () => {
+      const runtime = readRuntimeSiteConfig();
+      setRuntimePhone(runtime.phoneMain || business.phone);
+      setRuntimePhoneHref(phoneToHref(runtime.phoneMain || business.phone));
+      setRuntimeBusinessName(runtime.businessName || business.displayName);
+      setRuntimePrimaryCtaText(runtime.homepagePrimaryCtaText || "Get A Free Quote");
+      setRuntimePrimaryCtaHref(runtime.homepagePrimaryCtaLink || "/#estimate");
+    };
+
+    applyRuntime();
+    window.addEventListener(SITE_CONFIG_UPDATED_EVENT, applyRuntime);
+    return () => window.removeEventListener(SITE_CONFIG_UPDATED_EVENT, applyRuntime);
+  }, []);
 
   useEffect(() => {
     const onScroll = () => {
@@ -107,11 +129,11 @@ export default function SiteHeader() {
       >
         <div className="site-container flex h-11 items-center justify-between gap-4 text-[13px] font-medium text-site-text-muted">
           <a
-            href={business.phoneHref}
+            href={runtimePhoneHref}
             className="flex items-center gap-2 transition-colors hover:text-site-text-dark"
           >
             <Phone size={15} strokeWidth={2} aria-hidden className="text-site-accent" />
-            {business.phone}
+            {runtimePhone}
           </a>
           <nav aria-label="Utility navigation" className="hidden items-center gap-6 lg:gap-8 sm:flex">
             {utilityNavLinks.map((item) => {
@@ -226,11 +248,11 @@ export default function SiteHeader() {
             </nav>
 
             <Link
-              href="/#estimate"
+              href={runtimePrimaryCtaHref}
               className="hidden items-center gap-2 rounded-lg bg-site-nav-cta px-5 py-2.5 text-[15px] font-medium text-white transition-colors hover:bg-brand-navy-light sm:inline-flex"
             >
               <ClipboardCheck size={17} strokeWidth={2} aria-hidden />
-              Get A Free Quote
+              {runtimePrimaryCtaText || `Get A Free Quote - ${runtimeBusinessName}`}
             </Link>
             <button
               type="button"
@@ -401,12 +423,12 @@ export default function SiteHeader() {
 
             <li>
               <Link
-                href="/#estimate"
+                href={runtimePrimaryCtaHref}
                 className="my-3 flex items-center justify-center gap-2 rounded-lg bg-site-nav-cta px-5 py-3 font-medium text-white"
                 onClick={closeMenus}
               >
                 <ClipboardCheck size={16} aria-hidden />
-                Get A Free Quote
+                {runtimePrimaryCtaText || `Get A Free Quote - ${runtimeBusinessName}`}
               </Link>
             </li>
           </ul>
