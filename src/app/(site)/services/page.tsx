@@ -7,9 +7,9 @@ import { homeImages } from "@/lib/site/images";
 import { serviceDetails, serviceOrder } from "@/lib/site/scope";
 
 export const metadata: Metadata = {
-  title: "Construction Services Bay Area & Northern California | Elite Builders IX",
+  title: "Framing-First Construction Services | Elite Builders IX",
   description:
-    "Rough framing, remodeling, siding, and deck construction across the Bay Area, Central Valley, and Southern California — for homeowners, production builders, and general contractors. CSLB #970551.",
+    "Framing-first specialists — rough framing, remodeling, siding, and deck construction across the Bay Area, Central Valley, and Southern California. CSLB #970551.",
 };
 
 export default function ServicesPage() {
@@ -20,13 +20,13 @@ export default function ServicesPage() {
           <p className="text-sm font-medium uppercase tracking-[0.18em] text-brand-sky">
             Our Services
           </p>
-          <h1 className="mt-3 max-w-3xl text-3xl font-bold leading-tight sm:text-4xl lg:text-5xl">
-            Construction Services — Bay Area &amp; Northern California
+          <h1 className="mt-3 max-w-3xl text-3xl font-bold leading-tight text-white sm:text-4xl lg:text-5xl">
+            Framing-First Construction Services
           </h1>
           <p className="mt-5 max-w-2xl text-base leading-relaxed text-white/85">
-            Elite Builders IX specializes in rough framing, remodeling, and siding for both
-            residential and commercial projects — delivering strong, precise structural work in full
-            compliance with building codes and safety standards.
+            Elite Builders IX is a framing-first contractor — rough framing is our core, and every
+            remodeling, siding, and deck project is built on the same structural precision and code
+            compliance.
           </p>
           <p className="mt-4 text-sm font-semibold text-brand-sky">{business.license}</p>
         </div>

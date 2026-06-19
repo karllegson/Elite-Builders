@@ -74,7 +74,7 @@ export default async function ServiceAreaCityPage(
             <MapPin size={15} aria-hidden />
             {area.region}
           </p>
-          <h1 className="mt-3 max-w-3xl text-3xl font-bold leading-tight sm:text-4xl lg:text-5xl">
+          <h1 className="mt-3 max-w-3xl text-3xl font-bold leading-tight text-white sm:text-4xl lg:text-5xl">
             Framing Contractor in {cityLabel}
           </h1>
           <p className="mt-5 max-w-2xl text-base leading-relaxed text-white/85">{area.blurb}</p>

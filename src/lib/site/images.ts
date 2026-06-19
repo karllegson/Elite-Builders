@@ -1,8 +1,8 @@
 /** CMS-managed homepage/content images — migrate to Supabase Storage via `npm run seed:media`. */
 export const homeImages = {
   residentialRoofFraming: {
-    src: "/images/home/modesto-residential-roof-framing.png",
-    alt: "Residential roof framing contractor leveling rafters in Northern California",
+    src: "/images/home/rough-framing-aerial.png",
+    alt: "Aerial view of residential rough framing and roof trusses on a Northern California job site",
   },
   customKitchenRemodel: {
     src: "/images/home/modesto-custom-kitchen-remodel.png",
@@ -24,9 +24,17 @@ export const homeImages = {
     src: "/images/home/modesto-patio-doors-outdoor-living.png",
     alt: "Patio doors and outdoor living space installation in Northern California",
   },
+  deckPorch: {
+    src: "/images/home/deck-porch.png",
+    alt: "Custom deck and covered porch with outdoor living space on a Northern California home",
+  },
   residentialWindowInstallation: {
     src: "/images/home/modesto-residential-window-installation.png",
     alt: "Residential window and door installation on a new Northern California home build",
+  },
+  sidingInstallation: {
+    src: "/images/home/siding-installation.png",
+    alt: "Crew installing siding and trim on a residential home in Northern California",
   },
   luxuryHomeInterior: {
     src: "/images/home/modesto-luxury-home-interior.png",

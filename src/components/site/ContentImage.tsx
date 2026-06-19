@@ -3,12 +3,13 @@ import Image from "next/image";
 type ContentImageProps = {
   src: string;
   alt: string;
-  /** Tailwind height class, e.g. h-44 */
+  /** Tailwind height/aspect classes on the wrapper, e.g. h-48 or aspect-[3/2] */
   className?: string;
   priority?: boolean;
   /** Pass a full-width sizes hint for banner images so Next.js doesn't serve a tiny srcset. */
   sizes?: string;
   quality?: number;
+  objectFit?: "cover" | "contain";
 };
 
 const defaultSizes = "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw";
@@ -20,10 +21,14 @@ export default function ContentImage({
   priority = false,
   sizes = defaultSizes,
   quality = 85,
+  objectFit = "cover",
 }: ContentImageProps) {
-
   return (
-    <div className={`relative w-full overflow-hidden ${className}`}>
+    <div
+      className={`relative w-full overflow-hidden ${
+        objectFit === "contain" ? "bg-gray-100" : ""
+      } ${className}`}
+    >
       <Image
         src={src}
         alt={alt}
@@ -31,7 +36,7 @@ export default function ContentImage({
         priority={priority}
         quality={quality}
         sizes={sizes}
-        className="object-cover"
+        className={objectFit === "contain" ? "object-contain" : "object-cover"}
       />
     </div>
   );

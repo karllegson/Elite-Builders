@@ -8,25 +8,27 @@ export const integrityStatement =
   "Integrity means doing the right thing even when you didn't have to — because it's the right thing to do.";
 
 export const differentiationIntro =
-  "Family-owned since 2012 — we earn trust through the work, not sales pressure or empty promises.";
+  "How we work when the inspector isn't on site — and when they are.";
 
-export const brandPillarsHeading = "No Cutting Corners. Integrity. Promises.";
+export const brandPillarsHeading = "The Standard Behind Every Frame";
+
+export const framingFirstTagline = "Framing-first specialists — structure is our core, not a side service.";
 
 export const heroIntro =
-  "Family-owned since 2012 — trusted by homeowners and production builders for code-compliant structural work, dependable crews, and straight answers from estimate to inspection.";
+  "Trusted since 2012 across the Bay Area, Central Valley, and Southern California — elite-level structural work, dependable crews, and straight answers from estimate to inspection.";
 
 export const brandPillars = [
   {
     title: "No Cutting Corners",
-    body: "Every cut, connection, and inspection matters. We frame to code and to spec — no shortcuts, no cover-ups, and no passing problems down the line.",
+    body: "Every connection framed to code and spec. Shortcuts behind the walls become expensive problems — we don't pass them down the line.",
   },
   {
     title: "Integrity",
-    body: integrityStatement,
+    body: "When we find an issue, we address it — not bury it. Doing the right thing isn't optional just because no one would know.",
   },
   {
     title: "Promises",
-    body: "We show up when we say we will, communicate honestly, and stand behind our work. If we give you a timeline or a scope, that's what you can expect.",
+    body: "Clear scope, honest timelines, and updates you don't have to chase. If we commit to it, that's what you get.",
   },
 ] as const;
 

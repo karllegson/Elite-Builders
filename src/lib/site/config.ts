@@ -6,12 +6,12 @@ export const business = {
   displayName: "Elite Builders",
   slogan: "Build your dream",
   heroLocationLine: "Bay Area · Central Valley · Southern California",
-  heroHeadline: "Framing, Remodeling & Siding",
+  heroHeadline: "Framing California's Future.",
   companyStory:
-    "Family-owned since 2012, Elite Builders is known for integrity, straight answers, and experienced crews who treat every structure like their own — serving the Bay Area, Central Valley, and Southern California.",
+    "Family-owned framing-first specialists since 2012 — known for integrity, straight answers, and experienced crews who treat every structure like their own across the Bay Area, Central Valley, and Southern California.",
   phone: "1 (209) 484-2743",
   phoneHref: "tel:+12094842743",
-  email: "support@elitebuildersco.com",
+  email: "marketing@elitebuildersco.com",
   foundedYear: 2012,
   address: {
     street: "450 Burney Street",
@@ -61,7 +61,7 @@ export const services: SiteService[] = [
     shortDescription:
       "Fiber cement, wood, and composite siding and trim installation that protects your building and boosts curb appeal.",
     icon: "layers",
-    image: "residentialWindowInstallation",
+    image: "sidingInstallation",
   },
   {
     title: "Decks & Porches",
@@ -70,7 +70,7 @@ export const services: SiteService[] = [
     shortDescription:
       "Custom wood and composite decks and porches built with the same structural precision we bring to framing.",
     icon: "fence",
-    image: "patioDoorsOutdoorLiving",
+    image: "deckPorch",
   },
 ];
 
@@ -276,11 +276,6 @@ export const teamMembers: TeamMember[] = [
     profile: {
       experience: "Construction & framing background",
       bio: "Fernando built his career in construction long before Elite Builders — learning the trade on job sites across Northern California. During a difficult time in his life, he met the Lord, and his Christian faith became the foundation for how he leads today. He founded Elite Builders on no cutting corners, real integrity, and promises kept — treating every residential and commercial project with the honesty and care he'd want on his own home.",
-      testimonial: {
-        quote:
-          "Cleanest framing work the inspector had seen all year. Fernando's crew was professional from start to finish — zero drama.",
-        author: "Michael R.",
-      },
     },
   },
   {
@@ -351,8 +346,8 @@ export const serviceMenuGroups = [
 
 export const whyUsNavLinks = [
   { label: "Why Choose Elite Builders", href: "/#why-us" },
+  { label: "Framing-First Expertise", href: "/services/framing" },
   { label: "Meet Our Team", href: "/#team" },
-  { label: "How It Works", href: "/#process" },
   { label: "Featured Projects", href: "/projects" },
   { label: "Customer Reviews", href: "/#reviews" },
 ] as const;

@@ -12,12 +12,12 @@ export default function EstimateForm({ variant = "card" }: EstimateFormProps) {
       aria-label="Request a free estimate"
       className={
         variant === "card"
-          ? "rounded-xl border border-solid border-gray-200 bg-white p-6 shadow-sm sm:p-8"
-          : "rounded-xl bg-white/10 p-6 sm:p-8"
+          ? "rounded-xl border border-solid border-gray-200 bg-white p-4 shadow-sm sm:p-8"
+          : "rounded-xl bg-white/10 p-4 sm:p-8"
       }
     >
       <h3
-        className={`text-xl font-extrabold ${
+        className={`text-base font-extrabold sm:text-xl ${
           variant === "card" ? "text-brand-navy" : "text-white"
         }`}
       >
@@ -109,7 +109,7 @@ export default function EstimateForm({ variant = "card" }: EstimateFormProps) {
 
         <button
           type="submit"
-          className="rounded-full bg-brand-red px-6 py-3.5 text-base font-bold text-white transition-colors hover:bg-brand-red-dark"
+          className="rounded-full bg-brand-red px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-brand-red-dark sm:px-6 sm:py-3.5 sm:text-base"
         >
           Request My Free Estimate
         </button>

@@ -79,7 +79,7 @@ export const serviceDetails: Record<string, ServiceDetail> = {
     metaTitle: "Siding Installation Bay Area CA | Elite Builders IX",
     metaDescription:
       "Siding and trim installation, replacement, and weather protection across the Bay Area and Northern California — installed by framing-first specialists. CSLB #970551.",
-    heroImage: "residentialWindowInstallation",
+    heroImage: "sidingInstallation",
     intro: [
       "We install and replace siding and trim per plans and specifications, enhancing both the durability and appearance of your building while protecting it against the elements.",
       "Because we are framing-first specialists, our siding work is built on a structurally sound envelope — including vapor barrier at siding locations and full wrap where required.",
@@ -115,7 +115,7 @@ export const serviceDetails: Record<string, ServiceDetail> = {
     metaTitle: "Deck Construction Bay Area CA | Elite Builders IX",
     metaDescription:
       "Custom deck and porch construction across the Bay Area and Northern California, built by structural framing specialists. CSLB #970551.",
-    heroImage: "patioDoorsOutdoorLiving",
+    heroImage: "deckPorch",
     intro: [
       "Decks and porches are part of our core rough-carpentry scope. We build outdoor living structures that are square, solid, and built to last through California seasons.",
       "Every deck and porch is framed with the same structural precision we bring to walls, floors, and roofs.",

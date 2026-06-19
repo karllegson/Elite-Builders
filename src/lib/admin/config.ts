@@ -1,7 +1,7 @@
 export const siteConfig = {
   name: "Elite Builders IX",
   shortName: "Elite Builders IX",
-  supportEmail: "support@elitebuildersco.com",
+  supportEmail: "marketing@elitebuildersco.com",
   defaultUserRole: "Administrator",
 } as const;
 

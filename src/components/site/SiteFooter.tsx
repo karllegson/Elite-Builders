@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Mail, MapPin, Phone } from "lucide-react";
 import SiteLogo from "@/components/site/SiteLogo";
 import { business, featuredFooterServiceAreas, services } from "@/lib/site/config";
+import { framingFirstTagline } from "@/lib/site/messaging";
 
 const uniqueServices = services.filter(
   (service, index) => services.findIndex((s) => s.href === service.href) === index
@@ -15,6 +16,7 @@ export default function SiteFooter() {
         <div>
           <SiteLogo variant="footer" linked={false} />
           <p className="mt-4 text-sm leading-relaxed text-white/70">{business.companyStory}</p>
+          <p className="mt-3 text-xs font-semibold leading-relaxed text-brand-sky">{framingFirstTagline}</p>
           <p className="mt-4 text-xs text-white/50">{business.license}</p>
         </div>
 
@@ -103,7 +105,9 @@ export default function SiteFooter() {
           <p>
             © {new Date().getFullYear()} {business.name}. All rights reserved.
           </p>
-          <p className="text-center">Framing Contractor · Bay Area · Central Valley · Southern California</p>
+          <p className="text-center">
+            Framing-First Contractor · Bay Area · Central Valley · Southern California
+          </p>
           <p>
             Website by{" "}
             <a
