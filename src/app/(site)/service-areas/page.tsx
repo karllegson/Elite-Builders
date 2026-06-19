@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, MapPin } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import ContentImage from "@/components/site/ContentImage";
-import { business, serviceAreas, type ServiceArea } from "@/lib/site/config";
+import { ServiceAreasGrid } from "@/components/site/ServiceAreasGrid";
+import { business } from "@/lib/site/config";
 import { homeImages } from "@/lib/site/images";
 
 export const metadata: Metadata = {
@@ -11,23 +12,7 @@ export const metadata: Metadata = {
     "Elite Builders IX serves the Bay Area, Central Valley, Southern California, and the Eastern Sierra — rough framing, remodeling, siding, and decks. CSLB #970551.",
 };
 
-const regionOrder = [
-  "Bay Area",
-  "Central Valley",
-  "Southern California",
-  "Eastern Sierra",
-] as const;
-
 export default function ServiceAreasPage() {
-  const grouped = regionOrder
-    .map((region) => ({
-      region,
-      areas: serviceAreas.filter(
-        (area) => area.region === region && area.slug !== "bay-area",
-      ),
-    }))
-    .filter((group) => group.areas.length > 0);
-
   return (
     <>
       <section className="bg-brand-navy py-20 text-white">
@@ -57,35 +42,7 @@ export default function ServiceAreasPage() {
             priority
           />
 
-          {grouped.map((group) => (
-            <div key={group.region} className="mt-14">
-              <h2 className="text-2xl font-bold text-brand-navy sm:text-3xl">{group.region}</h2>
-              <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-                {group.areas.map((area: ServiceArea) => (
-                  <Link
-                    key={area.slug}
-                    href={area.href}
-                    className="group flex items-start gap-4 rounded-xl border border-solid border-gray-200 bg-white p-6 transition-all hover:border-brand-sky/60 hover:shadow-md"
-                  >
-                    <span className="rounded-full bg-brand-blue/5 p-2.5 text-brand-blue transition-colors group-hover:bg-brand-blue group-hover:text-white">
-                      <MapPin size={19} aria-hidden />
-                    </span>
-                    <span>
-                      <span className="flex items-center gap-1.5 font-bold text-brand-navy">
-                        {area.city}, CA
-                        <ArrowRight
-                          size={14}
-                          aria-hidden
-                          className="text-brand-blue opacity-0 transition-opacity group-hover:opacity-100"
-                        />
-                      </span>
-                      <span className="mt-1 block text-sm text-gray-500">{area.blurb}</span>
-                    </span>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          ))}
+          <ServiceAreasGrid />
 
           <div className="mt-14 text-center">
             <Link

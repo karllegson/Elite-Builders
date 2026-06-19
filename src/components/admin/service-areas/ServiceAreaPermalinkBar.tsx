@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { buildServiceAreaPermalinkUrl, slugify } from "@/lib/admin/postSeo";
+import { buildServiceAreaPermalinkUrl, slugifyServiceAreaPermalink } from "@/lib/admin/postSeo";
 import { business } from "@/lib/site/config";
 
 type ServiceAreaPermalinkBarProps = {
@@ -35,7 +35,7 @@ export function ServiceAreaPermalinkBar({
   };
 
   const handleOk = () => {
-    const nextSlug = slugify(draftSlug) || "sample-service-area";
+    const nextSlug = slugifyServiceAreaPermalink(draftSlug) || "sample-service-area";
     onSlugChange(nextSlug);
     setIsEditing(false);
   };

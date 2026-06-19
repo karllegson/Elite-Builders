@@ -69,6 +69,12 @@ export function AdminToolbar({
           {authBypass && <> &mdash; Dev Mode</>}
         </span>
 
+        <form action={logout} className="admin-toolbar-logout-form">
+          <button type="submit" className="admin-toolbar-item admin-toolbar-logout">
+            Log Out
+          </button>
+        </form>
+
         {!authBypass ? (
           <form action={logout} className="admin-toolbar-avatar-form">
             <button

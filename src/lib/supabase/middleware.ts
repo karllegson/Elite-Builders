@@ -1,6 +1,10 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
-import { isAuthBypassEnabled } from "@/lib/admin/auth";
+import {
+  ADMIN_DEV_OPT_OUT_COOKIE,
+  hasDevBypassOptOut,
+  isAuthBypassEnabled,
+} from "@/lib/admin/auth";
 import { getSupabaseEnv, isSupabaseConfigured } from "./env";
 
 export async function updateSession(request: NextRequest) {
@@ -8,11 +12,26 @@ export async function updateSession(request: NextRequest) {
   const isLoginRoute = pathname === "/admin/login";
 
   if (isAuthBypassEnabled()) {
+    const optedOut = hasDevBypassOptOut(
+      request.cookies.get(ADMIN_DEV_OPT_OUT_COOKIE)?.value,
+    );
+
+    if (optedOut) {
+      if (!isLoginRoute) {
+        const url = request.nextUrl.clone();
+        url.pathname = "/admin/login";
+        return NextResponse.redirect(url);
+      }
+
+      return NextResponse.next();
+    }
+
     if (isLoginRoute) {
       const url = request.nextUrl.clone();
       url.pathname = "/admin";
       return NextResponse.redirect(url);
     }
+
     return NextResponse.next();
   }
 

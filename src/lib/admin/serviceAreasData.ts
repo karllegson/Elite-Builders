@@ -1,12 +1,19 @@
 import { serviceAreas as staticServiceAreas } from "@/lib/site/config";
 import { siteConfig } from "@/lib/admin/config";
-import { slugify } from "@/lib/admin/postSeo";
+import { slugifyServiceAreaPermalink } from "@/lib/admin/postSeo";
 
 export const SERVICE_AREAS_STORAGE_KEY = "elite-builders-service-areas-v1";
+export const SERVICE_AREAS_CHANGED_EVENT = "elite-builders-service-areas-changed";
 export const UNUSED_SECTION_ID = "unused";
 export const DEFAULT_SERVICE_AREA_AUTHOR = siteConfig.defaultUserRole;
 
 export type ServiceAreaStatus = "published" | "draft";
+
+export type ServiceAreaFeaturedImage = {
+  src: string;
+  alt: string;
+  title: string;
+};
 
 export type ServiceAreaRecord = {
   id: string;
@@ -26,6 +33,7 @@ export type ServiceAreaRecord = {
   seoKeyword: string | null;
   seoSchema: string;
   hasFeaturedImage: boolean;
+  featuredImage: ServiceAreaFeaturedImage | null;
   archiveOnly: boolean;
   mapEmbed: string;
   breadcrumbsLinkInactive: boolean;
@@ -163,7 +171,8 @@ export function normalizeServiceAreaRecord(
     metaDescription: area.metaDescription ?? "",
     seoKeyword: area.seoKeyword ?? null,
     seoSchema: area.seoSchema ?? "WebPage",
-    hasFeaturedImage: area.hasFeaturedImage ?? false,
+    hasFeaturedImage: Boolean(area.featuredImage) || (area.hasFeaturedImage ?? false),
+    featuredImage: area.featuredImage ?? null,
     archiveOnly: area.archiveOnly ?? false,
     mapEmbed: area.mapEmbed ?? "",
     breadcrumbsLinkInactive: area.breadcrumbsLinkInactive ?? false,
@@ -275,6 +284,7 @@ export function createDefaultStore(): ServiceAreasStore {
       seoKeyword: null,
       seoSchema: "WebPage",
       hasFeaturedImage: false,
+      featuredImage: null,
       archiveOnly: false,
       mapEmbed: "",
       breadcrumbsLinkInactive: false,
@@ -330,6 +340,7 @@ export function writeServiceAreasStore(store: ServiceAreasStore): void {
   }
 
   window.localStorage.setItem(SERVICE_AREAS_STORAGE_KEY, JSON.stringify(store));
+  window.dispatchEvent(new CustomEvent(SERVICE_AREAS_CHANGED_EVENT));
 }
 
 export function resetServiceAreasStore(): ServiceAreasStore {
@@ -353,6 +364,7 @@ export type UpsertServiceAreaInput = {
   seoKeyword?: string | null;
   seoSchema?: string;
   hasFeaturedImage?: boolean;
+  featuredImage?: ServiceAreaFeaturedImage | null;
   archiveOnly?: boolean;
   mapEmbed?: string;
   breadcrumbsLinkInactive?: boolean;
@@ -362,6 +374,11 @@ export type UpsertServiceAreaInput = {
 
 export function getServiceAreaById(id: string): ServiceAreaRecord | null {
   const area = readServiceAreasStore().areas.find((item) => item.id === id);
+  return area ? normalizeServiceAreaRecord(area) : null;
+}
+
+export function getServiceAreaBySlug(slug: string): ServiceAreaRecord | null {
+  const area = readServiceAreasStore().areas.find((item) => item.slug === slug);
   return area ? normalizeServiceAreaRecord(area) : null;
 }
 
@@ -398,13 +415,16 @@ export function upsertServiceArea(input: UpsertServiceAreaInput): ServiceAreaRec
   const stateCode = isSubPage ? (parent?.stateCode ?? parsed.stateCode) : parsed.stateCode;
   const displayTitle = isSubPage ? trimmedTitle : formatServiceAreaLabel(parsed.city, stateCode);
   const slug =
-    input.slug.trim() ||
-    (isSubPage ? slugify(trimmedTitle) : slugify(parsed.city));
+    input.slug.trim() || slugifyServiceAreaPermalink(trimmedTitle);
   const id = input.id ?? slug;
   const existingIndex = store.areas.findIndex((area) => area.id === id);
   const existing = existingIndex >= 0 ? store.areas[existingIndex] : preliminaryExisting;
   const sectionId = stateCodeToSectionId(stateCode);
   const isPublished = (input.status ?? existing?.status ?? "draft") === "published";
+  const resolvedFeaturedImage =
+    input.featuredImage !== undefined
+      ? input.featuredImage
+      : (existing?.featuredImage ?? null);
 
   const nextRecord: ServiceAreaRecord = normalizeServiceAreaRecord({
     id,
@@ -434,7 +454,8 @@ export function upsertServiceArea(input: UpsertServiceAreaInput): ServiceAreaRec
     seoKeyword:
       input.seoKeyword !== undefined ? input.seoKeyword : (existing?.seoKeyword ?? null),
     seoSchema: input.seoSchema ?? existing?.seoSchema ?? "WebPage",
-    hasFeaturedImage: input.hasFeaturedImage ?? existing?.hasFeaturedImage ?? false,
+    hasFeaturedImage: resolvedFeaturedImage !== null,
+    featuredImage: resolvedFeaturedImage,
     archiveOnly: input.archiveOnly ?? existing?.archiveOnly ?? false,
     mapEmbed: input.mapEmbed ?? existing?.mapEmbed ?? "",
     breadcrumbsLinkInactive:

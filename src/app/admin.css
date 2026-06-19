@@ -273,6 +273,19 @@
   height: 32px;
 }
 
+.admin-toolbar-logout-form {
+  margin: 0;
+  padding: 0;
+  height: 32px;
+}
+
+.admin-toolbar-logout {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+}
+
 .admin-toolbar-avatar {
   display: inline-flex;
   align-items: center;
@@ -725,6 +738,47 @@
 
 .admin-post-content:focus {
   outline: none;
+}
+
+.admin-html-ide {
+  border: 1px solid var(--admin-border);
+  background: #1e1e1e;
+  overflow: hidden;
+}
+
+.admin-html-ide-toolbar {
+  border-bottom: 1px solid var(--admin-border);
+  background: #f6f7f7;
+}
+
+.admin-html-ide-surface {
+  min-height: 520px;
+  height: 58vh;
+}
+
+.admin-html-ide-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 520px;
+  height: 58vh;
+  background: #1e1e1e;
+  color: #c3c4c7;
+  font-size: 13px;
+}
+
+.admin-html-ide-footer {
+  margin-top: 0;
+  padding: 8px 12px;
+  background: #252526;
+  border-top: 1px solid #333;
+  color: #9d9d9d;
+}
+
+.admin-html-ide .monaco-editor,
+.admin-html-ide .monaco-editor-background,
+.admin-html-ide .monaco-editor .margin {
+  background-color: #1e1e1e !important;
 }
 
 .admin-post-editor-footer {
@@ -3461,6 +3515,41 @@
   border-left: 4px solid var(--admin-accent);
   font-size: 13px;
   color: var(--admin-text);
+}
+
+.admin-toast {
+  position: fixed;
+  top: 72px;
+  right: 20px;
+  z-index: 1200;
+  max-width: min(360px, calc(100vw - 32px));
+  padding: 10px 14px;
+  background: #fff;
+  border: 1px solid var(--admin-border);
+  border-left: 4px solid var(--admin-accent);
+  border-radius: 3px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14);
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--admin-text);
+  pointer-events: none;
+  animation: admin-toast-in 0.2s ease-out;
+}
+
+.admin-toast-error {
+  border-left-color: var(--admin-badge);
+}
+
+@keyframes admin-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .admin-categories-layout {

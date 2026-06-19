@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { FeaturedImageModal } from "@/components/admin/posts/FeaturedImageModal";
 import { PublishMetabox } from "@/components/admin/posts/PublishMetabox";
 import { PageAttributesMetabox } from "@/components/admin/service-areas/PageAttributesMetabox";
@@ -9,6 +9,7 @@ import type { MediaAttachment } from "@/lib/admin/mediaLibrary";
 import type { PostSeoSnippet } from "@/lib/admin/postSeo";
 import {
   createDefaultPageAttributes,
+  type ServiceAreaFeaturedImage,
   type ServiceAreaPageAttributes,
 } from "@/lib/admin/serviceAreaEditor";
 
@@ -19,12 +20,20 @@ type ServiceAreaEditorSidebarProps = {
   pageAttributes?: ServiceAreaPageAttributes;
   onPageAttributesChange?: (attributes: ServiceAreaPageAttributes) => void;
   excludeParentId?: string;
-  hasFeaturedImage?: boolean;
-  onFeaturedImageChange?: (hasFeaturedImage: boolean) => void;
+  featuredImage?: ServiceAreaFeaturedImage | null;
+  onFeaturedImageChange?: (image: ServiceAreaFeaturedImage | null) => void;
   onPublish?: () => void;
   onSaveDraft?: () => void;
   primaryActionLabel?: string;
 };
+
+function toFeaturedImage(image: MediaAttachment): ServiceAreaFeaturedImage {
+  return {
+    src: image.src,
+    alt: image.alt || image.title,
+    title: image.title,
+  };
+}
 
 export function ServiceAreaEditorSidebar({
   title = "",
@@ -33,7 +42,7 @@ export function ServiceAreaEditorSidebar({
   pageAttributes: pageAttributesProp,
   onPageAttributesChange,
   excludeParentId,
-  hasFeaturedImage = false,
+  featuredImage = null,
   onFeaturedImageChange,
   onPublish,
   onSaveDraft,
@@ -42,18 +51,7 @@ export function ServiceAreaEditorSidebar({
   const [internalPageAttributes, setInternalPageAttributes] =
     useState<ServiceAreaPageAttributes>(createDefaultPageAttributes);
   const pageAttributes = pageAttributesProp ?? internalPageAttributes;
-  const [featuredImage, setFeaturedImage] = useState<MediaAttachment | null>(
-    null,
-  );
   const [featuredImageModalOpen, setFeaturedImageModalOpen] = useState(false);
-
-  useEffect(() => {
-    if (hasFeaturedImage && !featuredImage) {
-      return;
-    }
-
-    onFeaturedImageChange?.(featuredImage !== null);
-  }, [featuredImage, hasFeaturedImage, onFeaturedImageChange]);
 
   const handlePageAttributesChange = (next: ServiceAreaPageAttributes) => {
     if (pageAttributesProp === undefined) {
@@ -63,13 +61,11 @@ export function ServiceAreaEditorSidebar({
   };
 
   const handleSetFeaturedImage = (image: MediaAttachment) => {
-    setFeaturedImage(image);
-    onFeaturedImageChange?.(true);
+    onFeaturedImageChange?.(toFeaturedImage(image));
   };
 
   const handleRemoveFeaturedImage = () => {
-    setFeaturedImage(null);
-    onFeaturedImageChange?.(false);
+    onFeaturedImageChange?.(null);
   };
 
   return (
@@ -79,7 +75,7 @@ export function ServiceAreaEditorSidebar({
           postTitle={title}
           postContent={content}
           seoSnippet={seoSnippet}
-          hasFeaturedImage={featuredImage !== null || hasFeaturedImage}
+          hasFeaturedImage={featuredImage !== null}
           previewHref="/service-areas"
           onPublish={onPublish}
           onSaveDraft={onSaveDraft}
