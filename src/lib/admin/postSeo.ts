@@ -36,6 +36,11 @@ export function slugify(value: string): string {
     .replace(/^-|-$/g, "");
 }
 
+/** Service area permalink from the full title (e.g. "San Jose, CA" → "san-jose-ca"). */
+export function slugifyServiceAreaPermalink(title: string): string {
+  return slugify(title);
+}
+
 export function createSchemaItem(
   type: string,
   headline = "",

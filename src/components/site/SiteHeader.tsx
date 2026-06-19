@@ -33,7 +33,11 @@ const utilityIcons = {
   Projects: FolderOpen,
 } as const;
 
-export default function SiteHeader() {
+type SiteHeaderProps = {
+  hasAdminBar?: boolean;
+};
+
+export default function SiteHeader({ hasAdminBar = false }: SiteHeaderProps) {
   const pathname = usePathname();
   const headerRef = useRef<HTMLElement>(null);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -116,9 +120,9 @@ export default function SiteHeader() {
   return (
     <header
       ref={headerRef}
-      className={`sticky top-0 z-50 bg-white transition-shadow duration-300 ${
-        scrolled ? "shadow-md" : "shadow-sm"
-      }`}
+      className={`sticky z-50 bg-white transition-shadow duration-300 ${
+        hasAdminBar ? "top-[var(--site-admin-bar-height,32px)]" : "top-0"
+      } ${scrolled ? "shadow-md" : "shadow-sm"}`}
     >
       <div className="h-0.5 bg-brand-red" aria-hidden />
       {/* Top utility bar — collapses on scroll (hysteresis prevents jitter near top) */}

@@ -3,6 +3,8 @@ import { Fira_Sans, Poppins } from "next/font/google";
 import { Phone } from "lucide-react";
 import SiteHeader from "@/components/site/SiteHeader";
 import SiteFooter from "@/components/site/SiteFooter";
+import { SiteAdminBar } from "@/components/site/SiteAdminBar";
+import { getSiteAdminSession } from "@/lib/admin/getSiteAdminSession";
 import { business } from "@/lib/site/config";
 
 /** Arlington / Level 10 pairing: Fira Sans body + Poppins headings & nav */
@@ -20,10 +22,28 @@ const poppins = Poppins({
   display: "swap",
 });
 
-export default function SiteLayout({ children }: { children: React.ReactNode }) {
+export default async function SiteLayout({ children }: { children: React.ReactNode }) {
+  const adminSession = await getSiteAdminSession();
+
   return (
-    <div className={`site ${firaSans.variable} ${poppins.variable} flex min-h-screen flex-col`}>
-      <SiteHeader />
+    <div
+      className={`site ${firaSans.variable} ${poppins.variable} flex min-h-screen flex-col${
+        adminSession.isAdmin ? " site-has-admin-bar" : ""
+      }`}
+      style={
+        adminSession.isAdmin
+          ? ({ "--site-admin-bar-height": "32px" } as React.CSSProperties)
+          : undefined
+      }
+    >
+      {adminSession.isAdmin ? (
+        <SiteAdminBar
+          displayName={adminSession.displayName ?? "Admin"}
+          email={adminSession.email}
+          authBypass={adminSession.authBypass}
+        />
+      ) : null}
+      <SiteHeader hasAdminBar={adminSession.isAdmin} />
       <main className="flex-1 pb-16 sm:pb-0">{children}</main>
       <SiteFooter />
 

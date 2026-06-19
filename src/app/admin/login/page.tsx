@@ -3,7 +3,7 @@ import { siteConfig } from "@/lib/admin/config";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 
 type LoginPageProps = {
-  searchParams: Promise<{ error?: string; setup?: string }>;
+  searchParams: Promise<{ error?: string; setup?: string; logged_out?: string }>;
 };
 
 export default async function AdminLoginPage({ searchParams }: LoginPageProps) {
@@ -25,6 +25,10 @@ export default async function AdminLoginPage({ searchParams }: LoginPageProps) {
             your Supabase URL and publishable key, then create an admin user in the
             Supabase dashboard.
           </div>
+        )}
+
+        {params.logged_out && (
+          <div className="admin-setup-notice">You have been logged out.</div>
         )}
 
         {params.error && <div className="admin-error">{params.error}</div>}

@@ -16,6 +16,12 @@ export type ServiceAreaExtraFields = {
   breadcrumbsLinkInactive: boolean;
 };
 
+export type ServiceAreaFeaturedImage = {
+  src: string;
+  alt: string;
+  title: string;
+};
+
 export function createDefaultPageAttributes(): ServiceAreaPageAttributes {
   return {
     parentId: null,

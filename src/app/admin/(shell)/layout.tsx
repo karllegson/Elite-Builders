@@ -1,7 +1,12 @@
+import { cookies } from "next/headers";
 import { AdminContentHeader } from "@/components/admin/AdminContentHeader";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { AdminToolbar } from "@/components/admin/AdminToolbar";
-import { bypassAdminUser, isAuthBypassEnabled } from "@/lib/admin/auth";
+import {
+  ADMIN_DEV_OPT_OUT_COOKIE,
+  bypassAdminUser,
+  isDevBypassSessionActive,
+} from "@/lib/admin/auth";
 import { siteConfig } from "@/lib/admin/config";
 import { createClient } from "@/lib/supabase/server";
 
@@ -10,7 +15,10 @@ export default async function AdminShellLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const bypass = isAuthBypassEnabled();
+  const cookieStore = await cookies();
+  const bypass = isDevBypassSessionActive(
+    cookieStore.get(ADMIN_DEV_OPT_OUT_COOKIE)?.value,
+  );
 
   const supabase = bypass ? null : await createClient();
   const {
