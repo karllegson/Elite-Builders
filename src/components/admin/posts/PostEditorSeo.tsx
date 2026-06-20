@@ -38,6 +38,7 @@ type PostEditorSeoProps = {
   onSchemaGeneratorConfigChange: (config: SchemaGeneratorConfig) => void;
   buildPermalinkUrl?: (domain: string, slug: string) => string;
   fallbackPreviewTitle?: string;
+  slugifyPermalinkFromTitle?: (title: string) => string;
 };
 
 export function PostEditorSeo({
@@ -50,6 +51,7 @@ export function PostEditorSeo({
   onSchemaGeneratorConfigChange,
   buildPermalinkUrl = buildBlogPermalinkUrl,
   fallbackPreviewTitle = "Sample Post Title",
+  slugifyPermalinkFromTitle,
 }: PostEditorSeoProps) {
   const siteUrl = useAdminSiteUrl();
   const [activeTab, setActiveTab] = useState<SeoTab>("general");
@@ -247,6 +249,7 @@ export function PostEditorSeo({
         fallbackTitle={postTitle}
         buildPermalinkUrl={buildPermalinkUrl}
         fallbackPreviewTitle={fallbackPreviewTitle}
+        slugifyPermalinkFromTitle={slugifyPermalinkFromTitle}
         onClose={() => setSnippetModalOpen(false)}
         onSave={onSnippetChange}
       />

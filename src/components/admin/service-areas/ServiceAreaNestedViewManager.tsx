@@ -24,6 +24,7 @@ import {
   listNestedServiceAreas,
   type ServiceAreaRecord,
 } from "@/lib/admin/serviceAreasData";
+import { getServiceAreaPublicHref } from "@/lib/site/serviceAreaUrls";
 
 const NESTED_VIEWS: { id: NestedListView; label: string; countKey: keyof ReturnType<typeof getNestedViewCounts> }[] = [
   { id: "all", label: "All", countKey: "all" },
@@ -159,7 +160,7 @@ function NestedServiceAreaRow({
             Quick Edit
           </button>
           <Link
-            href={`/service-areas/${area.slug}`}
+            href={getServiceAreaPublicHref(area)}
             className="admin-sa-nested-link-btn"
             target="_blank"
             rel="noopener noreferrer"

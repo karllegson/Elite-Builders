@@ -713,73 +713,92 @@ function shouldUseLocalStore(): boolean {
   return !hasAdminClient();
 }
 
-export async function listPosts(): Promise<PostRecord[]> {
-  if (shouldUseLocalStore()) {
-    return listPostsLocal();
+function isMissingPostsTableError(error: unknown): boolean {
+  if (!error || typeof error !== "object") {
+    return false;
   }
 
-  return listPostsSupabase();
+  const candidate = error as { code?: string; message?: string };
+  return (
+    candidate.code === "PGRST205" ||
+    Boolean(candidate.message?.includes("Could not find the table 'public.posts'")) ||
+    Boolean(candidate.message?.includes("Could not find the table 'public.post_categories'")) ||
+    Boolean(candidate.message?.includes("Could not find the table 'public.post_tags'"))
+  );
+}
+
+async function withPostsStoreFallback<T>(
+  supabaseFn: () => Promise<T>,
+  localFn: () => Promise<T>,
+): Promise<T> {
+  if (shouldUseLocalStore()) {
+    return localFn();
+  }
+
+  try {
+    return await supabaseFn();
+  } catch (error) {
+    if (isMissingPostsTableError(error)) {
+      return localFn();
+    }
+
+    throw error;
+  }
+}
+
+export async function listPosts(): Promise<PostRecord[]> {
+  return withPostsStoreFallback(listPostsSupabase, listPostsLocal);
 }
 
 export async function getPostById(id: string): Promise<PostRecord | null> {
-  if (shouldUseLocalStore()) {
-    return getPostByIdLocal(id);
-  }
-
-  return getPostByIdSupabase(id);
+  return withPostsStoreFallback(
+    () => getPostByIdSupabase(id),
+    () => getPostByIdLocal(id),
+  );
 }
 
 export async function getPostBySlug(slug: string): Promise<PostRecord | null> {
-  if (shouldUseLocalStore()) {
-    return getPostBySlugLocal(slug);
-  }
-
-  return getPostBySlugSupabase(slug);
+  return withPostsStoreFallback(
+    () => getPostBySlugSupabase(slug),
+    () => getPostBySlugLocal(slug),
+  );
 }
 
 export async function upsertPost(input: UpsertPostInput): Promise<PostRecord> {
-  if (shouldUseLocalStore()) {
-    return upsertPostLocal(input);
-  }
-
-  return upsertPostSupabase(input);
+  return withPostsStoreFallback(
+    () => upsertPostSupabase(input),
+    () => upsertPostLocal(input),
+  );
 }
 
 export async function updatePostFeaturedImage(
   postId: string,
   featuredImageId: string | null,
 ): Promise<PostRecord | null> {
-  if (shouldUseLocalStore()) {
-    return updatePostFeaturedImageLocal(postId, featuredImageId);
-  }
-
-  return updatePostFeaturedImageSupabase(postId, featuredImageId);
+  return withPostsStoreFallback(
+    () => updatePostFeaturedImageSupabase(postId, featuredImageId),
+    () => updatePostFeaturedImageLocal(postId, featuredImageId),
+  );
 }
 
 export async function bulkUpdatePostStatus(
   ids: string[],
   status: PostStoreStatus,
 ): Promise<number> {
-  if (shouldUseLocalStore()) {
-    return bulkUpdatePostStatusLocal(ids, status);
-  }
-
-  return bulkUpdatePostStatusSupabase(ids, status);
+  return withPostsStoreFallback(
+    () => bulkUpdatePostStatusSupabase(ids, status),
+    () => bulkUpdatePostStatusLocal(ids, status),
+  );
 }
 
 export async function deletePostsPermanently(ids: string[]): Promise<number> {
-  if (shouldUseLocalStore()) {
-    return deletePostsLocal(ids);
-  }
-
-  return deletePostsSupabase(ids);
+  return withPostsStoreFallback(
+    () => deletePostsSupabase(ids),
+    () => deletePostsLocal(ids),
+  );
 }
 
-export async function listCategories(): Promise<PostCategoryRecord[]> {
-  if (shouldUseLocalStore()) {
-    return listCategoriesLocal();
-  }
-
+async function listCategoriesSupabase(): Promise<PostCategoryRecord[]> {
   const client = createAdminClient();
   const { data, error } = await client
     .from("post_categories")
@@ -801,27 +820,25 @@ export async function listCategories(): Promise<PostCategoryRecord[]> {
   }));
 }
 
-export async function createCategory(input: CreateCategoryInput): Promise<PostCategoryRecord> {
-  if (shouldUseLocalStore()) {
-    return createCategoryLocal(input);
-  }
+export async function listCategories(): Promise<PostCategoryRecord[]> {
+  return withPostsStoreFallback(listCategoriesSupabase, listCategoriesLocal);
+}
 
-  return createCategorySupabase(input);
+export async function createCategory(input: CreateCategoryInput): Promise<PostCategoryRecord> {
+  return withPostsStoreFallback(
+    () => createCategorySupabase(input),
+    () => createCategoryLocal(input),
+  );
 }
 
 export async function deleteCategories(ids: string[]): Promise<number> {
-  if (shouldUseLocalStore()) {
-    return deleteCategoriesLocal(ids);
-  }
-
-  return deleteCategoriesSupabase(ids);
+  return withPostsStoreFallback(
+    () => deleteCategoriesSupabase(ids),
+    () => deleteCategoriesLocal(ids),
+  );
 }
 
-export async function listTags(): Promise<PostTagRecord[]> {
-  if (shouldUseLocalStore()) {
-    return listTagsLocal();
-  }
-
+async function listTagsSupabase(): Promise<PostTagRecord[]> {
   const client = createAdminClient();
   const { data, error } = await client.from("post_tags").select("*").order("name");
 
@@ -838,20 +855,22 @@ export async function listTags(): Promise<PostTagRecord[]> {
   }));
 }
 
-export async function createTag(input: CreateTagInput): Promise<PostTagRecord> {
-  if (shouldUseLocalStore()) {
-    return createTagLocal(input);
-  }
+export async function listTags(): Promise<PostTagRecord[]> {
+  return withPostsStoreFallback(listTagsSupabase, listTagsLocal);
+}
 
-  return createTagSupabase(input);
+export async function createTag(input: CreateTagInput): Promise<PostTagRecord> {
+  return withPostsStoreFallback(
+    () => createTagSupabase(input),
+    () => createTagLocal(input),
+  );
 }
 
 export async function deleteTags(ids: string[]): Promise<number> {
-  if (shouldUseLocalStore()) {
-    return deleteTagsLocal(ids);
-  }
-
-  return deleteTagsSupabase(ids);
+  return withPostsStoreFallback(
+    () => deleteTagsSupabase(ids),
+    () => deleteTagsLocal(ids),
+  );
 }
 
 export async function listPublishedPublicPosts(): Promise<PostRecord[]> {

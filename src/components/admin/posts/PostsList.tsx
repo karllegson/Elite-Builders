@@ -254,6 +254,7 @@ export function PostsList() {
   const router = useRouter();
   const [allPosts, setAllPosts] = useState<PostListItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const viewCounts = useMemo(() => getPostViewCounts(allPosts), [allPosts]);
   const dateOptions = useMemo(() => getPostDateOptions(allPosts), [allPosts]);
   const categoryOptions = useMemo(() => getPostCategoryOptions(allPosts), [allPosts]);
@@ -270,10 +271,26 @@ export function PostsList() {
 
   const loadPosts = useCallback(async () => {
     setIsLoading(true);
-    const result = await fetchPostsForAdmin();
-    setAllPosts(result.items);
-    setIsLoading(false);
-  }, []);
+    setLoadError(null);
+
+    try {
+      const result = await fetchPostsForAdmin();
+      setAllPosts(result.items);
+
+      if (result.error) {
+        setLoadError(result.error);
+        toast.error(result.error);
+      }
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Could not load posts.";
+      setAllPosts([]);
+      setLoadError(message);
+      toast.error(message);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [toast]);
 
   useEffect(() => {
     void loadPosts();
@@ -418,6 +435,14 @@ export function PostsList() {
 
   if (isLoading) {
     return <p className="admin-post-editor-loading">Loading posts…</p>;
+  }
+
+  if (loadError) {
+    return (
+      <p className="admin-categories-status-message admin-post-editor-status" role="alert">
+        {loadError}
+      </p>
+    );
   }
 
   return (

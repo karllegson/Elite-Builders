@@ -38,7 +38,29 @@ export function slugify(value: string): string {
 
 /** Service area permalink from the full title (e.g. "San Jose, CA" → "san-jose-ca"). */
 export function slugifyServiceAreaPermalink(title: string): string {
-  return slugify(title);
+  const trimmed = title.trim();
+
+  if (!trimmed) {
+    return "";
+  }
+
+  const commaIndex = trimmed.lastIndexOf(",");
+
+  if (commaIndex !== -1) {
+    const cityPart = trimmed.slice(0, commaIndex).trim();
+    const statePart = trimmed.slice(commaIndex + 1).trim();
+
+    if (cityPart && statePart) {
+      const citySlug = slugify(cityPart);
+      const stateSlug = slugify(statePart);
+
+      if (citySlug && stateSlug) {
+        return `${citySlug}-${stateSlug}`;
+      }
+    }
+  }
+
+  return slugify(trimmed);
 }
 
 export function createSchemaItem(
@@ -125,9 +147,4 @@ export function buildBlogPermalinkUrl(
   return buildPermalinkUrl(siteDomain, slug, "/blog/");
 }
 
-export function buildServiceAreaPermalinkUrl(
-  siteDomain: string,
-  slug: string,
-): string {
-  return buildPermalinkUrl(siteDomain, slug, "/service-areas/");
-}
+export { buildServiceAreaPermalinkUrl } from "@/lib/site/serviceAreaUrls";

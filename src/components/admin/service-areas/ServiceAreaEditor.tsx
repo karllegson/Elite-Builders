@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { HtmlIdeEditor } from "@/components/admin/HtmlIdeEditor";
 import { PostEditorSeo } from "@/components/admin/posts/PostEditorSeo";
 import { ServiceAreaExtraMetaboxes } from "@/components/admin/service-areas/ServiceAreaExtraMetaboxes";
@@ -18,15 +18,22 @@ import { createDefaultSchemaGeneratorConfig } from "@/lib/admin/postSchemaGenera
 import {
   createDefaultExtraFields,
   createDefaultPageAttributes,
+  resolveServiceAreaParentId,
+  serviceAreaToPublishSettings,
   type ServiceAreaExtraFields,
   type ServiceAreaFeaturedImage,
   type ServiceAreaPageAttributes,
 } from "@/lib/admin/serviceAreaEditor";
+import { createDefaultPublishSettings, type PublishSettings } from "@/lib/admin/postPublish";
 import { useAdminToast } from "@/components/admin/toast/useAdminToast";
 import {
   getServiceAreaById,
   upsertServiceArea,
+  type ServiceAreaRecord,
 } from "@/lib/admin/serviceAreasData";
+import { getParentSlugForServiceArea } from "@/lib/site/serviceAreaUrls";
+
+const SERVICE_AREA_SAVE_TOAST_KEY = "elite-builders-service-area-save-toast";
 
 type ServiceAreaEditorProps = {
   serviceAreaId?: string;
@@ -41,6 +48,9 @@ export function ServiceAreaEditor({
   const isEditing = Boolean(serviceAreaId);
   const [loaded, setLoaded] = useState(!isEditing);
   const [missing, setMissing] = useState(false);
+  const [publishSettings, setPublishSettings] = useState<PublishSettings>(
+    createDefaultPublishSettings,
+  );
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [snippet, setSnippet] = useState<PostSeoSnippet>({
@@ -59,7 +69,7 @@ export function ServiceAreaEditor({
   );
   const [pageAttributes, setPageAttributes] = useState<ServiceAreaPageAttributes>(() => ({
     ...createDefaultPageAttributes(),
-    parentId: defaultParentId,
+    parentId: resolveServiceAreaParentId(defaultParentId),
   }));
   const [featuredImage, setFeaturedImage] = useState<ServiceAreaFeaturedImage | null>(null);
   const snippetEditedRef = useRef({
@@ -67,20 +77,12 @@ export function ServiceAreaEditor({
     permalink: false,
     metaDescription: false,
   });
+  const parentSlug = useMemo(
+    () => getParentSlugForServiceArea(pageAttributes.parentId),
+    [pageAttributes.parentId],
+  );
 
-  useEffect(() => {
-    if (!serviceAreaId) {
-      return;
-    }
-
-    const record = getServiceAreaById(serviceAreaId);
-
-    if (!record) {
-      setMissing(true);
-      setLoaded(true);
-      return;
-    }
-
+  const applyLoadedRecord = useCallback((record: ServiceAreaRecord) => {
     snippetEditedRef.current = {
       seoTitle: Boolean(record.seoTitle && record.seoTitle !== record.title),
       permalink: record.slug !== slugifyServiceAreaPermalink(record.title),
@@ -111,8 +113,57 @@ export function ServiceAreaEditor({
       order: record.sortOrder,
     });
     setFeaturedImage(record.featuredImage);
+    setPublishSettings(serviceAreaToPublishSettings(record));
+  }, []);
+
+  useEffect(() => {
+    const savedMessage = sessionStorage.getItem(SERVICE_AREA_SAVE_TOAST_KEY);
+
+    if (!savedMessage) {
+      return;
+    }
+
+    sessionStorage.removeItem(SERVICE_AREA_SAVE_TOAST_KEY);
+    toast.success(savedMessage);
+  }, [toast]);
+
+  useEffect(() => {
+    if (isEditing || !defaultParentId) {
+      return;
+    }
+
+    const resolvedParentId = resolveServiceAreaParentId(defaultParentId);
+
+    if (!resolvedParentId) {
+      return;
+    }
+
+    setPageAttributes((current) =>
+      current.parentId === resolvedParentId
+        ? current
+        : {
+            ...current,
+            parentId: resolvedParentId,
+          },
+    );
+  }, [defaultParentId, isEditing]);
+
+  useEffect(() => {
+    if (!serviceAreaId) {
+      return;
+    }
+
+    const record = getServiceAreaById(serviceAreaId);
+
+    if (!record) {
+      setMissing(true);
+      setLoaded(true);
+      return;
+    }
+
+    applyLoadedRecord(record);
     setLoaded(true);
-  }, [serviceAreaId]);
+  }, [applyLoadedRecord, serviceAreaId]);
 
   useEffect(() => {
     setSnippet((current) => ({
@@ -142,9 +193,11 @@ export function ServiceAreaEditor({
   }, [snippet.seoTitle, snippet.metaDescription, title]);
 
   const handleSnippetChange = (nextSnippet: PostSeoSnippet) => {
+    const autoPermalink = slugifyServiceAreaPermalink(nextSnippet.seoTitle || title);
+
     snippetEditedRef.current = {
-      seoTitle: nextSnippet.seoTitle !== title,
-      permalink: nextSnippet.permalink !== slugifyServiceAreaPermalink(title),
+      seoTitle: nextSnippet.seoTitle.trim() !== title.trim(),
+      permalink: nextSnippet.permalink.trim() !== autoPermalink,
       metaDescription: nextSnippet.metaDescription.length > 0,
     };
 
@@ -171,8 +224,10 @@ export function ServiceAreaEditor({
 
     const primarySchema = schemas[0]?.type ?? "WebPage";
 
+    let saved: ServiceAreaRecord;
+
     try {
-      upsertServiceArea({
+      saved = upsertServiceArea({
         id: serviceAreaId,
         title,
         slug: snippet.permalink || slugifyServiceAreaPermalink(title),
@@ -196,11 +251,11 @@ export function ServiceAreaEditor({
       return;
     }
 
-    const isSubPage = pageAttributes.parentId !== null;
-
-    toast.success(
+    const isSubPage = saved.parentId !== null;
+    const wasEditing = Boolean(serviceAreaId);
+    const message =
       status === "published"
-        ? isEditing
+        ? wasEditing
           ? isSubPage
             ? "Sub-page updated."
             : "Service area updated."
@@ -209,8 +264,10 @@ export function ServiceAreaEditor({
             : "Service area published. Open Sorting to arrange display order."
         : isSubPage
           ? "Sub-page draft saved."
-          : "Draft saved.",
-    );
+          : "Draft saved.";
+
+    sessionStorage.setItem(SERVICE_AREA_SAVE_TOAST_KEY, message);
+    window.location.assign(`/admin/service-areas/${saved.id}`);
   };
 
   if (!loaded) {
@@ -246,6 +303,7 @@ export function ServiceAreaEditor({
 
         <ServiceAreaPermalinkBar
           slug={snippet.permalink}
+          parentSlug={parentSlug}
           onSlugChange={(permalink) =>
             handleSnippetChange({ ...snippet, permalink })
           }
@@ -266,7 +324,10 @@ export function ServiceAreaEditor({
           onSnippetChange={handleSnippetChange}
           onSchemasChange={setSchemas}
           onSchemaGeneratorConfigChange={setSchemaGeneratorConfig}
-          buildPermalinkUrl={buildServiceAreaPermalinkUrl}
+          buildPermalinkUrl={(domain, slug) =>
+            buildServiceAreaPermalinkUrl(domain, slug, parentSlug)
+          }
+          slugifyPermalinkFromTitle={slugifyServiceAreaPermalink}
           fallbackPreviewTitle="Sample Service Area Title"
         />
 
@@ -285,6 +346,7 @@ export function ServiceAreaEditor({
         excludeParentId={serviceAreaId}
         featuredImage={featuredImage}
         onFeaturedImageChange={setFeaturedImage}
+        publishSettings={publishSettings}
         onPublish={() => persistServiceArea("published")}
         onSaveDraft={() => persistServiceArea("draft")}
         primaryActionLabel={isEditing ? "Update" : "Publish"}

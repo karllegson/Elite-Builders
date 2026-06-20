@@ -1,6 +1,7 @@
 import { serviceAreas as staticServiceAreas } from "@/lib/site/config";
 import { siteConfig } from "@/lib/admin/config";
 import { slugifyServiceAreaPermalink } from "@/lib/admin/postSeo";
+import { createServiceAreaRecordId } from "@/lib/site/serviceAreaUrls";
 
 export const SERVICE_AREAS_STORAGE_KEY = "elite-builders-service-areas-v1";
 export const SERVICE_AREAS_CHANGED_EVENT = "elite-builders-service-areas-changed";
@@ -414,11 +415,35 @@ export function upsertServiceArea(input: UpsertServiceAreaInput): ServiceAreaRec
   const city = isSubPage ? trimmedTitle : parsed.city;
   const stateCode = isSubPage ? (parent?.stateCode ?? parsed.stateCode) : parsed.stateCode;
   const displayTitle = isSubPage ? trimmedTitle : formatServiceAreaLabel(parsed.city, stateCode);
-  const slug =
-    input.slug.trim() || slugifyServiceAreaPermalink(trimmedTitle);
-  const id = input.id ?? slug;
+  const slug = slugifyServiceAreaPermalink(input.slug.trim() || trimmedTitle);
+  const id = input.id ?? createServiceAreaRecordId(slug, resolvedParentId, parent);
   const existingIndex = store.areas.findIndex((area) => area.id === id);
   const existing = existingIndex >= 0 ? store.areas[existingIndex] : preliminaryExisting;
+
+  const duplicateSlug = store.areas.find((area) => {
+    if (area.id === id) {
+      return false;
+    }
+
+    if (area.slug !== slug) {
+      return false;
+    }
+
+    if (isSubPage) {
+      return area.parentId === resolvedParentId;
+    }
+
+    return isTopLevelServiceArea(area);
+  });
+
+  if (duplicateSlug) {
+    throw new Error(
+      isSubPage
+        ? `Slug "${slug}" is already used under this parent service area.`
+        : `Slug "${slug}" is already in use.`,
+    );
+  }
+
   const sectionId = stateCodeToSectionId(stateCode);
   const isPublished = (input.status ?? existing?.status ?? "draft") === "published";
   const resolvedFeaturedImage =

@@ -7,13 +7,12 @@ import { logout } from "@/app/admin/actions";
 import { siteConfig } from "@/lib/admin/config";
 import {
   getFrontendAdminBarItems,
-  getServiceAreaSlugFromPath,
   type FrontendAdminBarItem,
 } from "@/lib/admin/frontendAdminBar";
 import {
-  getServiceAreaBySlug,
   SERVICE_AREAS_CHANGED_EVENT,
 } from "@/lib/admin/serviceAreasData";
+import { resolveServiceAreaAdminIdFromPath } from "@/lib/site/serviceAreaUrls";
 
 type SiteAdminBarProps = {
   displayName: string;
@@ -45,9 +44,7 @@ function resolveItemHref(
     return `/admin/service-areas/${serviceAreaAdminId}`;
   }
 
-  const slug = getServiceAreaSlugFromPath(pathname);
-
-  return slug ? `/admin/service-areas/${slug}` : item.href;
+  return item.href;
 }
 
 export function SiteAdminBar({
@@ -61,16 +58,8 @@ export function SiteAdminBar({
   const baseItems = useMemo(() => getFrontendAdminBarItems(pathname), [pathname]);
 
   useEffect(() => {
-    const slug = getServiceAreaSlugFromPath(pathname);
-
-    if (!slug) {
-      setServiceAreaAdminId(null);
-      return;
-    }
-
     const syncServiceAreaId = () => {
-      const record = getServiceAreaBySlug(slug);
-      setServiceAreaAdminId(record?.id ?? null);
+      setServiceAreaAdminId(resolveServiceAreaAdminIdFromPath(pathname));
     };
 
     syncServiceAreaId();

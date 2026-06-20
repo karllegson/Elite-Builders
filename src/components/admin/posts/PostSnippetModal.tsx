@@ -1,7 +1,7 @@
 "use client";
 
 import { Monitor, Smartphone, Share2, Settings } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { SeoSnippetPreview } from "@/components/admin/posts/SeoSnippetPreview";
 import {
   buildBlogPermalinkUrl,
@@ -21,6 +21,7 @@ type PostSnippetModalProps = {
   onSave: (snippet: PostSeoSnippet) => void;
   buildPermalinkUrl?: (domain: string, slug: string) => string;
   fallbackPreviewTitle?: string;
+  slugifyPermalinkFromTitle?: (title: string) => string;
 };
 
 export function PostSnippetModal({
@@ -31,8 +32,10 @@ export function PostSnippetModal({
   onSave,
   buildPermalinkUrl = buildBlogPermalinkUrl,
   fallbackPreviewTitle = "Sample Post Title",
+  slugifyPermalinkFromTitle,
 }: PostSnippetModalProps) {
   const siteUrl = useAdminSiteUrl();
+  const permalinkEditedRef = useRef(false);
   const [activeTab, setActiveTab] = useState<"general" | "social">("general");
   const [previewMode, setPreviewMode] = useState<"desktop" | "mobile">(
     "desktop",
@@ -44,8 +47,15 @@ export function PostSnippetModal({
       setDraft(snippet);
       setActiveTab("general");
       setPreviewMode("desktop");
+
+      const autoPermalink = slugifyPermalinkFromTitle
+        ? slugifyPermalinkFromTitle(snippet.seoTitle || fallbackTitle)
+        : snippet.permalink;
+
+      permalinkEditedRef.current =
+        snippet.permalink.trim() !== autoPermalink.trim();
     }
-  }, [isOpen, snippet]);
+  }, [fallbackTitle, isOpen, slugifyPermalinkFromTitle, snippet]);
 
   if (!isOpen) {
     return null;
@@ -153,12 +163,18 @@ export function PostSnippetModal({
                   <input
                     type="text"
                     value={draft.seoTitle}
-                    onChange={(event) =>
+                    onChange={(event) => {
+                      const seoTitle = event.target.value;
+
                       setDraft((current) => ({
                         ...current,
-                        seoTitle: event.target.value,
-                      }))
-                    }
+                        seoTitle,
+                        permalink:
+                          slugifyPermalinkFromTitle && !permalinkEditedRef.current
+                            ? slugifyPermalinkFromTitle(seoTitle || fallbackTitle)
+                            : current.permalink,
+                      }));
+                    }}
                   />
                   <p className="admin-snippet-help">
                     This is what will appear in the first line when this post
@@ -183,12 +199,13 @@ export function PostSnippetModal({
                   <input
                     type="text"
                     value={draft.permalink}
-                    onChange={(event) =>
+                    onChange={(event) => {
+                      permalinkEditedRef.current = true;
                       setDraft((current) => ({
                         ...current,
                         permalink: event.target.value,
-                      }))
-                    }
+                      }));
+                    }}
                   />
                   <p className="admin-snippet-help">
                     This is the unique URL of this page, displayed below the

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
   fetchFeaturedImageForPost,
@@ -6,11 +7,13 @@ import {
   fetchRecentPostsForSite,
 } from "@/app/admin/(shell)/posts/actions";
 import { PasswordProtectedPost } from "@/components/site/BlogPostPasswordGate";
-import { BlogPostArticle } from "@/components/site/blog/BlogPostArticle";
-import { BlogSidebar } from "@/components/site/blog/BlogSidebar";
+import { BlogPostBody } from "@/components/site/blog/BlogPostBody";
 import { ViewAllBlogPostsLink } from "@/components/site/blog/ViewAllBlogPostsLink";
-import { SitePageTitleBar } from "@/components/site/SitePageTitleBar";
-import { formatBlogDateLong } from "@/lib/site/formatBlogDate";
+import { ServiceAreaSidebar } from "@/components/site/ServiceAreaSidebar";
+import {
+  blogEstimateDescription,
+  mapPostsToSidebarItems,
+} from "@/lib/site/blogSidebar";
 
 type BlogPostPageProps = {
   params: Promise<{ slug: string }>;
@@ -51,36 +54,43 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     notFound();
   }
 
-  const formattedDate = post.publishedAt
-    ? formatBlogDateLong(post.publishedAt)
-    : undefined;
+  const pageTitle = post.seoTitle?.trim() || post.title;
+  const sidebarPosts = mapPostsToSidebarItems(recentPosts);
 
   const article = (
-    <section className="blog-page-section">
-      <div className="site-container blog-page-container">
-        <div className="blog-layout">
-          <div className="blog-layout-main">
-            <SitePageTitleBar
-              title={post.title}
-              breadcrumbs={[
-                { label: "Home", href: "/" },
-                { label: "Blog", href: "/blog" },
-                { label: post.title },
-              ]}
-            />
-            <BlogPostArticle
-              post={post}
-              formattedDate={formattedDate}
-              featuredImage={featuredImage}
+    <>
+      <section className="bg-white pb-16 pt-10">
+        <div className="site-container">
+          <div className="mt-0 grid grid-cols-1 items-start gap-8 lg:mt-6 lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-10">
+            <div className="min-w-0">
+              <div className="service-area-page-header">
+                <h1 className="service-area-page-title">{pageTitle}</h1>
+                <nav className="service-area-breadcrumbs" aria-label="Breadcrumb">
+                  <Link href="/">Home</Link>
+                  <span aria-hidden>/</span>
+                  <Link href="/blog">Blog</Link>
+                  <span aria-hidden>/</span>
+                  <span aria-current="page">{post.title}</span>
+                </nav>
+              </div>
+
+              <BlogPostBody
+                content={post.content}
+                excerpt={post.excerpt}
+                featuredImage={featuredImage}
+              />
+            </div>
+
+            <ServiceAreaSidebar
+              estimateDescription={blogEstimateDescription}
+              recentPosts={sidebarPosts}
             />
           </div>
-
-          <BlogSidebar recentPosts={recentPosts} />
         </div>
+      </section>
 
-        <ViewAllBlogPostsLink />
-      </div>
-    </section>
+      <ViewAllBlogPostsLink />
+    </>
   );
 
   if (post.visibility === "password") {

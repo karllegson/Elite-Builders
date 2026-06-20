@@ -1,9 +1,8 @@
 "use client";
 
-import {
-  buildServiceAreaParentOptions,
-  type ServiceAreaPageAttributes,
-} from "@/lib/admin/serviceAreaEditor";
+import { useMemo } from "react";
+import { useServiceAreaParentOptions } from "@/hooks/useServiceAreaParentOptions";
+import type { ServiceAreaPageAttributes } from "@/lib/admin/serviceAreaEditor";
 
 type PageAttributesMetaboxProps = {
   attributes: ServiceAreaPageAttributes;
@@ -16,7 +15,21 @@ export function PageAttributesMetabox({
   onChange,
   excludeParentId,
 }: PageAttributesMetaboxProps) {
-  const parentOptions = buildServiceAreaParentOptions(excludeParentId);
+  const { options: parentOptions, ready } = useServiceAreaParentOptions(excludeParentId);
+
+  const selectedParentId = useMemo(() => {
+    if (!attributes.parentId) {
+      return "";
+    }
+
+    const match = parentOptions.find((option) => option.id === attributes.parentId);
+
+    if (match) {
+      return match.id;
+    }
+
+    return ready ? "" : attributes.parentId;
+  }, [attributes.parentId, parentOptions, ready]);
 
   return (
     <div className="admin-metabox">
@@ -27,47 +40,59 @@ export function PageAttributesMetabox({
         </span>
       </div>
       <div className="admin-metabox-body">
-        <label className="admin-page-attributes-field">
-          <span className="admin-page-attributes-label">Parent</span>
-          <select
-            value={attributes.parentId ?? ""}
-            onChange={(event) =>
-              onChange({
-                ...attributes,
-                parentId: event.target.value || null,
-              })
-            }
-          >
-            <option value="">(no parent)</option>
-            {parentOptions.map((option) => (
-              <option key={option.id} value={option.id}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </label>
+        <div className="admin-page-attributes">
+          <div className="admin-page-attributes-field">
+            <label className="admin-page-attributes-label" htmlFor="service-area-parent">
+              Parent
+            </label>
+            <select
+              id="service-area-parent"
+              className="admin-page-attributes-select"
+              value={selectedParentId}
+              disabled={!ready}
+              onChange={(event) =>
+                onChange({
+                  ...attributes,
+                  parentId: event.target.value || null,
+                })
+              }
+            >
+              <option value="">(no parent)</option>
+              {parentOptions.map((option) => (
+                <option key={option.id} value={option.id}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </div>
 
-        <p className="admin-page-attributes-help">
-          Choose <strong>(no parent)</strong> for a service area that appears in Sorting. Choose a
-          parent (e.g. Stockton, CA) to create a sub-page — it appears under that parent in Nested
-          View only.
-        </p>
+          <p className="admin-page-attributes-help">
+            Choose <strong>(no parent)</strong> for a service area that appears in Sorting at{" "}
+            <strong>/service-areas/your-slug</strong>. Choose a parent (e.g. Stockton, CA) to
+            create a landing page at{" "}
+            <strong>/service-areas/parent-slug/your-slug</strong> — it appears under that parent in
+            Nested View only.
+          </p>
 
-        <label className="admin-page-attributes-field">
-          <span className="admin-page-attributes-label">Order</span>
-          <input
-            type="number"
-            className="admin-page-attributes-order"
-            value={attributes.order}
-            min={0}
-            onChange={(event) =>
-              onChange({
-                ...attributes,
-                order: Number.parseInt(event.target.value, 10) || 0,
-              })
-            }
-          />
-        </label>
+          <div className="admin-page-attributes-field">
+            <label className="admin-page-attributes-label" htmlFor="service-area-order">
+              Order
+            </label>
+            <input
+              id="service-area-order"
+              type="number"
+              className="admin-page-attributes-order"
+              value={attributes.order}
+              min={0}
+              onChange={(event) =>
+                onChange({
+                  ...attributes,
+                  order: Number.parseInt(event.target.value, 10) || 0,
+                })
+              }
+            />
+          </div>
+        </div>
       </div>
     </div>
   );

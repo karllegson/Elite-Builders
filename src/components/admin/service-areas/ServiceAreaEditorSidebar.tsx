@@ -7,6 +7,7 @@ import { PublishMetabox } from "@/components/admin/posts/PublishMetabox";
 import { PageAttributesMetabox } from "@/components/admin/service-areas/PageAttributesMetabox";
 import type { MediaAttachment } from "@/lib/admin/mediaLibrary";
 import type { PostSeoSnippet } from "@/lib/admin/postSeo";
+import type { PublishSettings } from "@/lib/admin/postPublish";
 import {
   createDefaultPageAttributes,
   type ServiceAreaFeaturedImage,
@@ -22,6 +23,7 @@ type ServiceAreaEditorSidebarProps = {
   excludeParentId?: string;
   featuredImage?: ServiceAreaFeaturedImage | null;
   onFeaturedImageChange?: (image: ServiceAreaFeaturedImage | null) => void;
+  publishSettings?: PublishSettings;
   onPublish?: () => void;
   onSaveDraft?: () => void;
   primaryActionLabel?: string;
@@ -44,6 +46,7 @@ export function ServiceAreaEditorSidebar({
   excludeParentId,
   featuredImage = null,
   onFeaturedImageChange,
+  publishSettings,
   onPublish,
   onSaveDraft,
   primaryActionLabel = "Publish",
@@ -77,6 +80,7 @@ export function ServiceAreaEditorSidebar({
           seoSnippet={seoSnippet}
           hasFeaturedImage={featuredImage !== null}
           previewHref="/service-areas"
+          initialSettings={publishSettings}
           onPublish={onPublish}
           onSaveDraft={onSaveDraft}
           primaryActionLabel={primaryActionLabel}

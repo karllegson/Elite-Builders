@@ -10,7 +10,9 @@ import {
 import { business } from "@/lib/site/config";
 
 type ServiceAreaSidebarProps = {
-  city: string;
+  city?: string;
+  estimateDescription?: string;
+  recentPosts?: ReturnType<typeof getServiceAreaSidebarPosts>;
 };
 
 function StarRating({ rating }: { rating: number }) {
@@ -30,9 +32,18 @@ function StarRating({ rating }: { rating: number }) {
   );
 }
 
-export function ServiceAreaSidebar({ city }: ServiceAreaSidebarProps) {
-  const posts = getServiceAreaSidebarPosts();
+export function ServiceAreaSidebar({
+  city,
+  estimateDescription,
+  recentPosts,
+}: ServiceAreaSidebarProps) {
+  const posts = recentPosts ?? getServiceAreaSidebarPosts();
   const review = getServiceAreaSidebarReview();
+  const estimateCopy =
+    estimateDescription ??
+    (city
+      ? `Planning a project in ${city}? Tell us about your framing, siding, or deck needs and our team will follow up within one business day.`
+      : "Planning a project? Tell us about your framing, siding, or deck needs and our team will follow up within one business day.");
 
   return (
     <aside
@@ -43,10 +54,7 @@ export function ServiceAreaSidebar({ city }: ServiceAreaSidebarProps) {
         <h2 className="bg-brand-red px-4 py-3 text-base font-bold text-white">
           Request a Free Estimate
         </h2>
-        <p className="px-4 pt-4 text-sm leading-relaxed text-gray-600">
-          Planning a project in {city}? Tell us about your framing, siding, or deck needs and our
-          team will follow up within one business day.
-        </p>
+        <p className="px-4 pt-4 text-sm leading-relaxed text-gray-600">{estimateCopy}</p>
         <Link
           href="/#estimate"
           className="mx-4 mt-4 block rounded-md bg-brand-red px-4 py-3 text-center text-sm font-bold text-white transition-colors hover:bg-brand-red-dark"

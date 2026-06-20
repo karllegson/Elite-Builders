@@ -1,22 +1,29 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { buildServiceAreaPermalinkUrl, slugifyServiceAreaPermalink } from "@/lib/admin/postSeo";
+import {
+  buildServiceAreaPermalinkUrl,
+  slugifyServiceAreaPermalink,
+} from "@/lib/admin/postSeo";
 import { business } from "@/lib/site/config";
 
 type ServiceAreaPermalinkBarProps = {
   slug: string;
+  parentSlug?: string | null;
   onSlugChange: (slug: string) => void;
 };
 
 export function ServiceAreaPermalinkBar({
   slug,
+  parentSlug = null,
   onSlugChange,
 }: ServiceAreaPermalinkBarProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [draftSlug, setDraftSlug] = useState(slug);
-  const permalinkUrl = buildServiceAreaPermalinkUrl(business.domain, slug);
-  const permalinkBase = `${business.domain.replace(/\/$/, "")}/service-areas/`;
+  const permalinkUrl = buildServiceAreaPermalinkUrl(business.domain, slug, parentSlug);
+  const permalinkBase = parentSlug
+    ? `${business.domain.replace(/\/$/, "")}/service-areas/${parentSlug}/`
+    : `${business.domain.replace(/\/$/, "")}/service-areas/`;
 
   useEffect(() => {
     if (!isEditing) {
@@ -62,11 +69,7 @@ export function ServiceAreaPermalinkBar({
           >
             OK
           </button>
-          <button
-            type="button"
-            className="admin-inline-link"
-            onClick={handleCancel}
-          >
+          <button type="button" className="admin-inline-link" onClick={handleCancel}>
             Cancel
           </button>
         </div>

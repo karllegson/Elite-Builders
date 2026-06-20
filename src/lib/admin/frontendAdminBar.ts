@@ -33,6 +33,18 @@ const ROUTE_MATCHERS: RouteMatcher[] = [
     ],
   },
   {
+    test: (pathname) => /^\/service-areas\/[^/]+\/[^/]+\/?$/.test(pathname),
+    items: () => [
+      {
+        label: "Edit Service Area",
+        href: "/admin/service-areas",
+        resolveServiceAreaId: true,
+      },
+      { label: "All Service Areas", href: "/admin/service-areas" },
+      { label: "Dashboard", href: "/admin" },
+    ],
+  },
+  {
     test: (pathname) => /^\/service-areas\/[^/]+\/?$/.test(pathname),
     items: () => [
       {

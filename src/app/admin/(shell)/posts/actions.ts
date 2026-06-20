@@ -55,18 +55,28 @@ async function assertAdminAuth(): Promise<void> {
   }
 }
 
-export async function fetchPostsForAdmin() {
-  await assertAdminAuth();
+export async function fetchPostsForAdmin(): Promise<{
+  items: ReturnType<typeof toPostListItems>;
+  error?: string;
+}> {
+  try {
+    await assertAdminAuth();
 
-  const [posts, categories, tags] = await Promise.all([
-    listPosts(),
-    listCategories(),
-    listTags(),
-  ]);
+    const [posts, categories, tags] = await Promise.all([
+      listPosts(),
+      listCategories(),
+      listTags(),
+    ]);
 
-  return {
-    items: toPostListItems(posts, categories, tags, siteConfig.defaultUserRole),
-  };
+    return {
+      items: toPostListItems(posts, categories, tags, siteConfig.defaultUserRole),
+    };
+  } catch (error) {
+    return {
+      items: [],
+      error: error instanceof Error ? error.message : "Could not load posts.",
+    };
+  }
 }
 
 export async function fetchPostForEdit(postId: string) {

@@ -1,6 +1,7 @@
 import {
   isServiceAreaSubPage,
   isTopLevelServiceArea,
+  normalizeServiceAreaRecord,
   readServiceAreasStore,
   SERVICE_AREAS_CHANGED_EVENT,
   type ServiceAreaRecord,
@@ -8,6 +9,7 @@ import {
 } from "@/lib/admin/serviceAreasData";
 import type { ServiceAreaFeaturedImage } from "@/lib/admin/serviceAreaEditor";
 import { serviceAreas as staticServiceAreas, type ServiceArea } from "@/lib/site/config";
+import { getServiceAreaPublicHref } from "@/lib/site/serviceAreaUrls";
 
 export { SERVICE_AREAS_CHANGED_EVENT };
 
@@ -45,6 +47,7 @@ function resolveStaticMeta(record: ServiceAreaRecord): ServiceArea | undefined {
 
 export function toPublicServiceArea(
   record: ServiceAreaRecord,
+  areas: ServiceAreaRecord[] = readServiceAreasStore().areas,
 ): PublicServiceArea | null {
   if (record.status !== "published") {
     return null;
@@ -69,7 +72,7 @@ export function toPublicServiceArea(
     id: record.id,
     city: record.city,
     slug: record.slug,
-    href: `/service-areas/${record.slug}`,
+    href: getServiceAreaPublicHref(record, areas),
     blurb,
     region,
     seoTitle: record.seoTitle || record.title,
@@ -87,7 +90,7 @@ export function getPublicServiceAreasFromStore(
   store: ServiceAreasStore = readServiceAreasStore(),
 ): PublicServiceArea[] {
   return store.areas
-    .map(toPublicServiceArea)
+    .map((area) => toPublicServiceArea(area, store.areas))
     .filter((area): area is PublicServiceArea => area !== null)
     .sort(
       (left, right) =>
@@ -112,6 +115,101 @@ function getStaticPublicServiceAreas(): PublicServiceArea[] {
 
 export function getPublicServiceAreasFallback(): PublicServiceArea[] {
   return getStaticPublicServiceAreas();
+}
+
+export type PublicServiceAreaSubPage = {
+  id: string;
+  title: string;
+  slug: string;
+  href: string;
+  seoTitle: string;
+  content: string;
+  featuredImage: ServiceAreaFeaturedImage | null;
+  mapEmbed: string;
+  breadcrumbsLinkInactive: boolean;
+  parent: {
+    id: string;
+    title: string;
+    slug: string;
+    href: string;
+    city: string;
+    region: ServiceAreaRegion;
+  };
+};
+
+export function toPublicServiceAreaSubPage(
+  record: ServiceAreaRecord,
+  parent: ServiceAreaRecord,
+  areas: ServiceAreaRecord[] = readServiceAreasStore().areas,
+): PublicServiceAreaSubPage | null {
+  if (record.status !== "published") {
+    return null;
+  }
+
+  if (record.hidden || record.unused) {
+    return null;
+  }
+
+  if (!isServiceAreaSubPage(record) || record.parentId !== parent.id) {
+    return null;
+  }
+
+  const staticMeta = resolveStaticMeta(parent);
+  const region = staticMeta?.region ?? "Central Valley";
+
+  return {
+    id: record.id,
+    title: record.title,
+    slug: record.slug,
+    href: getServiceAreaPublicHref(record, areas),
+    seoTitle: record.seoTitle || record.title,
+    content: record.content,
+    featuredImage: record.featuredImage,
+    mapEmbed: record.mapEmbed ?? "",
+    breadcrumbsLinkInactive: record.breadcrumbsLinkInactive,
+    parent: {
+      id: parent.id,
+      title: parent.title,
+      slug: parent.slug,
+      href: getServiceAreaPublicHref(parent, areas),
+      city: parent.city,
+      region,
+    },
+  };
+}
+
+export function findPublicServiceAreaSubPage(
+  parentSlug: string,
+  childSlug: string,
+  store: ServiceAreasStore = readServiceAreasStore(),
+): PublicServiceAreaSubPage | null {
+  const parent = store.areas.find(
+    (area) =>
+      area.slug === parentSlug &&
+      isTopLevelServiceArea(area) &&
+      !area.unused,
+  );
+
+  if (!parent) {
+    return null;
+  }
+
+  const child = store.areas.find(
+    (area) =>
+      area.parentId === parent.id &&
+      area.slug === childSlug &&
+      !area.unused,
+  );
+
+  if (!child) {
+    return null;
+  }
+
+  return toPublicServiceAreaSubPage(
+    normalizeServiceAreaRecord(child),
+    normalizeServiceAreaRecord(parent),
+    store.areas.map(normalizeServiceAreaRecord),
+  );
 }
 
 export function findPublicServiceAreaBySlug(
