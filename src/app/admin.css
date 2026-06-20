@@ -721,9 +721,93 @@
   background: #32373c;
 }
 
+.admin-post-content-editor {
+  display: flex;
+  width: 100%;
+  align-items: stretch;
+}
+
+.admin-post-content-gutter {
+  flex-shrink: 0;
+  overflow: hidden;
+  padding: 12px 10px 12px 12px;
+  background: #2a2f33;
+  border-right: 1px solid #1e2226;
+  user-select: none;
+}
+
+.admin-post-content-code-area {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+.admin-post-content-highlight {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 12px;
+  overflow: hidden;
+  pointer-events: none;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  font-family: Consolas, Monaco, "Courier New", monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #d4d4d4;
+  background: transparent;
+  border: none;
+}
+
+.admin-post-content-highlight code {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  white-space: inherit;
+  word-wrap: inherit;
+}
+
+.admin-post-content-highlight-line {
+  display: inline;
+}
+
+.admin-post-content-hl-tag {
+  color: #7ec8e3;
+}
+
+.admin-post-content-hl-attr {
+  color: #9cdcfe;
+}
+
+.admin-post-content-hl-value {
+  color: #ce9178;
+}
+
+.admin-post-content-hl-comment {
+  color: #6a9955;
+}
+
+.admin-post-content-line-numbers {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-family: Consolas, Monaco, "Courier New", monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #8c9499;
+  text-align: right;
+  min-width: 1.75rem;
+}
+
+.admin-post-content-line-numbers li {
+  height: calc(13px * 1.6);
+}
+
 .admin-post-content {
   display: block;
+  flex: 1;
   width: 100%;
+  min-width: 0;
   min-height: 420px;
   box-sizing: border-box;
   padding: 12px;
@@ -733,6 +817,15 @@
   color: #fff;
   background: #32373c;
   border: none;
+  resize: vertical;
+}
+
+.admin-post-content-input {
+  position: relative;
+  z-index: 1;
+  color: transparent;
+  caret-color: #fff;
+  background: transparent;
   resize: vertical;
 }
 
@@ -1944,6 +2037,40 @@
   margin: 0 0 10px;
   font-size: 12px;
   line-height: 1.5;
+  color: var(--admin-text-muted);
+}
+
+.admin-media-attachment-upload-meta {
+  margin: 0 0 12px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--admin-text-muted);
+}
+
+.admin-media-attachment-upload-meta div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 4px;
+}
+
+.admin-media-attachment-upload-meta dt {
+  flex-shrink: 0;
+  margin: 0;
+  font-weight: 600;
+  color: var(--admin-text);
+}
+
+.admin-media-attachment-upload-meta dd {
+  margin: 0;
+  word-break: break-word;
+}
+
+.admin-media-field-help {
+  display: block;
+  margin-top: 4px;
+  font-size: 11px;
+  line-height: 1.4;
   color: var(--admin-text-muted);
 }
 
@@ -7702,3 +7829,99 @@ a.admin-form-entries-settings-item {
 .admin-form-embed-learn-more a:hover {
   color: var(--admin-accent-hover);
 }
+
+/* Admin toast notifications */
+.admin-toast-viewport {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 100000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: min(360px, calc(100vw - 32px));
+  pointer-events: none;
+}
+
+.admin-toast {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #fff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow:
+    0 10px 30px rgba(15, 23, 42, 0.12),
+    0 2px 8px rgba(15, 23, 42, 0.06);
+  pointer-events: auto;
+  animation: admin-toast-in 0.28s cubic-bezier(0.21, 1.02, 0.35, 1) both;
+}
+
+@keyframes admin-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.admin-toast-icon {
+  flex: 0 0 auto;
+  margin-top: 1px;
+}
+
+.admin-toast-success .admin-toast-icon {
+  color: #16a34a;
+}
+
+.admin-toast-error .admin-toast-icon {
+  color: #dc2626;
+}
+
+.admin-toast-info .admin-toast-icon {
+  color: #2563eb;
+}
+
+.admin-toast-message {
+  flex: 1 1 auto;
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: #0f172a;
+}
+
+.admin-toast-close {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  margin: -2px -4px -2px 0;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: #64748b;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+
+.admin-toast-close:hover {
+  background: rgba(15, 23, 42, 0.06);
+  color: #0f172a;
+}
+
+.admin-post-editor-loading {
+  margin: 0;
+  font-size: 13px;
+  color: var(--admin-text-muted);
+}
+

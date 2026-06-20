@@ -23,7 +23,7 @@ export const business = {
   },
   license: "CSLB #970551",
   licenseNumber: "970551",
-  domain: "https://elitebuildersco.com",
+  domain: "https://www.elitebuildersco.com",
 } as const;
 
 export type SiteService = {

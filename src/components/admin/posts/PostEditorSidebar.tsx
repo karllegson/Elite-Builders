@@ -1,27 +1,55 @@
 "use client";
 
 import Image from "next/image";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type MutableRefObject } from "react";
+import {
+  createCategoryAction,
+  fetchCategoriesAction,
+} from "@/app/admin/(shell)/posts/actions";
 import { FeaturedImageModal } from "@/components/admin/posts/FeaturedImageModal";
 import { PublishMetabox } from "@/components/admin/posts/PublishMetabox";
 import type { MediaAttachment } from "@/lib/admin/mediaLibrary";
-import {
-  buildCategoryOptions,
-  createCategory,
-  type PostCategory,
-} from "@/lib/admin/postCategories";
+import { buildCategoryOptions } from "@/lib/admin/postCategories";
+import type { PublishSettings } from "@/lib/admin/postPublish";
 import type { PostSeoSnippet } from "@/lib/admin/postSeo";
+import type { PostCategoryDTO } from "@/lib/admin/posts.dto";
 
 type PostEditorSidebarProps = {
   postTitle?: string;
   postContent?: string;
   seoSnippet?: PostSeoSnippet;
+  categoryIds: string[];
+  onCategoryIdsChange: (ids: string[]) => void;
+  featuredImage: MediaAttachment | null;
+  onFeaturedImageChange: (image: MediaAttachment | null) => void;
+  publishSettings: PublishSettings;
+  initialPublishSettings?: PublishSettings;
+  publishSettingsRef: MutableRefObject<PublishSettings>;
+  onPublishSettingsChange: (settings: PublishSettings) => void;
+  previewHref?: string;
+  onPublish?: () => void;
+  onSaveDraft?: () => void;
+  onMoveToTrash?: () => void;
+  primaryActionLabel?: string;
 };
 
 export function PostEditorSidebar({
   postTitle = "",
   postContent = "",
   seoSnippet,
+  categoryIds,
+  onCategoryIdsChange,
+  featuredImage,
+  onFeaturedImageChange,
+  publishSettings,
+  initialPublishSettings,
+  publishSettingsRef,
+  onPublishSettingsChange,
+  previewHref,
+  onPublish,
+  onSaveDraft,
+  onMoveToTrash,
+  primaryActionLabel,
 }: PostEditorSidebarProps) {
   const [categoriesTab, setCategoriesTab] = useState<"all" | "most-used">(
     "all",
@@ -29,15 +57,26 @@ export function PostEditorSidebar({
   const [showAddCategoryForm, setShowAddCategoryForm] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState("");
   const [newCategoryParentId, setNewCategoryParentId] = useState("");
-  const [categories, setCategories] = useState<PostCategory[]>([]);
-  const [selectedCategoryIds, setSelectedCategoryIds] = useState<string[]>([]);
-  const [featuredImage, setFeaturedImage] = useState<MediaAttachment | null>(
-    null,
-  );
+  const [categories, setCategories] = useState<PostCategoryDTO[]>([]);
   const [featuredImageModalOpen, setFeaturedImageModalOpen] = useState(false);
+  const [categoryError, setCategoryError] = useState("");
+
+  useEffect(() => {
+    void (async () => {
+      const items = await fetchCategoriesAction();
+      setCategories(items);
+    })();
+  }, []);
 
   const parentOptions = useMemo(
-    () => buildCategoryOptions(categories),
+    () =>
+      buildCategoryOptions(
+        categories.map((category) => ({
+          id: category.id,
+          name: category.name,
+          parentId: category.parentId,
+        })),
+      ),
     [categories],
   );
 
@@ -49,30 +88,36 @@ export function PostEditorSidebar({
     return [...categories].slice(0, 5);
   }, [categories, categoriesTab]);
 
-  const handleAddCategory = () => {
+  const handleAddCategory = async () => {
     const name = newCategoryName.trim();
 
     if (!name) {
       return;
     }
 
-    const category = createCategory(
+    const result = await createCategoryAction({
       name,
-      newCategoryParentId ? newCategoryParentId : null,
-    );
+      parentId: newCategoryParentId ? newCategoryParentId : null,
+    });
 
-    setCategories((current) => [...current, category]);
-    setSelectedCategoryIds((current) => [...current, category.id]);
+    if (result.error || !result.category) {
+      setCategoryError(result.error ?? "Could not create category.");
+      return;
+    }
+
+    setCategories((current) => [...current, result.category!]);
+    onCategoryIdsChange([...categoryIds, result.category.id]);
     setNewCategoryName("");
     setNewCategoryParentId("");
     setShowAddCategoryForm(false);
+    setCategoryError("");
   };
 
   const toggleCategory = (categoryId: string) => {
-    setSelectedCategoryIds((current) =>
-      current.includes(categoryId)
-        ? current.filter((id) => id !== categoryId)
-        : [...current, categoryId],
+    onCategoryIdsChange(
+      categoryIds.includes(categoryId)
+        ? categoryIds.filter((id) => id !== categoryId)
+        : [...categoryIds, categoryId],
     );
   };
 
@@ -84,6 +129,14 @@ export function PostEditorSidebar({
           postContent={postContent}
           seoSnippet={seoSnippet}
           hasFeaturedImage={featuredImage !== null}
+          previewHref={previewHref}
+          initialSettings={initialPublishSettings ?? publishSettings}
+          publishSettingsRef={publishSettingsRef}
+          onSettingsChange={onPublishSettingsChange}
+          onPublish={onPublish}
+          onSaveDraft={onSaveDraft}
+          onMoveToTrash={onMoveToTrash}
+          primaryActionLabel={primaryActionLabel}
         />
 
         <div className="admin-metabox">
@@ -118,7 +171,7 @@ export function PostEditorSidebar({
                   <label key={category.id} className="admin-category-item">
                     <input
                       type="checkbox"
-                      checked={selectedCategoryIds.includes(category.id)}
+                      checked={categoryIds.includes(category.id)}
                       onChange={() => toggleCategory(category.id)}
                     />
                     <span>{category.name}</span>
@@ -126,6 +179,12 @@ export function PostEditorSidebar({
                 ))
               )}
             </div>
+
+            {categoryError ? (
+              <p className="admin-category-empty" role="alert">
+                {categoryError}
+              </p>
+            ) : null}
 
             {!showAddCategoryForm ? (
               <button
@@ -160,7 +219,7 @@ export function PostEditorSidebar({
                 <button
                   type="button"
                   className="admin-btn-secondary admin-add-category-submit"
-                  onClick={handleAddCategory}
+                  onClick={() => void handleAddCategory()}
                 >
                   Add Category
                 </button>
@@ -177,7 +236,7 @@ export function PostEditorSidebar({
             </span>
           </div>
           <div className="admin-metabox-body">
-            {featuredImage ? (
+            {featuredImage && featuredImage.src ? (
               <div className="admin-featured-image-preview">
                 <Image
                   src={featuredImage.src}
@@ -198,7 +257,27 @@ export function PostEditorSidebar({
                   <button
                     type="button"
                     className="admin-inline-link admin-media-delete-link"
-                    onClick={() => setFeaturedImage(null)}
+                    onClick={() => onFeaturedImageChange(null)}
+                  >
+                    Remove featured image
+                  </button>
+                </div>
+              </div>
+            ) : featuredImage ? (
+              <div className="admin-featured-image-preview">
+                <p className="admin-category-empty">Featured image selected.</p>
+                <div className="admin-featured-image-actions">
+                  <button
+                    type="button"
+                    className="admin-inline-link"
+                    onClick={() => setFeaturedImageModalOpen(true)}
+                  >
+                    Replace image
+                  </button>
+                  <button
+                    type="button"
+                    className="admin-inline-link admin-media-delete-link"
+                    onClick={() => onFeaturedImageChange(null)}
                   >
                     Remove featured image
                   </button>
@@ -220,7 +299,7 @@ export function PostEditorSidebar({
       <FeaturedImageModal
         isOpen={featuredImageModalOpen}
         onClose={() => setFeaturedImageModalOpen(false)}
-        onSetFeaturedImage={setFeaturedImage}
+        onSetFeaturedImage={onFeaturedImageChange}
       />
     </>
   );

@@ -9,9 +9,10 @@ export type PostListView =
   | "pillar";
 
 export type PostListItem = {
-  id: number;
+  id: string;
+  numericId: number;
   title: string;
-  status: PostStatus | "trash";
+  status: PostStatus | "scheduled" | "trash";
   author: string;
   isMine: boolean;
   categories: string[];
@@ -58,7 +59,9 @@ export function getPostViewCounts(posts: PostListItem[]) {
   return {
     all: nonTrash.length,
     mine: nonTrash.filter((post) => post.isMine).length,
-    published: posts.filter((post) => post.status === "published").length,
+    published: posts.filter(
+      (post) => post.status === "published" || post.status === "scheduled",
+    ).length,
     draft: posts.filter((post) => post.status === "draft").length,
     trash: posts.filter((post) => post.status === "trash").length,
     pillar: posts.filter((post) => post.isPillar).length,
@@ -105,7 +108,7 @@ export function filterPosts(
       return false;
     }
 
-    if (filters.view === "published" && post.status !== "published") {
+    if (filters.view === "published" && post.status !== "published" && post.status !== "scheduled") {
       return false;
     }
 

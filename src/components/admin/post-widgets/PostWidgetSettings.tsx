@@ -2,6 +2,7 @@
 
 import { BriefcaseMedical, Flame, Star, X } from "lucide-react";
 import { useState, type FormEvent, type ReactNode } from "react";
+import { useAdminToast } from "@/components/admin/toast/useAdminToast";
 import {
   createDefaultGeneralSettings,
   createDefaultPopularSettings,
@@ -386,16 +387,15 @@ function WidgetSettingsPanel({
 }
 
 export function PostWidgetSettings() {
+  const toast = useAdminToast();
   const [activeTab, setActiveTab] = useState<PostWidgetSettingsTab>("general");
   const [generalSettings, setGeneralSettings] = useState(createDefaultGeneralSettings);
   const [popularSettings, setPopularSettings] = useState(createDefaultPopularSettings);
   const [widgetTabs, setWidgetTabs] = useState(createDefaultWidgetTabs);
   const [nextQueryTime, setNextQueryTime] = useState(formatNextQueryTime);
-  const [statusMessage, setStatusMessage] = useState("");
 
   const showStatus = (message: string) => {
-    setStatusMessage(message);
-    window.setTimeout(() => setStatusMessage(""), 2500);
+    toast.success(message);
   };
 
   const handleAddTab = () => {
@@ -432,12 +432,6 @@ export function PostWidgetSettings() {
 
   return (
     <div className="admin-post-widget-settings">
-      {statusMessage ? (
-        <p className="admin-post-widget-status-message" role="status">
-          {statusMessage}
-        </p>
-      ) : null}
-
       <nav className="admin-post-widget-nav" aria-label="Post widget settings sections">
         {POST_WIDGET_TABS.map((tab) => (
           <button

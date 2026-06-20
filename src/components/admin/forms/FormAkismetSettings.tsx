@@ -2,6 +2,7 @@
 
 import { ArrowRight } from "lucide-react";
 import { type ReactNode, useState } from "react";
+import { useAdminToast } from "@/components/admin/toast/useAdminToast";
 import { FormToggle } from "@/components/admin/forms/FormToggle";
 import {
   AKISMET_FIELD_OPTIONS,
@@ -50,8 +51,8 @@ function SettingsField({
 }
 
 export function FormAkismetSettings() {
+  const toast = useAdminToast();
   const [settings, setSettings] = useState<FormAkismetState>(DEFAULT_FORM_AKISMET);
-  const [statusMessage, setStatusMessage] = useState("");
 
   const updateSettings = <K extends keyof FormAkismetState>(
     key: K,
@@ -61,18 +62,11 @@ export function FormAkismetSettings() {
   };
 
   const handleSave = () => {
-    setStatusMessage("Akismet settings saved.");
-    window.setTimeout(() => setStatusMessage(""), 2500);
+    toast.success("Akismet settings saved.");
   };
 
   return (
     <div className="admin-form-settings-editor admin-form-akismet">
-      {statusMessage ? (
-        <p className="admin-posts-status-message" role="status">
-          {statusMessage}
-        </p>
-      ) : null}
-
       <SettingsMetabox title="Akismet Settings">
         <FormToggle
           id="akismet-enabled"

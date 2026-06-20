@@ -21,6 +21,7 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import { ArrowDown, ArrowUp, GripVertical, List, Plus, X } from "lucide-react";
 import { useMemo, useState } from "react";
+import { useAdminToast } from "@/components/admin/toast/useAdminToast";
 import {
   addCustomSection,
   buildSortingColumns,
@@ -173,13 +174,13 @@ function SortingSectionColumn({
 const SORTING_MODES = [{ value: "custom", label: "Custom" }] as const;
 
 export function ServiceAreaSortingManager() {
+  const toast = useAdminToast();
   const [board, setBoard] = useState<SortingBoardState>(() => {
     const store = readServiceAreasStore();
     const columns = buildSortingColumns(store);
     return createBoardStateFromColumns(columns);
   });
   const [activeItem, setActiveItem] = useState<ServiceAreaRecord | null>(null);
-  const [statusMessage, setStatusMessage] = useState("");
   const [sortingMode, setSortingMode] = useState<(typeof SORTING_MODES)[number]["value"]>("custom");
   const [addSectionOpen, setAddSectionOpen] = useState(false);
   const [newSectionName, setNewSectionName] = useState("");
@@ -216,8 +217,7 @@ export function ServiceAreaSortingManager() {
   }, [board]);
 
   const showStatus = (message: string) => {
-    setStatusMessage(message);
-    window.setTimeout(() => setStatusMessage(""), 3000);
+    toast.success(message);
   };
 
   const handleDragStart = (event: DragStartEvent) => {
@@ -288,12 +288,6 @@ export function ServiceAreaSortingManager() {
 
   return (
     <div className="admin-sa-sort-page">
-      {statusMessage ? (
-        <p className="admin-categories-status-message" role="status">
-          {statusMessage}
-        </p>
-      ) : null}
-
       <p className="admin-sa-sort-intro">
         Sort top-level service areas by dragging and dropping them in the desired order. Only pages
         with <strong>(no parent)</strong> in Page Attributes appear here — sub-pages are managed in

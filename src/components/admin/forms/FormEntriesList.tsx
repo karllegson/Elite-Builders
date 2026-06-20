@@ -2,6 +2,7 @@
 
 import { ArrowDown, ArrowUp, Settings, Star } from "lucide-react";
 import { useMemo, useState } from "react";
+import { useAdminToast } from "@/components/admin/toast/useAdminToast";
 import { FormEditorToolbar } from "@/components/admin/forms/FormEditorToolbar";
 import {
   filterFormEntries,
@@ -166,6 +167,7 @@ function EntriesTablenav({
 }
 
 export function FormEntriesList() {
+  const toast = useAdminToast();
   const [entries, setEntries] = useState<FormEntryItem[]>([]);
   const [view, setView] = useState<FormEntryView>("all");
   const [searchField, setSearchField] = useState<FormEntrySearchField>("any");
@@ -178,7 +180,6 @@ export function FormEntriesList() {
   const [sortKey, setSortKey] = useState<FormEntrySortKey>("first");
   const [sortDirection, setSortDirection] = useState<FormEntrySortDirection>("asc");
   const [currentPage, setCurrentPage] = useState(1);
-  const [statusMessage, setStatusMessage] = useState("");
 
   const viewCounts = useMemo(() => getFormEntryViewCounts(entries), [entries]);
 
@@ -271,17 +272,15 @@ export function FormEntriesList() {
     }
 
     if (selectedIds.size === 0) {
-      setStatusMessage("Select at least one entry.");
-      window.setTimeout(() => setStatusMessage(""), 2500);
+      toast.info("Select at least one entry.");
       return;
     }
 
-    setStatusMessage(
+    toast.success(
       `Applied "${bulkAction}" to ${selectedIds.size} entr${selectedIds.size === 1 ? "y" : "ies"}.`,
     );
     setSelectedIds(new Set());
     setBulkAction("");
-    window.setTimeout(() => setStatusMessage(""), 2500);
   };
 
   const tablenavProps = {
@@ -375,12 +374,6 @@ export function FormEntriesList() {
           Search
         </button>
       </div>
-
-      {statusMessage ? (
-        <p className="admin-posts-status-message" role="status">
-          {statusMessage}
-        </p>
-      ) : null}
 
       <EntriesTablenav {...tablenavProps} position="top" />
 

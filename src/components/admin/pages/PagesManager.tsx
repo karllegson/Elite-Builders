@@ -20,6 +20,7 @@ import {
   type PageQuickEditTab,
   type PageQuickEditValues,
 } from "@/lib/admin/pageQuickEdit";
+import { useAdminToast } from "@/components/admin/toast/useAdminToast";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import {
   countPages,
@@ -257,6 +258,7 @@ function PageRow({
 }
 
 export function PagesManager({ initialView = "all" }: { initialView?: PageListView }) {
+  const toast = useAdminToast();
   const [pages] = useState<PageTreeItem[]>(() => getPlaceholderPages());
   const [expandedIds, setExpandedIds] = useState<Set<string>>(
     () => new Set(getDefaultExpandedPageIds(getPlaceholderPages())),
@@ -266,7 +268,6 @@ export function PagesManager({ initialView = "all" }: { initialView?: PageListVi
   const [searchInput, setSearchInput] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [syncMenu, setSyncMenu] = useState(false);
-  const [statusMessage, setStatusMessage] = useState("");
   const [openMoreMenuId, setOpenMoreMenuId] = useState<string | null>(null);
   const [quickEditRowId, setQuickEditRowId] = useState<string | null>(null);
   const [quickEditTab, setQuickEditTab] = useState<PageQuickEditTab>("page");
@@ -307,8 +308,7 @@ export function PagesManager({ initialView = "all" }: { initialView?: PageListVi
 
   const expandAll = () => {
     setExpandedIds(new Set(getDefaultExpandedPageIds(pages)));
-    setStatusMessage("All sections expanded.");
-    window.setTimeout(() => setStatusMessage(""), 2000);
+    toast.success("All sections expanded.");
   };
 
   const toggleSelect = (id: string) => {
@@ -341,8 +341,7 @@ export function PagesManager({ initialView = "all" }: { initialView?: PageListVi
       PAGE_ROW_MORE_MENU_ITEMS.find((item) => item.id === action)?.label ??
       action;
 
-    setStatusMessage(`${label} — ${row.title}`);
-    window.setTimeout(() => setStatusMessage(""), 2000);
+    toast.success(`${label} — ${row.title}`);
   };
 
   const openQuickEdit = (row: FlatPageRow) => {
@@ -384,8 +383,7 @@ export function PagesManager({ initialView = "all" }: { initialView?: PageListVi
     const row = flatRows.find((item) => item.id === quickEditRowId);
 
     if (row) {
-      setStatusMessage(`Page updated — ${row.title}`);
-      window.setTimeout(() => setStatusMessage(""), 2000);
+      toast.success(`Page updated — ${row.title}`);
     }
 
     closeQuickEdit();
@@ -406,12 +404,6 @@ export function PagesManager({ initialView = "all" }: { initialView?: PageListVi
           Expand All
         </button>
       </div>
-
-      {statusMessage ? (
-        <p className="admin-pages-status-message" role="status">
-          {statusMessage}
-        </p>
-      ) : null}
 
       <ul className="admin-pages-views">
         {PAGE_LIST_VIEWS.map((item, index) => {

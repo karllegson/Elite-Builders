@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { useAdminToast } from "@/components/admin/toast/useAdminToast";
 import { FormTemplatesModal } from "@/components/admin/forms/FormTemplatesModal";
 import { FormsList } from "@/components/admin/forms/FormsList";
 import {
@@ -9,8 +10,8 @@ import {
 } from "@/lib/admin/formTemplates";
 
 export function FormsPageClient() {
+  const toast = useAdminToast();
   const [isTemplatesOpen, setIsTemplatesOpen] = useState(false);
-  const [statusMessage, setStatusMessage] = useState("");
 
   const openTemplates = useCallback(() => {
     setIsTemplatesOpen(true);
@@ -33,17 +34,11 @@ export function FormsPageClient() {
   }, [openTemplates]);
 
   const handleSelectTemplate = (template: FormTemplate) => {
-    setStatusMessage(`Selected "${template.label}" — form builder coming soon.`);
-    window.setTimeout(() => setStatusMessage(""), 3000);
+    toast.info(`Selected "${template.label}" — form builder coming soon.`);
   };
 
   return (
     <>
-      {statusMessage ? (
-        <p className="admin-posts-status-message" role="status">
-          {statusMessage}
-        </p>
-      ) : null}
       <FormsList />
       <FormTemplatesModal
         isOpen={isTemplatesOpen}

@@ -3,9 +3,11 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { AdminPostContentEditor } from "@/components/admin/posts/AdminPostContentEditor";
 import { PostEditorToolbar } from "@/components/admin/posts/PostEditorToolbar";
 import { FaqEditorSidebar } from "@/components/admin/faqs/FaqEditorSidebar";
 import { countWords } from "@/lib/admin/postEditor";
+import { useAdminToast } from "@/components/admin/toast/useAdminToast";
 import { getFaqById, upsertFaq } from "@/lib/admin/faqsData";
 
 type FaqEditorProps = {
@@ -13,6 +15,7 @@ type FaqEditorProps = {
 };
 
 export function FaqEditor({ faqId }: FaqEditorProps) {
+  const toast = useAdminToast();
   const router = useRouter();
   const isEditing = Boolean(faqId);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -22,8 +25,6 @@ export function FaqEditor({ faqId }: FaqEditorProps) {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [categoryId, setCategoryId] = useState<string | null>(null);
-  const [saveMessage, setSaveMessage] = useState("");
-
   const wordCount = countWords(content);
 
   useEffect(() => {
@@ -47,8 +48,7 @@ export function FaqEditor({ faqId }: FaqEditorProps) {
 
   const persistFaq = (status: "published" | "draft") => {
     if (!title.trim()) {
-      setSaveMessage("Add a title before saving.");
-      window.setTimeout(() => setSaveMessage(""), 3000);
+      toast.error("Add a title before saving.");
       return;
     }
 
@@ -65,14 +65,13 @@ export function FaqEditor({ faqId }: FaqEditorProps) {
       router.replace(`/admin/faqs/${saved.id}`);
     }
 
-    setSaveMessage(
+    toast.success(
       status === "published"
         ? recordId || isEditing
           ? "FAQ updated."
           : "FAQ published."
         : "Draft saved.",
     );
-    window.setTimeout(() => setSaveMessage(""), 4000);
   };
 
   if (!loaded) {
@@ -91,12 +90,6 @@ export function FaqEditor({ faqId }: FaqEditorProps) {
 
   return (
     <div className="admin-post-editor">
-      {saveMessage ? (
-        <p className="admin-categories-status-message admin-post-editor-status" role="status">
-          {saveMessage}
-        </p>
-      ) : null}
-
       <div className="admin-post-editor-main">
         <label className="admin-post-title-label" htmlFor="faq-title">
           {isEditing ? "Edit title" : "Add title"}
@@ -113,17 +106,13 @@ export function FaqEditor({ faqId }: FaqEditorProps) {
 
         <PostEditorToolbar textareaRef={textareaRef} onContentChange={setContent} />
 
-        <div className="admin-post-content-wrap">
-          <textarea
-            ref={textareaRef}
-            id="faq-content"
-            className="admin-post-content"
-            value={content}
-            onChange={(event) => setContent(event.target.value)}
-            spellCheck={false}
-            aria-label="FAQ content"
-          />
-        </div>
+        <AdminPostContentEditor
+          id="faq-content"
+          value={content}
+          onChange={setContent}
+          textareaRef={textareaRef}
+          ariaLabel="FAQ content"
+        />
 
         <div className="admin-post-editor-footer">
           <span>Word count: {wordCount}</span>

@@ -178,6 +178,25 @@ export async function deleteMediaAsset(id: string): Promise<void> {
   }
 }
 
+export async function getMediaAssetById(id: string): Promise<MediaAttachment | null> {
+  if (!hasAdminClient()) {
+    return null;
+  }
+
+  const supabase = createAdminClient();
+  const { data, error } = await supabase
+    .from("media_assets")
+    .select("*")
+    .eq("id", id)
+    .maybeSingle();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data ? rowToMediaAttachment(data as MediaAssetRow) : null;
+}
+
 export async function getMediaAssetBySourceKey(
   sourceKey: string,
 ): Promise<MediaAttachment | null> {

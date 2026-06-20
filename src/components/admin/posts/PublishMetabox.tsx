@@ -1,7 +1,8 @@
 "use client";
 
 import { BarChart2, Calendar, Eye, KeyRound } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type MutableRefObject } from "react";
+import { useAdminToast } from "@/components/admin/toast/useAdminToast";
 import type { PostSeoSnippet } from "@/lib/admin/postSeo";
 import {
   buildPublishDate,
@@ -26,8 +27,12 @@ type PublishMetaboxProps = {
   seoSnippet?: PostSeoSnippet;
   hasFeaturedImage?: boolean;
   previewHref?: string;
+  initialSettings?: PublishSettings;
+  publishSettingsRef?: MutableRefObject<PublishSettings | null>;
+  onSettingsChange?: (settings: PublishSettings) => void;
   onPublish?: () => void;
   onSaveDraft?: () => void;
+  onMoveToTrash?: () => void;
   primaryActionLabel?: string;
 };
 
@@ -55,12 +60,17 @@ export function PublishMetabox({
   seoSnippet = { seoTitle: "", permalink: "", metaDescription: "" },
   hasFeaturedImage = false,
   previewHref = "/blog",
+  initialSettings,
+  publishSettingsRef,
+  onSettingsChange,
   onPublish,
   onSaveDraft,
+  onMoveToTrash,
   primaryActionLabel = "Publish",
 }: PublishMetaboxProps) {
-  const [settings, setSettings] = useState<PublishSettings>(() =>
-    createDefaultPublishSettings(),
+  const toast = useAdminToast();
+  const [settings, setSettings] = useState<PublishSettings>(
+    () => initialSettings ?? createDefaultPublishSettings(),
   );
   const [activePanel, setActivePanel] = useState<PublishEditPanel>(null);
   const [statusDraft, setStatusDraft] = useState<PostStatus>("draft");
@@ -70,7 +80,21 @@ export function PublishMetabox({
   const [publishDateDraft, setPublishDateDraft] = useState<PublishDateDraft>(() =>
     dateToDraft(new Date()),
   );
-  const [syncMessage, setSyncMessage] = useState("");
+
+  useEffect(() => {
+    if (initialSettings) {
+      setSettings(initialSettings);
+    }
+  }, [initialSettings]);
+
+  useEffect(() => {
+    publishSettingsRef && (publishSettingsRef.current = settings);
+    onSettingsChange?.(settings);
+  }, [onSettingsChange, publishSettingsRef, settings]);
+
+  const updateSettings = (updater: (current: PublishSettings) => PublishSettings) => {
+    setSettings(updater);
+  };
 
   const seoScore = useMemo(
     () =>
@@ -111,17 +135,16 @@ export function PublishMetabox({
   };
 
   const applyStatus = () => {
-    setSettings((current) => ({ ...current, status: statusDraft }));
+    updateSettings((current) => ({ ...current, status: statusDraft }));
     closePanel();
   };
 
   const applyVisibility = () => {
-    setSettings((current) => ({
+    updateSettings((current) => ({
       ...current,
       visibility: visibilityDraft,
       password: visibilityDraft === "password" ? passwordDraft : "",
-      stickToFrontPage:
-        visibilityDraft === "public" ? stickDraft : false,
+      stickToFrontPage: visibilityDraft === "public" ? stickDraft : false,
     }));
     closePanel();
   };
@@ -143,7 +166,7 @@ export function PublishMetabox({
       return;
     }
 
-    setSettings((current) => ({
+    updateSettings((current) => ({
       ...current,
       publishDate: buildPublishDate(
         publishDateDraft.month,
@@ -157,30 +180,33 @@ export function PublishMetabox({
   };
 
   const handlePublish = () => {
-    setSettings((current) => ({
-      ...current,
+    const next: PublishSettings = {
+      ...settings,
       status: "published",
       publishDate:
-        current.publishDate.getTime() <= Date.now()
-          ? current.publishDate
+        settings.publishDate.getTime() <= Date.now()
+          ? settings.publishDate
           : new Date(),
-    }));
+    };
+
+    publishSettingsRef && (publishSettingsRef.current = next);
+    updateSettings(() => next);
     onPublish?.();
   };
 
   const handleSaveDraft = () => {
-    setSettings((current) => ({ ...current, status: "draft" }));
+    const next: PublishSettings = { ...settings, status: "draft" };
+    publishSettingsRef && (publishSettingsRef.current = next);
+    updateSettings(() => next);
     onSaveDraft?.();
   };
 
   const handleMoveToTrash = () => {
-    setSettings(createDefaultPublishSettings());
-    setActivePanel(null);
+    onMoveToTrash?.();
   };
 
   const handleSyncExternal = () => {
-    setSyncMessage("External sync is not connected yet.");
-    window.setTimeout(() => setSyncMessage(""), 3000);
+    toast.info("External sync is not connected yet.");
   };
 
   return (
@@ -475,16 +501,13 @@ export function PublishMetabox({
         >
           Sync From External Post
         </button>
-        {syncMessage ? (
-          <p className="admin-publish-sync-message">{syncMessage}</p>
-        ) : null}
 
         <label className="admin-publish-lock-toggle">
           <input
             type="checkbox"
             checked={settings.lockModifiedDate}
             onChange={(event) =>
-              setSettings((current) => ({
+              updateSettings((current) => ({
                 ...current,
                 lockModifiedDate: event.target.checked,
               }))

@@ -24,7 +24,7 @@ import {
   type SchemaItem,
 } from "@/lib/admin/postSeo";
 import type { SchemaGeneratorConfig } from "@/lib/admin/postSchemaGenerator";
-import { business } from "@/lib/site/config";
+import { useAdminSiteUrl } from "@/lib/admin/siteUrl";
 
 type SeoTab = "general" | "advanced" | "schema" | "social";
 
@@ -51,6 +51,7 @@ export function PostEditorSeo({
   buildPermalinkUrl = buildBlogPermalinkUrl,
   fallbackPreviewTitle = "Sample Post Title",
 }: PostEditorSeoProps) {
+  const siteUrl = useAdminSiteUrl();
   const [activeTab, setActiveTab] = useState<SeoTab>("general");
   const [snippetModalOpen, setSnippetModalOpen] = useState(false);
   const [schemaGeneratorModalOpen, setSchemaGeneratorModalOpen] = useState(false);
@@ -59,7 +60,7 @@ export function PostEditorSeo({
 
   const previewTitle = snippet.seoTitle || postTitle || fallbackPreviewTitle;
   const previewPermalink = buildPermalinkUrl(
-    business.domain,
+    siteUrl,
     snippet.permalink || postTitle,
   );
   const previewDescription =

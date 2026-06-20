@@ -3,6 +3,7 @@
 import { ArrowDown, ArrowUp } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { useAdminToast } from "@/components/admin/toast/useAdminToast";
 import {
   filterReviews,
   formatReviewListDate,
@@ -201,6 +202,7 @@ function ReviewsTablenav({
 }
 
 export function ReviewsList() {
+  const toast = useAdminToast();
   const allReviews = useMemo<ReviewListItem[]>(() => [], []);
   const viewCounts = useMemo(() => getReviewViewCounts(allReviews), [allReviews]);
   const dateOptions = useMemo(() => getReviewDateOptions(allReviews), [allReviews]);
@@ -214,7 +216,6 @@ export function ReviewsList() {
   const [page, setPage] = useState(1);
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [bulkAction, setBulkAction] = useState("");
-  const [statusMessage, setStatusMessage] = useState("");
 
   const filteredReviews = useMemo(
     () =>
@@ -305,17 +306,15 @@ export function ReviewsList() {
     }
 
     if (selectedIds.size === 0) {
-      setStatusMessage("Select at least one review.");
-      window.setTimeout(() => setStatusMessage(""), 2500);
+      toast.info("Select at least one review.");
       return;
     }
 
-    setStatusMessage(
+    toast.success(
       `Applied "${bulkAction}" to ${selectedIds.size} review${selectedIds.size === 1 ? "" : "s"}.`,
     );
     setSelectedIds(new Set());
     setBulkAction("");
-    window.setTimeout(() => setStatusMessage(""), 2500);
   };
 
   return (
@@ -364,12 +363,6 @@ export function ReviewsList() {
           </button>
         </div>
       </div>
-
-      {statusMessage ? (
-        <p className="admin-posts-status-message" role="status">
-          {statusMessage}
-        </p>
-      ) : null}
 
       <ReviewsTablenav
         position="top"

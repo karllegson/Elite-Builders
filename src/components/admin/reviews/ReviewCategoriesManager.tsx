@@ -2,6 +2,7 @@
 
 import { ArrowDown, ArrowUp } from "lucide-react";
 import { useMemo, useState, type FormEvent } from "react";
+import { useAdminToast } from "@/components/admin/toast/useAdminToast";
 import {
   buildCategoryParentOptions,
   CATEGORY_BULK_ACTIONS,
@@ -196,6 +197,7 @@ function ReviewCategoriesTablenav({
 }
 
 export function ReviewCategoriesManager() {
+  const toast = useAdminToast();
   const [categories, setCategories] = useState<CategoryListItem[]>([]);
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
@@ -209,7 +211,6 @@ export function ReviewCategoriesManager() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [sortKey, setSortKey] = useState<CategorySortKey>("name");
   const [sortDirection, setSortDirection] = useState<CategorySortDirection>("asc");
-  const [statusMessage, setStatusMessage] = useState("");
 
   const parentOptions = useMemo(
     () => buildCategoryParentOptions(categories),
@@ -268,8 +269,7 @@ export function ReviewCategoriesManager() {
     setSlugTouched(false);
     setParentId("");
     setDescription("");
-    setStatusMessage(`Category "${category.name}" added.`);
-    window.setTimeout(() => setStatusMessage(""), 2500);
+    toast.success(`Category "${category.name}" added.`);
   };
 
   const handleSort = (key: CategorySortKey) => {
@@ -327,8 +327,7 @@ export function ReviewCategoriesManager() {
     }
 
     if (selectedIds.size === 0) {
-      setStatusMessage("Select at least one category.");
-      window.setTimeout(() => setStatusMessage(""), 2500);
+      toast.info("Select at least one category.");
       return;
     }
 
@@ -337,8 +336,7 @@ export function ReviewCategoriesManager() {
         current.filter((category) => !selectedIds.has(category.id)),
       );
       setSelectedIds(new Set());
-      setStatusMessage("Selected categories deleted.");
-      window.setTimeout(() => setStatusMessage(""), 2500);
+      toast.info("Selected categories deleted.");
     }
 
     setBulkAction("");
@@ -359,12 +357,6 @@ export function ReviewCategoriesManager() {
 
   return (
     <div className="admin-categories-page admin-review-categories-page">
-      {statusMessage ? (
-        <p className="admin-categories-status-message" role="status">
-          {statusMessage}
-        </p>
-      ) : null}
-
       <div className="admin-categories-layout">
         <section className="admin-categories-form-panel">
           <h2 className="admin-categories-form-title">Add New Category</h2>

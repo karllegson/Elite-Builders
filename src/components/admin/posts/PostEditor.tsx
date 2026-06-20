@@ -1,24 +1,94 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  bulkPostsAction,
+  fetchPostForEdit,
+  savePostAction,
+  updatePostFeaturedImageAction,
+} from "@/app/admin/(shell)/posts/actions";
+import { fetchMediaLibrary } from "@/app/admin/media/actions";
+import { AdminPostContentEditor } from "@/components/admin/posts/AdminPostContentEditor";
+import { PostEditorSeo } from "@/components/admin/posts/PostEditorSeo";
+import { PostEditorSidebar } from "@/components/admin/posts/PostEditorSidebar";
+import { PostEditorToolbar } from "@/components/admin/posts/PostEditorToolbar";
+import { PostPermalinkBar } from "@/components/admin/posts/PostPermalinkBar";
+import { useAdminToast } from "@/components/admin/toast/useAdminToast";
+import type { MediaAttachment } from "@/lib/admin/mediaLibrary";
+import { fromMediaDTO } from "@/lib/admin/media.dto";
 import { countWords } from "@/lib/admin/postEditor";
+import {
+  createDefaultPublishSettings,
+  type PublishSettings,
+} from "@/lib/admin/postPublish";
+import {
+  createDefaultSchemaGeneratorConfig,
+  type SchemaGeneratorConfig,
+} from "@/lib/admin/postSchemaGenerator";
 import {
   createDefaultArticleSchema,
   slugify,
   type PostSeoSnippet,
   type SchemaItem,
 } from "@/lib/admin/postSeo";
-import {
-  createDefaultSchemaGeneratorConfig,
-  type SchemaGeneratorConfig,
-} from "@/lib/admin/postSchemaGenerator";
-import { PostEditorSeo } from "@/components/admin/posts/PostEditorSeo";
-import { PostEditorSidebar } from "@/components/admin/posts/PostEditorSidebar";
-import { PostEditorToolbar } from "@/components/admin/posts/PostEditorToolbar";
-import { PostPermalinkBar } from "@/components/admin/posts/PostPermalinkBar";
+import type { PostRecordDTO } from "@/lib/admin/posts.dto";
+import type { PostStoreStatus } from "@/lib/admin/posts.types";
 
-export function PostEditor() {
+type PostEditorProps = {
+  postId?: string;
+};
+
+function postToPublishSettings(post: PostRecordDTO): PublishSettings {
+  const publishDate = post.publishedAt
+    ? new Date(post.publishedAt)
+    : new Date(post.updatedAt);
+
+  let status: PublishSettings["status"] = "draft";
+
+  if (post.status === "published" || post.status === "scheduled") {
+    status = "published";
+  } else if (post.status === "draft") {
+    status = "draft";
+  }
+
+  return {
+    status,
+    visibility: post.visibility,
+    password: post.password,
+    stickToFrontPage: post.stickToFrontPage,
+    publishDate,
+    lockModifiedDate: post.lockModifiedDate,
+  };
+}
+
+function resolveStoreStatus(settings: PublishSettings): PostStoreStatus {
+  if (settings.status === "draft" || settings.status === "pending") {
+    return "draft";
+  }
+
+  if (settings.publishDate.getTime() > Date.now()) {
+    return "scheduled";
+  }
+
+  return "published";
+}
+
+export function PostEditor({ postId }: PostEditorProps) {
+  const router = useRouter();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const publishSettingsRef = useRef<PublishSettings>(createDefaultPublishSettings());
+  const snippetEditedRef = useRef({
+    seoTitle: false,
+    permalink: false,
+    metaDescription: false,
+  });
+
+  const toast = useAdminToast();
+  const [loadedPostId, setLoadedPostId] = useState<string | undefined>(postId);
+  const [isLoading, setIsLoading] = useState(Boolean(postId));
+  const [isSaving, setIsSaving] = useState(false);
+
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [snippet, setSnippet] = useState<PostSeoSnippet>({
@@ -29,16 +99,108 @@ export function PostEditor() {
   const [schemas, setSchemas] = useState<SchemaItem[]>([
     createDefaultArticleSchema(),
   ]);
-  const [schemaGeneratorConfig, setSchemaGeneratorConfig] = useState(
-    createDefaultSchemaGeneratorConfig,
+  const [schemaGeneratorConfig, setSchemaGeneratorConfig] = useState<SchemaGeneratorConfig>(
+    createDefaultSchemaGeneratorConfig(),
   );
-  const snippetEditedRef = useRef({
-    seoTitle: false,
-    permalink: false,
-    metaDescription: false,
-  });
+  const [initialPublishSettings, setInitialPublishSettings] = useState<
+    PublishSettings | undefined
+  >(postId ? undefined : createDefaultPublishSettings());
+  const [categoryIds, setCategoryIds] = useState<string[]>([]);
+  const [featuredImage, setFeaturedImage] = useState<MediaAttachment | null>(null);
 
   const wordCount = countWords(content);
+  const previewHref = snippet.permalink ? `/blog/${snippet.permalink}` : "/blog";
+
+  const showMessage = useCallback(
+    (message: string, isError = false) => {
+      if (isError) {
+        toast.error(message);
+        return;
+      }
+
+      toast.success(message);
+    },
+    [toast],
+  );
+
+  const applyLoadedPost = useCallback(async (post: PostRecordDTO) => {
+    setLoadedPostId(post.id);
+    setTitle(post.title);
+    setContent(post.content);
+    setSnippet({
+      seoTitle: post.seoTitle,
+      permalink: post.permalink || post.slug,
+      metaDescription: post.metaDescription,
+    });
+    snippetEditedRef.current = {
+      seoTitle: true,
+      permalink: true,
+      metaDescription: Boolean(post.metaDescription),
+    };
+    setSchemas(post.schemas.length > 0 ? post.schemas : [createDefaultArticleSchema()]);
+    setSchemaGeneratorConfig(post.schemaGeneratorConfig);
+    setCategoryIds(post.categoryIds);
+    const settings = postToPublishSettings(post);
+    publishSettingsRef.current = settings;
+    setInitialPublishSettings(settings);
+
+    if (post.featuredImageId) {
+      const media = await fetchMediaLibrary();
+      const match = media.items.find((item) => item.id === post.featuredImageId);
+
+      if (match) {
+        setFeaturedImage(fromMediaDTO(match));
+      } else {
+        setFeaturedImage({
+          id: post.featuredImageId,
+          src: "",
+          filename: "",
+          title: "",
+          alt: "",
+          caption: "",
+          description: "",
+          mimeType: "image/jpeg",
+          fileSize: 0,
+          width: 0,
+          height: 0,
+          uploadedAt: new Date(),
+        });
+      }
+    } else {
+      setFeaturedImage(null);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!postId) {
+      setIsLoading(false);
+      return;
+    }
+
+    let cancelled = false;
+
+    void (async () => {
+      setIsLoading(true);
+      const result = await fetchPostForEdit(postId);
+
+      if (cancelled) {
+        return;
+      }
+
+      if (!result.post) {
+        showMessage("Post not found.", true);
+        setIsLoading(false);
+        return;
+      }
+
+      await applyLoadedPost(result.post);
+      setIsLoading(false);
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [applyLoadedPost, postId, showMessage]);
 
   useEffect(() => {
     setSnippet((current) => ({
@@ -89,6 +251,120 @@ export function PostEditor() {
     );
   };
 
+  const handlePublishSettingsChange = (settings: PublishSettings) => {
+    publishSettingsRef.current = settings;
+  };
+
+  const handleFeaturedImageChange = useCallback(
+    async (image: MediaAttachment | null) => {
+      setFeaturedImage(image);
+
+      if (!loadedPostId) {
+        if (image) {
+          showMessage("Featured image selected. Save or publish the post to keep it.");
+        }
+        return;
+      }
+
+      const result = await updatePostFeaturedImageAction(
+        loadedPostId,
+        image?.id ?? null,
+      );
+
+      if (result.error || !result.post) {
+        showMessage(result.error ?? "Could not save featured image.", true);
+        return;
+      }
+
+      setLoadedPostId(result.post.id);
+      showMessage(image ? "Featured image saved." : "Featured image removed.");
+    },
+    [loadedPostId, showMessage],
+  );
+
+  const savePost = async (overrideStatus?: PublishSettings["status"]) => {
+    const trimmedTitle = title.trim();
+
+    if (!trimmedTitle) {
+      showMessage("Add a title before saving.", true);
+      return;
+    }
+
+    const settings = { ...publishSettingsRef.current };
+
+    if (overrideStatus) {
+      settings.status = overrideStatus;
+    }
+
+    const storeStatus = resolveStoreStatus(settings);
+
+    setIsSaving(true);
+
+    const result = await savePostAction({
+      id: loadedPostId,
+      title: trimmedTitle,
+      slug: snippet.permalink,
+      content,
+      status: storeStatus,
+      visibility: settings.visibility,
+      password: settings.password,
+      stickToFrontPage: settings.stickToFrontPage,
+      featuredImageId: featuredImage?.id ?? null,
+      seoTitle: snippet.seoTitle || trimmedTitle,
+      metaDescription: snippet.metaDescription,
+      permalink: snippet.permalink,
+      schemas,
+      schemaGeneratorConfig,
+      categoryIds,
+      tagIds: [],
+      publishedAt: settings.publishDate.toISOString(),
+      lockModifiedDate: settings.lockModifiedDate,
+    });
+
+    setIsSaving(false);
+
+    if (result.error || !result.post) {
+      showMessage(result.error ?? "Could not save post.", true);
+      return;
+    }
+
+    await applyLoadedPost(result.post);
+
+    if (!postId && result.post.id) {
+      router.replace(`/admin/posts/new?post=${result.post.id}`);
+    }
+
+    const label =
+      storeStatus === "published"
+        ? "Post published."
+        : storeStatus === "scheduled"
+          ? "Post scheduled."
+          : "Draft saved.";
+
+    showMessage(label);
+  };
+
+  const handleMoveToTrash = async () => {
+    if (!loadedPostId) {
+      showMessage("Save the post before moving it to trash.", true);
+      return;
+    }
+
+    const result = await bulkPostsAction([loadedPostId], "trash");
+
+    if (result.error) {
+      showMessage(result.error, true);
+      return;
+    }
+
+    showMessage("Post moved to trash.");
+    router.push("/admin/posts");
+  };
+
+  if (isLoading) {
+    return <p className="admin-post-editor-loading">Loading post…</p>;
+  }
+
   return (
     <div className="admin-post-editor">
       <div className="admin-post-editor-main">
@@ -117,20 +393,17 @@ export function PostEditor() {
           onContentChange={setContent}
         />
 
-        <div className="admin-post-content-wrap">
-          <textarea
-            ref={textareaRef}
-            id="post-content"
-            className="admin-post-content"
-            value={content}
-            onChange={(event) => setContent(event.target.value)}
-            spellCheck={false}
-            aria-label="Post content"
-          />
-        </div>
+        <AdminPostContentEditor
+          id="post-content"
+          value={content}
+          onChange={setContent}
+          textareaRef={textareaRef}
+          ariaLabel="Post content"
+        />
 
         <div className="admin-post-editor-footer">
           <span>Word count: {wordCount}</span>
+          {isSaving ? <span>Saving…</span> : null}
         </div>
 
         <PostEditorSeo
@@ -148,6 +421,21 @@ export function PostEditor() {
         postTitle={title}
         postContent={content}
         seoSnippet={snippet}
+        categoryIds={categoryIds}
+        onCategoryIdsChange={setCategoryIds}
+        featuredImage={featuredImage}
+        onFeaturedImageChange={handleFeaturedImageChange}
+        publishSettings={initialPublishSettings ?? createDefaultPublishSettings()}
+        initialPublishSettings={initialPublishSettings}
+        publishSettingsRef={publishSettingsRef}
+        onPublishSettingsChange={handlePublishSettingsChange}
+        previewHref={previewHref}
+        onPublish={() => void savePost("published")}
+        onSaveDraft={() => void savePost("draft")}
+        onMoveToTrash={() => void handleMoveToTrash()}
+        primaryActionLabel={
+          initialPublishSettings?.status === "published" ? "Update" : "Publish"
+        }
       />
     </div>
   );

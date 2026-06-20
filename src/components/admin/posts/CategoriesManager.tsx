@@ -1,11 +1,16 @@
 "use client";
 
 import { ArrowDown, ArrowUp, X } from "lucide-react";
-import { useMemo, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
+import { useAdminToast } from "@/components/admin/toast/useAdminToast";
+import {
+  createCategoryAction,
+  deleteCategoriesAction,
+  fetchCategoriesWithCountsAction,
+} from "@/app/admin/(shell)/posts/actions";
 import {
   buildCategoryParentOptions,
   CATEGORY_BULK_ACTIONS,
-  createCategoryListItem,
   filterCategories,
   slugifyCategoryName,
   sortCategories,
@@ -138,6 +143,7 @@ function CategoriesTablenav({
 
 export function CategoriesManager() {
   const [categories, setCategories] = useState<CategoryListItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
   const [slugTouched, setSlugTouched] = useState(false);
@@ -150,7 +156,28 @@ export function CategoriesManager() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [sortKey, setSortKey] = useState<CategorySortKey>("name");
   const [sortDirection, setSortDirection] = useState<CategorySortDirection>("asc");
-  const [statusMessage, setStatusMessage] = useState("");
+  const toast = useAdminToast();
+
+  const loadCategories = useCallback(async () => {
+    setIsLoading(true);
+    const items = await fetchCategoriesWithCountsAction();
+    setCategories(
+      items.map((category) => ({
+        id: category.id,
+        name: category.name,
+        parentId: category.parentId,
+        slug: category.slug,
+        description: category.description,
+        icon: category.icon,
+        postCount: category.postCount,
+      })),
+    );
+    setIsLoading(false);
+  }, []);
+
+  useEffect(() => {
+    void loadCategories();
+  }, [loadCategories]);
 
   const parentOptions = useMemo(
     () => buildCategoryParentOptions(categories),
@@ -184,7 +211,7 @@ export function CategoriesManager() {
     setSlug(value);
   };
 
-  const handleAddCategory = (event: FormEvent) => {
+  const handleAddCategory = async (event: FormEvent) => {
     event.preventDefault();
 
     const trimmedName = name.trim();
@@ -193,21 +220,27 @@ export function CategoriesManager() {
       return;
     }
 
-    const category = createCategoryListItem(trimmedName, parentId || null, {
+    const result = await createCategoryAction({
+      name: trimmedName,
       slug,
       description,
+      parentId: parentId || null,
       icon,
     });
 
-    setCategories((current) => [...current, category]);
+    if (result.error || !result.category) {
+      toast.error(result.error ?? "Could not create category.");
+      return;
+    }
+
+    await loadCategories();
     setName("");
     setSlug("");
     setSlugTouched(false);
     setParentId("");
     setDescription("");
     setIcon(null);
-    setStatusMessage(`Category "${category.name}" added.`);
-    window.setTimeout(() => setStatusMessage(""), 2500);
+    toast.success(`Category "${result.category.name}" added.`);
   };
 
   const handleSort = (key: CategorySortKey) => {
@@ -258,36 +291,37 @@ export function CategoriesManager() {
     });
   };
 
-  const handleApplyBulkAction = () => {
+  const handleApplyBulkAction = async () => {
     if (!bulkAction) {
       return;
     }
 
     if (selectedIds.size === 0) {
-      setStatusMessage("Select at least one category.");
-      window.setTimeout(() => setStatusMessage(""), 2500);
+      toast.info("Select at least one category.");
       return;
     }
 
     if (bulkAction === "delete") {
-      setCategories((current) =>
-        current.filter((category) => !selectedIds.has(category.id)),
-      );
-      setSelectedIds(new Set());
-      setStatusMessage("Selected categories deleted.");
-      window.setTimeout(() => setStatusMessage(""), 2500);
+      const result = await deleteCategoriesAction(Array.from(selectedIds));
+
+      if (result.error) {
+        toast.error(result.error);
+      } else {
+        setSelectedIds(new Set());
+        toast.success("Selected categories deleted.");
+        await loadCategories();
+      }
     }
 
     setBulkAction("");
   };
 
+  if (isLoading) {
+    return <p className="admin-post-editor-loading">Loading categories…</p>;
+  }
+
   return (
     <div className="admin-categories-page">
-      {statusMessage ? (
-        <p className="admin-categories-status-message" role="status">
-          {statusMessage}
-        </p>
-      ) : null}
 
       <div className="admin-categories-layout">
         <section className="admin-categories-form-panel">

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Fragment, useEffect, useMemo, useState } from "react";
 import { FaqQuickEditRow } from "@/components/admin/faqs/FaqQuickEditRow";
+import { useAdminToast } from "@/components/admin/toast/useAdminToast";
 import {
   DEFAULT_FAQ_AUTHOR,
   FAQ_BULK_ACTIONS,
@@ -150,6 +151,7 @@ function FaqsTablenav({
 }
 
 export function FaqsList() {
+  const toast = useAdminToast();
   const searchParams = useSearchParams();
   const categoryFilterId = searchParams.get("category");
   const [ready, setReady] = useState(false);
@@ -181,7 +183,6 @@ export function FaqsList() {
   const [page, setPage] = useState(1);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkAction, setBulkAction] = useState("");
-  const [statusMessage, setStatusMessage] = useState("");
   const [quickEditId, setQuickEditId] = useState<string | null>(null);
 
   const filteredItems = useMemo(
@@ -204,8 +205,7 @@ export function FaqsList() {
     pagination.items.every((item) => selectedIds.has(item.id));
 
   const showStatus = (message: string) => {
-    setStatusMessage(message);
-    window.setTimeout(() => setStatusMessage(""), 3000);
+    toast.success(message);
   };
 
   const handleViewChange = (nextView: FaqListView) => {
@@ -315,12 +315,6 @@ export function FaqsList() {
           <Link href="/admin/faqs" className="admin-inline-link">
             Clear filter
           </Link>
-        </p>
-      ) : null}
-
-      {statusMessage ? (
-        <p className="admin-posts-status-message" role="status">
-          {statusMessage}
         </p>
       ) : null}
 

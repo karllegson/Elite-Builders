@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useAdminToast } from "@/components/admin/toast/useAdminToast";
 import { FormEditorCanvas } from "@/components/admin/forms/FormEditorCanvas";
 import { FormEditorSidebar } from "@/components/admin/forms/FormEditorSidebar";
 import { FormEditorToolbar } from "@/components/admin/forms/FormEditorToolbar";
@@ -11,11 +11,10 @@ type FormEditorProps = {
 };
 
 export function FormEditor({ formId }: FormEditorProps) {
-  const [statusMessage, setStatusMessage] = useState("");
+  const toast = useAdminToast();
 
   const handleSave = () => {
-    setStatusMessage("Form saved.");
-    window.setTimeout(() => setStatusMessage(""), 2500);
+    toast.success("Form saved.");
   };
 
   return (
@@ -26,12 +25,6 @@ export function FormEditor({ formId }: FormEditorProps) {
         showEditActions
         onSave={handleSave}
       />
-
-      {statusMessage ? (
-        <p className="admin-posts-status-message" role="status">
-          {statusMessage}
-        </p>
-      ) : null}
 
       <div className="admin-form-editor-layout">
         <div className="admin-form-editor-canvas-wrap">

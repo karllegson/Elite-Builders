@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { AdminToast } from "@/components/admin/AdminToast";
 import { HtmlIdeEditor } from "@/components/admin/HtmlIdeEditor";
 import { PostEditorSeo } from "@/components/admin/posts/PostEditorSeo";
 import { ServiceAreaExtraMetaboxes } from "@/components/admin/service-areas/ServiceAreaExtraMetaboxes";
@@ -23,6 +22,7 @@ import {
   type ServiceAreaFeaturedImage,
   type ServiceAreaPageAttributes,
 } from "@/lib/admin/serviceAreaEditor";
+import { useAdminToast } from "@/components/admin/toast/useAdminToast";
 import {
   getServiceAreaById,
   upsertServiceArea,
@@ -37,6 +37,7 @@ export function ServiceAreaEditor({
   serviceAreaId,
   defaultParentId = null,
 }: ServiceAreaEditorProps) {
+  const toast = useAdminToast();
   const isEditing = Boolean(serviceAreaId);
   const [loaded, setLoaded] = useState(!isEditing);
   const [missing, setMissing] = useState(false);
@@ -61,10 +62,6 @@ export function ServiceAreaEditor({
     parentId: defaultParentId,
   }));
   const [featuredImage, setFeaturedImage] = useState<ServiceAreaFeaturedImage | null>(null);
-  const [saveMessage, setSaveMessage] = useState("");
-  const [saveMessageVariant, setSaveMessageVariant] = useState<"success" | "error">(
-    "success",
-  );
   const snippetEditedRef = useRef({
     seoTitle: false,
     permalink: false,
@@ -168,8 +165,7 @@ export function ServiceAreaEditor({
 
   const persistServiceArea = (status: "published" | "draft") => {
     if (!title.trim()) {
-      setSaveMessageVariant("error");
-      setSaveMessage("Add a title before saving (e.g. Stockton, CA).");
+      toast.error("Add a title before saving (e.g. Stockton, CA).");
       return;
     }
 
@@ -194,8 +190,7 @@ export function ServiceAreaEditor({
         breadcrumbsLinkInactive: extraFields.breadcrumbsLinkInactive,
       });
     } catch (error) {
-      setSaveMessageVariant("error");
-      setSaveMessage(
+      toast.error(
         error instanceof Error ? error.message : "Unable to save this service area.",
       );
       return;
@@ -203,8 +198,7 @@ export function ServiceAreaEditor({
 
     const isSubPage = pageAttributes.parentId !== null;
 
-    setSaveMessageVariant("success");
-    setSaveMessage(
+    toast.success(
       status === "published"
         ? isEditing
           ? isSubPage
@@ -236,11 +230,6 @@ export function ServiceAreaEditor({
 
   return (
     <div className="admin-post-editor">
-      <AdminToast
-        message={saveMessage}
-        variant={saveMessageVariant}
-        onDismiss={() => setSaveMessage("")}
-      />
       <div className="admin-post-editor-main">
         <label className="admin-post-title-label" htmlFor="service-area-title">
           {isEditing ? "Edit title" : "Add title"}

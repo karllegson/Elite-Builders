@@ -3,6 +3,7 @@
 import { ArrowDown, ArrowUp } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { useAdminToast } from "@/components/admin/toast/useAdminToast";
 import {
   filterForms,
   FORM_BULK_ACTIONS,
@@ -150,6 +151,7 @@ function FormsTablenav({
 }
 
 export function FormsList() {
+  const toast = useAdminToast();
   const allForms = useMemo<FormListItem[]>(() => [], []);
 
   const viewCounts = useMemo(() => getFormViewCounts(allForms), [allForms]);
@@ -161,7 +163,6 @@ export function FormsList() {
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [sortKey, setSortKey] = useState<FormSortKey>("title");
   const [sortDirection, setSortDirection] = useState<FormSortDirection>("asc");
-  const [statusMessage, setStatusMessage] = useState("");
 
   const visibleForms = useMemo(
     () =>
@@ -232,17 +233,15 @@ export function FormsList() {
     }
 
     if (selectedIds.size === 0) {
-      setStatusMessage("Select at least one form.");
-      window.setTimeout(() => setStatusMessage(""), 2500);
+      toast.info("Select at least one form.");
       return;
     }
 
-    setStatusMessage(
+    toast.success(
       `Applied "${bulkAction}" to ${selectedIds.size} form${selectedIds.size === 1 ? "" : "s"}.`,
     );
     setSelectedIds(new Set());
     setBulkAction("");
-    window.setTimeout(() => setStatusMessage(""), 2500);
   };
 
   const tablenavProps = {
@@ -277,12 +276,6 @@ export function FormsList() {
           );
         })}
       </ul>
-
-      {statusMessage ? (
-        <p className="admin-posts-status-message" role="status">
-          {statusMessage}
-        </p>
-      ) : null}
 
       <FormsTablenav {...tablenavProps} position="top" showSearch />
 
