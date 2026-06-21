@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { ServiceAreaCityView } from "@/components/site/ServiceAreaCityView";
 import { business } from "@/lib/site/config";
+import { buildPageMetadata } from "@/lib/site/seo";
 
 export const dynamic = "force-dynamic";
 
@@ -13,10 +14,11 @@ export async function generateMetadata(
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
     .join(" ");
 
-  return {
-    title: `Framing Contractor ${label} CA | Elite Builders IX`,
-    description: `Rough framing, remodeling, siding, and decks in ${label}, California. Licensed contractor ${business.license}.`,
-  };
+  return buildPageMetadata({
+    title: `Framing Contractor ${label} CA`,
+    description: `Rough framing, remodeling, siding, and deck construction in ${label}, California. Licensed contractor ${business.license}. Request a free estimate from Elite Builders.`,
+    path: `/service-areas/${city}`,
+  });
 }
 
 export default async function ServiceAreaCityPage(

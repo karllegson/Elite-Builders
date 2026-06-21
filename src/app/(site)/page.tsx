@@ -6,8 +6,8 @@ import {
 } from "lucide-react";
 import ContentImage from "@/components/site/ContentImage";
 import EstimateForm from "@/components/site/EstimateForm";
-import HeroVideo from "@/components/site/HeroVideo";
 import HomeHeroContent from "@/components/site/HomeHeroContent";
+import HomeHeroSection from "@/components/site/HomeHeroSection";
 import BuilderPartnersSection from "@/components/site/BuilderPartnersSection";
 import BrandPillars from "@/components/site/BrandPillars";
 import TeamSection from "@/components/site/TeamSection";
@@ -24,22 +24,9 @@ import {
 import { homepageFaqs, integrityStatement, framingFirstTagline } from "@/lib/site/messaging";
 import { homeImages, homepageGalleryImageKeys } from "@/lib/site/images";
 import { completedProjects, currentProjects, type Project } from "@/lib/site/projects";
+import { homepageMetadata, logoSchemaImage, organizationSchema } from "@/lib/site/seo";
 
-export const metadata: Metadata = {
-  title: "Framing-First Contractor Bay Area & Northern California | Elite Builders IX",
-  description:
-    "Framing-first specialists since 2012. Rough framing, remodeling, siding, and decks for residential and commercial projects across the Bay Area, Central Valley, and Southern California. CSLB #970551.",
-  alternates: { canonical: business.domain },
-  openGraph: {
-    title: "Framing-First Contractor Bay Area & Northern California | Elite Builders IX",
-    description:
-      "Framing-first specialists — rough framing, remodeling, and siding for residential & commercial projects across Northern California.",
-    url: business.domain,
-    siteName: business.name,
-    type: "website",
-    images: [{ url: "/logo.png", width: 1024, height: 1024, alt: "Elite Builders IX logo" }],
-  },
-};
+export const metadata: Metadata = homepageMetadata;
 
 const yearsInBusiness = new Date().getFullYear() - business.foundedYear;
 
@@ -109,7 +96,8 @@ const localBusinessSchema = {
   url: business.domain,
   telephone: business.phone,
   email: business.email,
-  image: `${business.domain}/logo.png`,
+  logo: logoSchemaImage,
+  image: logoSchemaImage.url,
   address: {
     "@type": "PostalAddress",
     streetAddress: business.address.street,
@@ -139,6 +127,10 @@ export default function HomePage() {
     <>
       <script
         type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+      />
+      <script
+        type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }}
       />
       <script
@@ -147,18 +139,9 @@ export default function HomePage() {
       />
 
       {/* ── Hero with commercial video ───────────────────────── */}
-      <section className="relative min-h-[58dvh] overflow-hidden bg-brand-navy sm:min-h-[75dvh]">
-        <HeroVideo />
-        {/* Readability overlay — strong on the left, clear on the right */}
-        <div
-          aria-hidden
-          className="absolute inset-0 bg-gradient-to-r from-brand-navy/60 via-brand-navy/25 to-transparent"
-        />
-
-        <div className="site-container relative z-10 flex min-h-[58dvh] items-center py-8 sm:min-h-[75dvh] sm:py-14">
-          <HomeHeroContent />
-        </div>
-      </section>
+      <HomeHeroSection>
+        <HomeHeroContent />
+      </HomeHeroSection>
 
       <BrandPillars />
 

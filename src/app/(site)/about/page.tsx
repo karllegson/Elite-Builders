@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import PagePlaceholder from "@/components/site/PagePlaceholder";
+import { buildPageMetadata } from "@/lib/site/seo";
 
-export const metadata: Metadata = {
-  title: "About Us | Elite Builders IX",
+export const metadata: Metadata = buildPageMetadata({
+  title: "About Us",
   description:
-    "Learn about Elite Builders IX — a trusted framing contractor serving the Bay Area, Central Valley, and Southern California.",
-};
+    "Meet Elite Builders — family-owned framing-first specialists since 2012, serving the Bay Area, Central Valley, and Southern California with integrity and precision.",
+  path: "/about",
+});
 
 export default function AboutPage() {
   return (

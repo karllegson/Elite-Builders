@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import "./admin.css";
+import { SITE_URL } from "@/lib/site/seo";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://www.elitebuildersco.com"),
-  title: "Elite Builders IX",
-  description: "Elite Builders contractor administration and website",
+  metadataBase: new URL(SITE_URL),
 };
 
 export default function RootLayout({

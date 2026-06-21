@@ -14,6 +14,7 @@ import {
   blogEstimateDescription,
   mapPostsToSidebarItems,
 } from "@/lib/site/blogSidebar";
+import { buildPageMetadata } from "@/lib/site/seo";
 
 type BlogPostPageProps = {
   params: Promise<{ slug: string }>;
@@ -26,15 +27,25 @@ export async function generateMetadata({
   const post = await fetchPublicPostBySlug(slug);
 
   if (!post) {
-    return {
-      title: "Post Not Found | Elite Builders IX",
-    };
+    return buildPageMetadata({
+      title: "Post Not Found",
+      description: "The requested blog post could not be found.",
+      path: `/blog/${slug}`,
+      noIndex: true,
+    });
   }
 
-  return {
-    title: post.seoTitle || `${post.title} | Elite Builders IX`,
-    description: post.metaDescription || post.excerpt,
-  };
+  const title = post.seoTitle?.trim() || post.title;
+  const description =
+    post.metaDescription?.trim() ||
+    post.excerpt?.trim() ||
+    `${post.title} — construction and framing insights from Elite Builders.`;
+
+  return buildPageMetadata({
+    title,
+    description,
+    path: `/blog/${slug}`,
+  });
 }
 
 export default async function BlogPostPage({ params }: BlogPostPageProps) {

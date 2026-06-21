@@ -41,7 +41,7 @@ export const serviceDetails: Record<string, ServiceDetail> = {
     slug: "framing",
     name: "Rough Framing",
     h1: "Rough Framing Contractor — Bay Area & Northern California",
-    metaTitle: "Rough Framing Contractor Bay Area CA | Elite Builders IX",
+    metaTitle: "Rough Framing Contractor Bay Area CA",
     metaDescription:
       "Residential and commercial rough carpentry and framing across the Bay Area, Central Valley, and Southern California — walls, floors, roofs, trusses, shear panels, and structural hardware. CSLB #970551.",
     heroImage: "residentialRoofFraming",
@@ -76,7 +76,7 @@ export const serviceDetails: Record<string, ServiceDetail> = {
     slug: "siding",
     name: "Siding",
     h1: "Siding Installation — Bay Area & Northern California",
-    metaTitle: "Siding Installation Bay Area CA | Elite Builders IX",
+    metaTitle: "Siding Installation Bay Area CA",
     metaDescription:
       "Siding and trim installation, replacement, and weather protection across the Bay Area and Northern California — installed by framing-first specialists. CSLB #970551.",
     heroImage: "sidingInstallation",
@@ -112,7 +112,7 @@ export const serviceDetails: Record<string, ServiceDetail> = {
     slug: "decks",
     name: "Decks & Porches",
     h1: "Deck & Porch Construction — Bay Area & Northern California",
-    metaTitle: "Deck Construction Bay Area CA | Elite Builders IX",
+    metaTitle: "Deck Construction Bay Area CA",
     metaDescription:
       "Custom deck and porch construction across the Bay Area and Northern California, built by structural framing specialists. CSLB #970551.",
     heroImage: "deckPorch",
@@ -147,7 +147,7 @@ export const serviceDetails: Record<string, ServiceDetail> = {
     slug: "remodeling",
     name: "Remodeling",
     h1: "Remodeling Contractor — Bay Area & Northern California",
-    metaTitle: "Remodeling Contractor Bay Area CA | Elite Builders IX",
+    metaTitle: "Remodeling Contractor Bay Area CA",
     metaDescription:
       "Remodeling across the Bay Area and Northern California — structural modifications, renovations, additions, and upgrades for residential and commercial spaces. CSLB #970551.",
     heroImage: "customKitchenRemodel",

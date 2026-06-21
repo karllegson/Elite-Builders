@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import PagePlaceholder from "@/components/site/PagePlaceholder";
+import { buildPageMetadata } from "@/lib/site/seo";
 
-export const metadata: Metadata = {
-  title: "Contact Us | Elite Builders IX",
+export const metadata: Metadata = buildPageMetadata({
+  title: "Contact Us",
   description:
-    "Contact Elite Builders IX for a free framing, remodeling, siding, or deck estimate across the Bay Area and Northern California.",
-};
+    "Contact Elite Builders for a free framing, remodeling, siding, or deck estimate. Serving the Bay Area, Central Valley, and Southern California. CSLB #970551.",
+  path: "/contact",
+});
 
 export default function ContactPage() {
   return (

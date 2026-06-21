@@ -6,12 +6,14 @@ import ContentImage from "@/components/site/ContentImage";
 import { business } from "@/lib/site/config";
 import { homeImages } from "@/lib/site/images";
 import { completedProjects, currentProjects, type Project } from "@/lib/site/projects";
+import { buildPageMetadata } from "@/lib/site/seo";
 
-export const metadata: Metadata = {
-  title: "Our Projects | Framing Contractor Northern California | Elite Builders IX",
+export const metadata: Metadata = buildPageMetadata({
+  title: "Our Projects",
   description:
-    "Completed and current framing projects by Elite Builders IX — custom homes, condominiums, apartments, and production communities for builders across Northern California. CSLB #970551.",
-};
+    "View completed and in-progress framing projects by Elite Builders — custom homes, condominiums, apartments, and production communities across Northern California.",
+  path: "/projects",
+});
 
 function ProjectCard({ project }: { project: Project }) {
   const img = homeImages[project.image];

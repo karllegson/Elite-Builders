@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { Fira_Sans, Poppins } from "next/font/google";
 import { Phone } from "lucide-react";
 import SiteHeader from "@/components/site/SiteHeader";
@@ -6,8 +7,11 @@ import SiteFooter from "@/components/site/SiteFooter";
 import { SiteAdminBar } from "@/components/site/SiteAdminBar";
 import { getSiteAdminSession } from "@/lib/admin/getSiteAdminSession";
 import { business } from "@/lib/site/config";
+import { siteDefaultMetadata } from "@/lib/site/seo";
 
-/** Arlington / Level 10 pairing: Fira Sans body + Poppins headings & nav */
+export const metadata: Metadata = siteDefaultMetadata;
+
+/** Fira Sans body + Poppins headings & nav */
 const firaSans = Fira_Sans({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],

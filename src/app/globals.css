@@ -21,7 +21,7 @@
   --color-site-text: #545659;
   --color-site-text-dark: #353638;
   --color-site-text-muted: #696c6f;
-  /* Arlington / Level 10 nav & utility accents */
+  /* Site nav & utility accents */
   --color-site-accent: #00a4d7;
   --color-site-nav-hover: #f0f0f1;
   --color-site-nav-cta: #004f8e;
@@ -530,7 +530,7 @@ body {
     }
   }
 
-  /* Level 10 editor blocks (image cards, grids, buttons) */
+  /* Service area editor blocks (image cards, grids, buttons) */
   .site .service-area-html-content .site-grid {
     width: 100%;
     display: grid;

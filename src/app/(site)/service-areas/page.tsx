@@ -5,12 +5,14 @@ import ContentImage from "@/components/site/ContentImage";
 import { ServiceAreasGrid } from "@/components/site/ServiceAreasGrid";
 import { business } from "@/lib/site/config";
 import { homeImages } from "@/lib/site/images";
+import { buildPageMetadata } from "@/lib/site/seo";
 
-export const metadata: Metadata = {
-  title: "Service Areas | Framing Contractor Northern California | Elite Builders IX",
+export const metadata: Metadata = buildPageMetadata({
+  title: "Service Areas",
   description:
-    "Elite Builders IX serves the Bay Area, Central Valley, Southern California, and the Eastern Sierra — rough framing, remodeling, siding, and decks. CSLB #970551.",
-};
+    "Elite Builders serves the Bay Area, Central Valley, Southern California, and the Eastern Sierra for rough framing, remodeling, siding, and deck construction. CSLB #970551.",
+  path: "/service-areas",
+});
 
 export default function ServiceAreasPage() {
   return (

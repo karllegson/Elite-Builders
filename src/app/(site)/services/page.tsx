@@ -5,12 +5,14 @@ import ContentImage from "@/components/site/ContentImage";
 import { business } from "@/lib/site/config";
 import { homeImages } from "@/lib/site/images";
 import { serviceDetails, serviceOrder } from "@/lib/site/scope";
+import { buildPageMetadata } from "@/lib/site/seo";
 
-export const metadata: Metadata = {
-  title: "Framing-First Construction Services | Elite Builders IX",
+export const metadata: Metadata = buildPageMetadata({
+  title: "Framing & Construction Services",
   description:
-    "Framing-first specialists — rough framing, remodeling, siding, and deck construction across the Bay Area, Central Valley, and Southern California. CSLB #970551.",
-};
+    "Framing-first construction services — rough framing, remodeling, siding, and deck construction across the Bay Area, Central Valley, and Southern California. CSLB #970551.",
+  path: "/services",
+});
 
 export default function ServicesPage() {
   return (

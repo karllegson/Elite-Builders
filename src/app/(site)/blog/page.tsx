@@ -9,12 +9,14 @@ import {
   blogEstimateDescription,
   mapPostsToSidebarItems,
 } from "@/lib/site/blogSidebar";
+import { buildPageMetadata } from "@/lib/site/seo";
 
-export const metadata: Metadata = {
-  title: "Blog | Elite Builders IX",
+export const metadata: Metadata = buildPageMetadata({
+  title: "Blog",
   description:
-    "Framing, siding, and construction tips for homeowners across the Bay Area and Northern California.",
-};
+    "Framing, siding, remodeling, and construction tips for homeowners and builders across the Bay Area and Northern California from Elite Builders.",
+  path: "/blog",
+});
 
 function formatBlogDate(value: string | null): string {
   if (!value) {

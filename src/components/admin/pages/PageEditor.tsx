@@ -167,7 +167,7 @@ export function PageEditor() {
           </button>
         </div>
 
-        <PageEditorMetabox title="Level 10 Page Specific Scripts">
+        <PageEditorMetabox title="Legson Media Page Specific Scripts">
           <label className="admin-page-scripts-label" htmlFor="page-scripts">
             Add custom scripts for this page:
           </label>
