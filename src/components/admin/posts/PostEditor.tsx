@@ -9,15 +9,13 @@ import {
   updatePostFeaturedImageAction,
 } from "@/app/admin/(shell)/posts/actions";
 import { fetchMediaLibrary } from "@/app/admin/media/actions";
-import { AdminPostContentEditor } from "@/components/admin/posts/AdminPostContentEditor";
+import { HtmlIdeEditor } from "@/components/admin/HtmlIdeEditor";
 import { PostEditorSeo } from "@/components/admin/posts/PostEditorSeo";
 import { PostEditorSidebar } from "@/components/admin/posts/PostEditorSidebar";
-import { PostEditorToolbar } from "@/components/admin/posts/PostEditorToolbar";
 import { PostPermalinkBar } from "@/components/admin/posts/PostPermalinkBar";
 import { useAdminToast } from "@/components/admin/toast/useAdminToast";
 import type { MediaAttachment } from "@/lib/admin/mediaLibrary";
 import { fromMediaDTO } from "@/lib/admin/media.dto";
-import { countWords } from "@/lib/admin/postEditor";
 import {
   createDefaultPublishSettings,
   type PublishSettings,
@@ -76,7 +74,6 @@ function resolveStoreStatus(settings: PublishSettings): PostStoreStatus {
 
 export function PostEditor({ postId }: PostEditorProps) {
   const router = useRouter();
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const publishSettingsRef = useRef<PublishSettings>(createDefaultPublishSettings());
   const snippetEditedRef = useRef({
     seoTitle: false,
@@ -108,7 +105,6 @@ export function PostEditor({ postId }: PostEditorProps) {
   const [categoryIds, setCategoryIds] = useState<string[]>([]);
   const [featuredImage, setFeaturedImage] = useState<MediaAttachment | null>(null);
 
-  const wordCount = countWords(content);
   const previewHref = snippet.permalink ? `/blog/${snippet.permalink}` : "/blog";
 
   const showMessage = useCallback(
@@ -388,23 +384,18 @@ export function PostEditor({ postId }: PostEditorProps) {
           }
         />
 
-        <PostEditorToolbar
-          textareaRef={textareaRef}
-          onContentChange={setContent}
-        />
-
-        <AdminPostContentEditor
+        <HtmlIdeEditor
           id="post-content"
           value={content}
           onChange={setContent}
-          textareaRef={textareaRef}
           ariaLabel="Post content"
         />
 
-        <div className="admin-post-editor-footer">
-          <span>Word count: {wordCount}</span>
-          {isSaving ? <span>Saving…</span> : null}
-        </div>
+        {isSaving ? (
+          <div className="admin-post-editor-footer">
+            <span>Saving…</span>
+          </div>
+        ) : null}
 
         <PostEditorSeo
           postTitle={title}

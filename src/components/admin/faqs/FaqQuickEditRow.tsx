@@ -1,14 +1,13 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import {
+  fetchFaqsForAdminAction,
+  saveFaqAction,
+} from "@/app/admin/(shell)/faqs/actions";
 import { buildFaqCategoryEditorOptions } from "@/lib/admin/faqCategoriesList";
 import { buildPublishDate } from "@/lib/admin/postPublish";
-import {
-  getFaqById,
-  upsertFaq,
-  type FaqStatus,
-  type FaqVisibility,
-} from "@/lib/admin/faqsData";
+import type { FaqCategory, FaqRecord, FaqStatus, FaqVisibility } from "@/lib/admin/faqsData";
 
 const QUICK_EDIT_MONTHS = [
   { value: 0, label: "Jan" },
@@ -74,6 +73,8 @@ type FaqQuickEditRowProps = {
 
 export function FaqQuickEditRow({ faqId, onCancel, onUpdated }: FaqQuickEditRowProps) {
   const [ready, setReady] = useState(false);
+  const [categories, setCategories] = useState<FaqCategory[]>([]);
+  const [faqs, setFaqs] = useState<FaqRecord[]>([]);
   const [title, setTitle] = useState("");
   const [dateDraft, setDateDraft] = useState<DateDraft>(dateToDraft(new Date()));
   const [password, setPassword] = useState("");
@@ -83,25 +84,34 @@ export function FaqQuickEditRow({ faqId, onCancel, onUpdated }: FaqQuickEditRowP
   const [status, setStatus] = useState<FaqStatus>("published");
 
   useEffect(() => {
-    const faq = getFaqById(faqId);
+    void (async () => {
+      const result = await fetchFaqsForAdminAction();
+      const faq = result.faqs.find((item) => item.id === faqId);
 
-    if (!faq) {
+      setCategories(result.categories);
+      setFaqs(result.faqs);
+
+      if (!faq) {
+        setReady(true);
+        return;
+      }
+
+      const sourceDate = new Date(faq.publishedAt ?? faq.updatedAt);
+      setTitle(faq.title);
+      setDateDraft(dateToDraft(sourceDate));
+      setPassword(faq.visibility === "password" ? faq.password : "");
+      setIsPrivate(faq.visibility === "private");
+      setCategoryId(faq.categoryId);
+      setMenuOrder(String(faq.menuOrder));
+      setStatus(faq.status);
       setReady(true);
-      return;
-    }
-
-    const sourceDate = new Date(faq.publishedAt ?? faq.updatedAt);
-    setTitle(faq.title);
-    setDateDraft(dateToDraft(sourceDate));
-    setPassword(faq.visibility === "password" ? faq.password : "");
-    setIsPrivate(faq.visibility === "private");
-    setCategoryId(faq.categoryId);
-    setMenuOrder(String(faq.menuOrder));
-    setStatus(faq.status);
-    setReady(true);
+    })();
   }, [faqId]);
 
-  const categoryOptions = useMemo(() => buildFaqCategoryEditorOptions("all"), []);
+  const categoryOptions = useMemo(
+    () => buildFaqCategoryEditorOptions(categories, faqs, "all"),
+    [categories, faqs],
+  );
 
   const selectCategory = (nextId: string) => {
     setCategoryId(categoryId === nextId ? null : nextId);
@@ -119,7 +129,7 @@ export function FaqQuickEditRow({ faqId, onCancel, onUpdated }: FaqQuickEditRowP
     return "public";
   };
 
-  const handleUpdate = () => {
+  const handleUpdate = async () => {
     const trimmedTitle = title.trim();
 
     if (!trimmedTitle) {
@@ -130,7 +140,7 @@ export function FaqQuickEditRow({ faqId, onCancel, onUpdated }: FaqQuickEditRowP
     const visibility = resolveVisibility();
     const publishedAt = draftToIso(dateDraft);
 
-    upsertFaq({
+    const result = await saveFaqAction({
       id: faqId,
       title: trimmedTitle,
       status,
@@ -140,6 +150,10 @@ export function FaqQuickEditRow({ faqId, onCancel, onUpdated }: FaqQuickEditRowP
       visibility,
       password: visibility === "password" ? password.trim() : "",
     });
+
+    if (result.error) {
+      return;
+    }
 
     onUpdated(trimmedTitle);
   };
@@ -159,7 +173,7 @@ export function FaqQuickEditRow({ faqId, onCancel, onUpdated }: FaqQuickEditRowP
           className="admin-quick-edit-form"
           onSubmit={(event) => {
             event.preventDefault();
-            handleUpdate();
+            void handleUpdate();
           }}
         >
           <div className="admin-quick-edit-col admin-quick-edit-col-main">

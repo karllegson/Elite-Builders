@@ -2,26 +2,25 @@
 
 import { ArrowDown, ArrowUp } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useMemo, useState, useTransition, type FormEvent } from "react";
+import {
+  createFaqCategoryAction,
+  deleteFaqCategoriesAction,
+  fetchFaqCategoriesWithCountsAction,
+  updateFaqCategoryAction,
+} from "@/app/admin/(shell)/faqs/actions";
 import {
   buildFaqCategoryParentOptions,
   FAQ_CATEGORY_BULK_ACTIONS,
   filterFaqCategories,
   slugifyFaqCategoryName,
   sortFaqCategories,
-  toFaqCategoryListItem,
+  type FaqCategoryListItem,
   type FaqCategorySortDirection,
   type FaqCategorySortKey,
 } from "@/lib/admin/faqCategoriesList";
+import type { FaqCategory } from "@/lib/admin/faqsData";
 import { useAdminToast } from "@/components/admin/toast/useAdminToast";
-import {
-  createFaqCategory,
-  deleteFaqCategories,
-  listFaqCategories,
-  listFaqs,
-  updateFaqCategory,
-  type FaqCategory,
-} from "@/lib/admin/faqsData";
 
 type SortableHeaderProps = {
   label: string;
@@ -147,21 +146,10 @@ function FaqCategoriesTablenav({
 
 export function FaqCategoriesManager() {
   const toast = useAdminToast();
-  const [ready, setReady] = useState(false);
-  const [refreshKey, setRefreshKey] = useState(0);
-
-  useEffect(() => {
-    setReady(true);
-  }, []);
-
-  const categories = useMemo(() => {
-    if (!ready) {
-      return [];
-    }
-
-    const faqs = listFaqs();
-    return listFaqCategories().map((category) => toFaqCategoryListItem(category, faqs));
-  }, [ready, refreshKey]);
+  const [, startTransition] = useTransition();
+  const [categories, setCategories] = useState<FaqCategoryListItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
 
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
@@ -175,6 +163,26 @@ export function FaqCategoriesManager() {
   const [sortKey, setSortKey] = useState<FaqCategorySortKey>("name");
   const [sortDirection, setSortDirection] = useState<FaqCategorySortDirection>("asc");
   const [editingCategoryId, setEditingCategoryId] = useState<string | null>(null);
+
+  const loadCategories = useCallback(() => {
+    startTransition(async () => {
+      setIsLoading(true);
+      const result = await fetchFaqCategoriesWithCountsAction();
+
+      if (result.error) {
+        toast.error(result.error);
+        setCategories([]);
+      } else {
+        setCategories(result.categories);
+      }
+
+      setIsLoading(false);
+    });
+  }, [toast]);
+
+  useEffect(() => {
+    loadCategories();
+  }, [loadCategories]);
 
   const parentOptions = useMemo(() => {
     const options = buildFaqCategoryParentOptions(categories);
@@ -212,7 +220,16 @@ export function FaqCategoriesManager() {
     setSlug(value);
   };
 
-  const handleAddCategory = (event: FormEvent) => {
+  const resetCategoryForm = () => {
+    setName("");
+    setSlug("");
+    setSlugTouched(false);
+    setParentId("");
+    setDescription("");
+    setEditingCategoryId(null);
+  };
+
+  const handleAddCategory = async (event: FormEvent) => {
     event.preventDefault();
 
     const trimmedName = name.trim();
@@ -221,35 +238,33 @@ export function FaqCategoriesManager() {
       return;
     }
 
-    if (editingCategoryId) {
-      updateFaqCategory(editingCategoryId, {
-        name: trimmedName,
-        slug,
-        description,
-        parentId: parentId || null,
-      });
-      toast.success(`Category "${trimmedName}" updated.`);
-    } else {
-      createFaqCategory({
-        name: trimmedName,
-        slug,
-        description,
-        parentId: parentId || null,
-      });
-      toast.success(`Category "${trimmedName}" added.`);
+    setIsSaving(true);
+
+    const payload = {
+      name: trimmedName,
+      slug,
+      description,
+      parentId: parentId || null,
+    };
+
+    const result = editingCategoryId
+      ? await updateFaqCategoryAction(editingCategoryId, payload)
+      : await createFaqCategoryAction(payload);
+
+    setIsSaving(false);
+
+    if (result.error || !result.category) {
+      toast.error(result.error ?? "Could not save category.");
+      return;
     }
 
-    setRefreshKey((current) => current + 1);
+    loadCategories();
+    toast.success(
+      editingCategoryId
+        ? `Category "${result.category.name}" updated.`
+        : `Category "${result.category.name}" added.`,
+    );
     resetCategoryForm();
-  };
-
-  const resetCategoryForm = () => {
-    setName("");
-    setSlug("");
-    setSlugTouched(false);
-    setParentId("");
-    setDescription("");
-    setEditingCategoryId(null);
   };
 
   const handleEditCategory = (category: FaqCategory) => {
@@ -262,13 +277,19 @@ export function FaqCategoriesManager() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const handleDeleteCategory = (category: FaqCategory) => {
+  const handleDeleteCategory = async (category: FaqCategory) => {
     if (!window.confirm(`Delete "${category.name}"? FAQs in this category will be uncategorized.`)) {
       return;
     }
 
-    deleteFaqCategories([category.id]);
-    setRefreshKey((current) => current + 1);
+    const result = await deleteFaqCategoriesAction([category.id]);
+
+    if (result.error) {
+      toast.error(result.error);
+      return;
+    }
+
+    loadCategories();
 
     if (editingCategoryId === category.id) {
       resetCategoryForm();
@@ -313,7 +334,7 @@ export function FaqCategoriesManager() {
     });
   };
 
-  const handleApplyBulkAction = () => {
+  const handleApplyBulkAction = async () => {
     if (!bulkAction) {
       return;
     }
@@ -324,8 +345,14 @@ export function FaqCategoriesManager() {
     }
 
     if (bulkAction === "delete") {
-      deleteFaqCategories([...selectedIds]);
-      setRefreshKey((current) => current + 1);
+      const result = await deleteFaqCategoriesAction([...selectedIds]);
+
+      if (result.error) {
+        toast.error(result.error);
+        return;
+      }
+
+      loadCategories();
       setSelectedIds(new Set());
       toast.info("Selected categories deleted.");
     }
@@ -333,7 +360,7 @@ export function FaqCategoriesManager() {
     setBulkAction("");
   };
 
-  if (!ready) {
+  if (isLoading) {
     return <p className="admin-faqs-loading">Loading categories…</p>;
   }
 
@@ -367,9 +394,9 @@ export function FaqCategoriesManager() {
                 onChange={(event) => handleSlugChange(event.target.value)}
               />
               <p className="admin-categories-help">
-                The &ldquo;slug&rdquo; is the URL-friendly version of the name. It is
-                usually all lowercase and contains only letters, numbers, and
-                hyphens.
+                Match this slug to the <code>[faqs category=&quot;…&quot;]</code> shortcode in blog
+                or service area content (e.g.{" "}
+                <code>common-questions-about-replacement-windows-tri-state-area</code>).
               </p>
             </div>
 
@@ -388,8 +415,7 @@ export function FaqCategoriesManager() {
                 ))}
               </select>
               <p className="admin-categories-help">
-                Assign a parent term to create a hierarchy. The term Jazz, for
-                example, would be the parent of Bebop and Big Band.
+                Assign a parent term to create a hierarchy.
               </p>
             </div>
 
@@ -402,13 +428,20 @@ export function FaqCategoriesManager() {
                 onChange={(event) => setDescription(event.target.value)}
               />
               <p className="admin-categories-help">
-                The description is not prominent by default; however, some
-                themes may show it.
+                Optional description for admin reference.
               </p>
             </div>
 
-            <button type="submit" className="admin-btn-primary admin-categories-submit">
-              {editingCategoryId ? "Update Category" : "Add New Category"}
+            <button
+              type="submit"
+              className="admin-btn-primary admin-categories-submit"
+              disabled={isSaving}
+            >
+              {isSaving
+                ? "Saving…"
+                : editingCategoryId
+                  ? "Update Category"
+                  : "Add New Category"}
             </button>
             {editingCategoryId ? (
               <button
@@ -520,20 +553,8 @@ export function FaqCategoriesManager() {
                           </span>
                           <button
                             type="button"
-                            className="admin-categories-row-action"
-                            onClick={() =>
-                              toast.info("Quick Edit will be available in a future update.")
-                            }
-                          >
-                            Quick Edit
-                          </button>
-                          <span className="admin-categories-row-action-sep" aria-hidden>
-                            |
-                          </span>
-                          <button
-                            type="button"
                             className="admin-categories-row-action admin-categories-row-action-delete"
-                            onClick={() => handleDeleteCategory(category)}
+                            onClick={() => void handleDeleteCategory(category)}
                           >
                             Delete
                           </button>
@@ -546,18 +567,6 @@ export function FaqCategoriesManager() {
                           >
                             View
                           </Link>
-                          <span className="admin-categories-row-action-sep" aria-hidden>
-                            |
-                          </span>
-                          <button
-                            type="button"
-                            className="admin-categories-row-action"
-                            onClick={() =>
-                              toast.info("Download will be available in a future update.")
-                            }
-                          >
-                            Download
-                          </button>
                         </div>
                       </td>
                       <td className="admin-categories-col-description">

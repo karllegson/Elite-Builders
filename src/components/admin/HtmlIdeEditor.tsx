@@ -1,13 +1,15 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { editor } from "monaco-editor";
 import { InsertLinkModal } from "@/components/admin/posts/InsertLinkModal";
 import { countWords } from "@/lib/admin/postEditor";
 import { buildLinkSnippet, type LinkInsertOptions } from "@/lib/admin/postEditor";
 import {
   insertEditorH2WithId,
+  insertEditorHighlightBox,
+  insertEditorQuickSummary,
   insertEditorHr,
   insertEditorShortHr,
   insertHtmlAtEditorRange,
@@ -38,6 +40,8 @@ const toolbarButtons: ToolbarButton[] = [
   { label: "p", action: (ed) => wrapEditorSelection(ed, "p") },
   { label: "HR", action: insertEditorHr },
   { label: "Short HR", action: insertEditorShortHr },
+  { label: "Highlight Box", action: insertEditorHighlightBox },
+  { label: "Quick Summary", action: insertEditorQuickSummary },
   { label: "b", action: (ed) => wrapEditorSelection(ed, "strong") },
   { label: "u", action: (ed) => wrapEditorSelection(ed, "u") },
   { label: "i", action: (ed) => wrapEditorSelection(ed, "em") },
@@ -57,7 +61,9 @@ export function HtmlIdeEditor({
   onChange,
   ariaLabel = "HTML content editor",
 }: HtmlIdeEditorProps) {
+  const surfaceRef = useRef<HTMLDivElement>(null);
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
+  const [editorReady, setEditorReady] = useState(false);
   const [linkModalOpen, setLinkModalOpen] = useState(false);
   const [initialLinkText, setInitialLinkText] = useState("");
   const linkSelectionRef = useRef({ start: 0, end: 0 });
@@ -104,9 +110,43 @@ export function HtmlIdeEditor({
 
   const handleEditorMount = (editorInstance: editor.IStandaloneCodeEditor) => {
     editorRef.current = editorInstance;
+    setEditorReady(true);
+    requestAnimationFrame(() => editorInstance.layout());
     editorInstance.focus();
   };
 
+  useEffect(() => {
+    if (!editorReady) {
+      return;
+    }
+
+    const editorInstance = editorRef.current;
+    const surface = surfaceRef.current;
+
+    if (!editorInstance || !surface) {
+      return;
+    }
+
+    const relayout = () => {
+      requestAnimationFrame(() => editorInstance.layout());
+    };
+
+    relayout();
+
+    const observer = new ResizeObserver(relayout);
+    observer.observe(surface);
+
+    if (surface.parentElement) {
+      observer.observe(surface.parentElement);
+    }
+
+    window.addEventListener("resize", relayout);
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", relayout);
+    };
+  }, [editorReady]);
   return (
     <div className="admin-html-ide">
       <div className="admin-post-toolbar admin-html-ide-toolbar">
@@ -129,10 +169,12 @@ export function HtmlIdeEditor({
         </button>
       </div>
 
-      <div className="admin-html-ide-surface" id={id}>
+      <div className="admin-html-ide-surface" id={id} ref={surfaceRef}>
         <MonacoEditor
           language="html"
           theme="vs-dark"
+          height="100%"
+          width="100%"
           value={value}
           onChange={(nextValue) => onChange(nextValue ?? "")}
           onMount={handleEditorMount}
@@ -147,7 +189,8 @@ export function HtmlIdeEditor({
             lineNumbersMinChars: 3,
             renderLineHighlight: "all",
             scrollBeyondLastLine: false,
-            wordWrap: "off",
+            wordWrap: "on",
+            wordWrapBreakAfterCharacters: " \t})]>+;.,",
             fontFamily: 'Consolas, Monaco, "Courier New", monospace',
             fontSize: 13,
             lineHeight: 20,
@@ -166,7 +209,8 @@ export function HtmlIdeEditor({
             hideCursorInOverviewRuler: true,
             scrollbar: {
               verticalScrollbarSize: 12,
-              horizontalScrollbarSize: 12,
+              horizontal: "hidden",
+              horizontalScrollbarSize: 0,
             },
           }}
         />

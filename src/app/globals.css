@@ -507,19 +507,19 @@ body {
   @keyframes service-area-featured-pan {
     0%,
     100% {
-      transform: scale(1.05) translateX(-1%);
+      transform: translateX(-1.5%);
     }
 
     25% {
-      transform: scale(1.02) translateX(-1%);
+      transform: translateX(-1.5%);
     }
 
     50% {
-      transform: scale(1.02) translateX(1%);
+      transform: translateX(1.5%);
     }
 
     75% {
-      transform: scale(1.05) translateX(1%);
+      transform: translateX(1.5%);
     }
   }
 
@@ -779,4 +779,52 @@ body {
     background: var(--color-brand-blue);
     color: #fff;
   }
+}
+
+/* Highlight / Quick Summary boxes — outside @layer so .site * reset cannot strip borders */
+.site .service-area-html-content .highlight-box,
+.site .service-area-html-content .quick-summary {
+  margin: 0 0 1.5rem;
+  padding: 1.25rem 1.5rem;
+  background: #f7f8f9;
+  border: 1px solid #e2e5e9;
+  border-radius: 0.375rem;
+}
+
+.site .service-area-html-content .highlight-box > :first-child,
+.site .service-area-html-content .quick-summary > :first-child {
+  margin-top: 0;
+}
+
+.site .service-area-html-content .highlight-box > :last-child,
+.site .service-area-html-content .quick-summary > :last-child {
+  margin-bottom: 0;
+}
+
+.site .service-area-html-content .quick-summary h2 {
+  margin: 0 0 0.75rem;
+  font-size: clamp(1.35rem, 2.2vw, 1.75rem);
+  font-weight: 700;
+  color: var(--color-brand-navy);
+}
+
+.site .service-area-html-content .quick-summary h1,
+.site .service-area-html-content .quick-summary h3,
+.site .service-area-html-content .quick-summary h4 {
+  margin: 0 0 0.75rem;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--color-brand-navy);
+}
+
+.site .service-area-html-content .quick-summary p {
+  margin: 0;
+  color: var(--color-site-text-dark);
+  font-style: normal;
+  line-height: 1.75;
+}
+
+.site .service-area-html-content .quick-summary em,
+.site .service-area-html-content .quick-summary i {
+  font-style: normal;
 }
