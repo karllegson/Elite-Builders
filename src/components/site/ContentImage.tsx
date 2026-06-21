@@ -22,7 +22,7 @@ export default function ContentImage({
   className = "h-48",
   priority = false,
   sizes = defaultSizes,
-  quality = 85,
+  quality = 75,
   objectFit = "cover",
   objectPosition,
 }: ContentImageProps) {

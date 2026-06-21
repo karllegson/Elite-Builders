@@ -1,6 +1,6 @@
 "use client";
 
-import { CornerDownLeft, ExternalLink, Link2 } from "lucide-react";
+import { ChevronDown, ChevronRight, CornerDownLeft, ExternalLink, Link2 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useAdminToast } from "@/components/admin/toast/useAdminToast";
@@ -8,19 +8,26 @@ import {
   DEFAULT_SERVICE_AREA_AUTHOR,
   deleteServiceArea,
   listAllServiceAreas,
+  SERVICE_AREAS_CHANGED_EVENT,
 } from "@/lib/admin/serviceAreasData";
 import { ensureServiceAreasStoreReady } from "@/lib/admin/serviceAreasSync.client";
 import {
+  buildFilteredServiceAreaTree,
+  flattenServiceAreaTree,
+} from "@/lib/admin/serviceAreasNested";
+import {
   filterServiceAreaListItems,
   formatServiceAreaListDate,
+  getDefaultExpandedServiceAreaIds,
   getSeoScoreClass,
   getServiceAreaDateOptions,
   getServiceAreaViewCounts,
-  paginateServiceAreaListItems,
+  paginateServiceAreaTreeRoots,
   SERVICE_AREA_BULK_ACTIONS,
   SERVICE_AREA_LIST_VIEWS,
   toServiceAreaListItem,
   type ServiceAreaListItem,
+  type ServiceAreaListRow,
   type ServiceAreaListView,
 } from "@/lib/admin/serviceAreasList";
 
@@ -212,16 +219,14 @@ export function ServiceAreasList() {
   const toast = useAdminToast();
   const [refreshKey, setRefreshKey] = useState(0);
 
-  useEffect(() => {
-    void ensureServiceAreasStoreReady();
-  }, []);
+  const activeAreas = useMemo(
+    () => listAllServiceAreas().filter((area) => !area.unused),
+    [refreshKey],
+  );
 
   const allItems = useMemo(
-    () =>
-      listAllServiceAreas()
-        .filter((area) => !area.unused)
-        .map((area) => toServiceAreaListItem(area, DEFAULT_SERVICE_AREA_AUTHOR)),
-    [refreshKey],
+    () => activeAreas.map((area) => toServiceAreaListItem(area, DEFAULT_SERVICE_AREA_AUTHOR)),
+    [activeAreas],
   );
 
   const viewCounts = useMemo(() => getServiceAreaViewCounts(allItems), [allItems]);
@@ -234,6 +239,26 @@ export function ServiceAreasList() {
   const [page, setPage] = useState(1);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkAction, setBulkAction] = useState("");
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    const refresh = () => {
+      setRefreshKey((current) => current + 1);
+      setExpandedIds(
+        new Set(getDefaultExpandedServiceAreaIds(listAllServiceAreas().filter((area) => !area.unused))),
+      );
+    };
+
+    void ensureServiceAreasStoreReady().then(refresh);
+
+    window.addEventListener(SERVICE_AREAS_CHANGED_EVENT, refresh);
+    window.addEventListener("storage", refresh);
+
+    return () => {
+      window.removeEventListener(SERVICE_AREAS_CHANGED_EVENT, refresh);
+      window.removeEventListener("storage", refresh);
+    };
+  }, []);
 
   const filteredItems = useMemo(
     () =>
@@ -245,14 +270,51 @@ export function ServiceAreasList() {
     [allItems, dateFilter, searchQuery, view],
   );
 
+  const filteredTree = useMemo(() => {
+    const matchingIds = new Set(filteredItems.map((item) => item.id));
+
+    return buildFilteredServiceAreaTree(
+      activeAreas,
+      activeAreas.filter((area) => matchingIds.has(area.id)),
+    );
+  }, [activeAreas, filteredItems]);
+
   const pagination = useMemo(
-    () => paginateServiceAreaListItems(filteredItems, page, PER_PAGE),
-    [filteredItems, page],
+    () => paginateServiceAreaTreeRoots(filteredTree, page, PER_PAGE),
+    [filteredTree, page],
+  );
+
+  const visibleRows = useMemo(
+    () =>
+      flattenServiceAreaTree(pagination.treeSlice, expandedIds).map((row) => {
+        const item = allItems.find((entry) => entry.id === row.area.id)!;
+
+        return {
+          ...item,
+          depth: row.depth,
+          hasChildren: row.hasChildren,
+        } satisfies ServiceAreaListRow;
+      }),
+    [allItems, expandedIds, pagination.treeSlice],
   );
 
   const allVisibleSelected =
-    pagination.items.length > 0 &&
-    pagination.items.every((item) => selectedIds.has(item.id));
+    visibleRows.length > 0 &&
+    visibleRows.every((item) => selectedIds.has(item.id));
+
+  const toggleExpand = (id: string) => {
+    setExpandedIds((current) => {
+      const next = new Set(current);
+
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+
+      return next;
+    });
+  };
 
   const showStatus = (message: string) => {
     toast.success(message);
@@ -281,7 +343,7 @@ export function ServiceAreasList() {
       return;
     }
 
-    setSelectedIds(new Set(pagination.items.map((item) => item.id)));
+    setSelectedIds(new Set(visibleRows.map((item) => item.id)));
   };
 
   const toggleSelect = (id: string) => {
@@ -364,7 +426,7 @@ export function ServiceAreasList() {
         searchQuery={searchInput}
         onSearchQueryChange={setSearchInput}
         onSearch={handleSearch}
-        totalItems={pagination.totalItems}
+        totalItems={filteredItems.length}
         currentPage={pagination.currentPage}
         totalPages={pagination.totalPages}
         onPageChange={setPage}
@@ -406,7 +468,7 @@ export function ServiceAreasList() {
             </tr>
           </thead>
           <tbody>
-            {pagination.items.length === 0 ? (
+            {visibleRows.length === 0 ? (
               <tr>
                 <td colSpan={8} className="admin-posts-empty">
                   No service areas found.{" "}
@@ -414,7 +476,7 @@ export function ServiceAreasList() {
                 </td>
               </tr>
             ) : (
-              pagination.items.map((item) => (
+              visibleRows.map((item) => (
                 <tr key={item.id}>
                   <th scope="row" className="admin-posts-col-check">
                     <input
@@ -425,12 +487,39 @@ export function ServiceAreasList() {
                     />
                   </th>
                   <td className="admin-posts-col-title">
-                    <Link
-                      href={`/admin/service-areas/${item.id}`}
-                      className="admin-posts-title-link"
+                    <div
+                      className="admin-sa-list-title-row"
+                      style={{ paddingLeft: `${item.depth * 24}px` }}
                     >
-                      {item.listTitle}
-                    </Link>
+                      {item.hasChildren ? (
+                        <button
+                          type="button"
+                          className="admin-sa-list-expand"
+                          aria-label={expandedIds.has(item.id) ? "Collapse sub-pages" : "Expand sub-pages"}
+                          aria-expanded={expandedIds.has(item.id)}
+                          onClick={() => toggleExpand(item.id)}
+                        >
+                          {expandedIds.has(item.id) ? (
+                            <ChevronDown size={14} aria-hidden />
+                          ) : (
+                            <ChevronRight size={14} aria-hidden />
+                          )}
+                        </button>
+                      ) : (
+                        <span className="admin-sa-list-expand-spacer" aria-hidden />
+                      )}
+                      <Link
+                        href={`/admin/service-areas/${item.id}`}
+                        className="admin-posts-title-link"
+                      >
+                        {item.listTitle}
+                      </Link>
+                      {item.parentId ? (
+                        <span className="admin-sa-list-subpage-label">Sub-page</span>
+                      ) : (
+                        <span className="admin-sa-list-subpage-label">Landing page</span>
+                      )}
+                    </div>
                     <ServiceAreaStatusLabel item={item} />
                   </td>
                   <td className="admin-posts-col-author">{item.author}</td>
@@ -466,7 +555,7 @@ export function ServiceAreasList() {
         searchQuery={searchInput}
         onSearchQueryChange={setSearchInput}
         onSearch={handleSearch}
-        totalItems={pagination.totalItems}
+        totalItems={filteredItems.length}
         currentPage={pagination.currentPage}
         totalPages={pagination.totalPages}
         onPageChange={setPage}

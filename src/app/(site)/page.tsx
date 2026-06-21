@@ -1,16 +1,14 @@
 import type { Metadata } from "next";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import {
   ArrowRight,
   MapPin,
 } from "lucide-react";
 import ContentImage from "@/components/site/ContentImage";
-import EstimateForm from "@/components/site/EstimateForm";
 import HomeHeroContent from "@/components/site/HomeHeroContent";
 import HomeHeroSection from "@/components/site/HomeHeroSection";
-import BuilderPartnersSection from "@/components/site/BuilderPartnersSection";
 import BrandPillars from "@/components/site/BrandPillars";
-import TeamSection from "@/components/site/TeamSection";
 import WhoWeServeCards from "@/components/site/WhoWeServeCards";
 import SectionIntro from "@/components/site/SectionIntro";
 import WhyChooseUsSection from "@/components/site/WhyChooseUsSection";
@@ -25,6 +23,12 @@ import { homepageFaqs, integrityStatement, framingFirstTagline } from "@/lib/sit
 import { homeImages, homepageGalleryImageKeys } from "@/lib/site/images";
 import { completedProjects, currentProjects, type Project } from "@/lib/site/projects";
 import { homepageMetadata, logoSchemaImage, organizationSchema } from "@/lib/site/seo";
+
+const EstimateForm = dynamic(() => import("@/components/site/EstimateForm"));
+const BuilderPartnersSection = dynamic(
+  () => import("@/components/site/BuilderPartnersSection"),
+);
+const TeamSection = dynamic(() => import("@/components/site/TeamSection"));
 
 export const metadata: Metadata = homepageMetadata;
 
@@ -342,8 +346,7 @@ export default function HomePage() {
             alt={homeImages.bayAreaNorthBayService.alt}
             className="mt-6 h-40 rounded-lg sm:mt-12 sm:h-72 sm:rounded-xl"
             sizes="(max-width: 1152px) 100vw, 1152px"
-            quality={90}
-            priority
+            quality={80}
           />
 
           <div className="mt-6 grid gap-3 sm:mt-10 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3">

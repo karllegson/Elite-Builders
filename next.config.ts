@@ -5,6 +5,12 @@ const supabaseHostname = getSupabaseStorageHostname();
 
 const nextConfig: NextConfig = {
   experimental: {
+    optimizePackageImports: [
+      "lucide-react",
+      "@dnd-kit/core",
+      "@dnd-kit/sortable",
+      "@dnd-kit/utilities",
+    ],
     serverActions: {
       bodySizeLimit: "256mb",
     },

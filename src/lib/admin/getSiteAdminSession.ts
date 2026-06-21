@@ -28,6 +28,18 @@ export async function getSiteAdminSession(): Promise<SiteAdminSession> {
     };
   }
 
+  const hasAuthCookie = cookieStore
+    .getAll()
+    .some(
+      (cookie) =>
+        cookie.name.includes("auth-token") ||
+        (cookie.name.startsWith("sb-") && cookie.value.length > 0),
+    );
+
+  if (!hasAuthCookie) {
+    return { isAdmin: false };
+  }
+
   const supabase = await createClient();
 
   if (!supabase) {

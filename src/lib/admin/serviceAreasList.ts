@@ -1,5 +1,10 @@
 import { calculateSeoScore } from "@/lib/admin/postPublish";
 import type { ServiceAreaRecord, ServiceAreaStatus } from "@/lib/admin/serviceAreasData";
+import {
+  buildServiceAreaTree,
+  collectExpandableIds,
+  type NestedServiceAreaNode,
+} from "@/lib/admin/serviceAreasNested";
 
 export type ServiceAreaListView = "all" | "mine" | "published" | "draft" | "pillar";
 
@@ -22,6 +27,11 @@ export type ServiceAreaListItem = {
   externalLinks: number;
   parentId: string | null;
   isPillar: boolean;
+};
+
+export type ServiceAreaListRow = ServiceAreaListItem & {
+  depth: number;
+  hasChildren: boolean;
 };
 
 export type ServiceAreaListFilters = {
@@ -70,7 +80,7 @@ export function toServiceAreaListItem(
     id: area.id,
     numericId: area.numericId,
     title: area.title,
-    listTitle: area.parentId ? `— ${area.title}` : area.title,
+    listTitle: area.title,
     status: area.status,
     author: area.author,
     isMine: currentAuthor ? area.author === currentAuthor : true,
@@ -183,6 +193,33 @@ export function paginateServiceAreaListItems<T>(
     totalPages,
     currentPage,
   };
+}
+
+export function paginateServiceAreaTreeRoots(
+  tree: NestedServiceAreaNode[],
+  page: number,
+  perPage: number,
+): {
+  treeSlice: NestedServiceAreaNode[];
+  totalItems: number;
+  totalPages: number;
+  currentPage: number;
+} {
+  const totalItems = tree.length;
+  const totalPages = Math.max(1, Math.ceil(totalItems / perPage));
+  const currentPage = Math.min(Math.max(page, 1), totalPages);
+  const start = (currentPage - 1) * perPage;
+
+  return {
+    treeSlice: tree.slice(start, start + perPage),
+    totalItems,
+    totalPages,
+    currentPage,
+  };
+}
+
+export function getDefaultExpandedServiceAreaIds(areas: ServiceAreaRecord[]): string[] {
+  return collectExpandableIds(buildServiceAreaTree(areas.filter((area) => !area.unused)));
 }
 
 export function formatServiceAreaListDate(date: Date): string {

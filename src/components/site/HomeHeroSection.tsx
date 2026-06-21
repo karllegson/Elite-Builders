@@ -13,15 +13,16 @@ type HomeHeroSectionProps = {
 
 export default function HomeHeroSection({ children }: HomeHeroSectionProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [isReady, setIsReady] = useState(false);
+  const [videoReady, setVideoReady] = useState(false);
+  const [showVideo, setShowVideo] = useState(true);
 
-  const markReady = useCallback(() => {
-    setIsReady(true);
+  const markVideoReady = useCallback(() => {
+    setVideoReady(true);
   }, []);
 
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      markReady();
+      setShowVideo(false);
       return;
     }
 
@@ -29,62 +30,66 @@ export default function HomeHeroSection({ children }: HomeHeroSectionProps) {
     if (!video) return;
 
     if (video.readyState >= HTMLMediaElement.HAVE_ENOUGH_DATA) {
-      void video.play().catch(() => markReady());
+      void video.play().catch(() => markVideoReady());
       if (!video.paused) {
-        markReady();
+        markVideoReady();
         return;
       }
     }
 
-    const onPlaying = () => markReady();
+    const onPlaying = () => markVideoReady();
 
     const onCanPlayThrough = () => {
-      void video.play().catch(() => markReady());
+      void video.play().catch(() => markVideoReady());
     };
 
     video.addEventListener("playing", onPlaying, { once: true });
     video.addEventListener("canplaythrough", onCanPlayThrough, { once: true });
 
-    const fallback = window.setTimeout(markReady, READY_FALLBACK_MS);
+    const fallback = window.setTimeout(markVideoReady, READY_FALLBACK_MS);
 
     return () => {
       video.removeEventListener("playing", onPlaying);
       video.removeEventListener("canplaythrough", onCanPlayThrough);
       window.clearTimeout(fallback);
     };
-  }, [markReady]);
+  }, [markVideoReady]);
 
   return (
     <section className="relative min-h-[58dvh] overflow-hidden bg-brand-navy sm:min-h-[75dvh]">
-      <video
-        ref={videoRef}
-        className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ${
-          isReady ? "opacity-100" : "opacity-0"
-        }`}
-        src={HERO_VIDEO_SRC}
-        poster={homeImages.residentialRoofFraming.src}
-        autoPlay
-        muted
-        loop
-        playsInline
-        preload="auto"
-        {...({ fetchPriority: "high" } as ComponentPropsWithoutRef<"video">)}
-        aria-label="Elite Builders commercial video showing framing and construction work"
-        aria-hidden={!isReady}
-      />
+      {showVideo ? (
+        <video
+          ref={videoRef}
+          className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ${
+            videoReady ? "opacity-100" : "opacity-0"
+          }`}
+          src={HERO_VIDEO_SRC}
+          poster={homeImages.residentialRoofFraming.src}
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          {...({ fetchPriority: "high" } as ComponentPropsWithoutRef<"video">)}
+          aria-label="Elite Builders commercial video showing framing and construction work"
+          aria-hidden={!videoReady}
+        />
+      ) : (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={homeImages.residentialRoofFraming.src}
+          alt=""
+          className="absolute inset-0 h-full w-full object-cover"
+          aria-hidden
+        />
+      )}
 
       <div
         aria-hidden
-        className={`absolute inset-0 bg-gradient-to-r from-brand-navy/60 via-brand-navy/25 to-transparent transition-opacity duration-500 ${
-          isReady ? "opacity-100" : "opacity-0"
-        }`}
+        className="absolute inset-0 bg-gradient-to-r from-brand-navy/60 via-brand-navy/25 to-transparent"
       />
 
-      <div
-        className={`site-container relative z-10 flex min-h-[58dvh] items-center py-8 transition-opacity duration-500 sm:min-h-[75dvh] sm:py-14 ${
-          isReady ? "opacity-100" : "opacity-0"
-        }`}
-      >
+      <div className="site-container relative z-10 flex min-h-[58dvh] items-center py-8 sm:min-h-[75dvh] sm:py-14">
         {children}
       </div>
     </section>

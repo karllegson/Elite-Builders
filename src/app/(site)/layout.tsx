@@ -14,14 +14,14 @@ export const metadata: Metadata = siteDefaultMetadata;
 /** Fira Sans body + Poppins headings & nav */
 const firaSans = Fira_Sans({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "600", "700"],
   variable: "--font-fira",
   display: "swap",
 });
 
 const poppins = Poppins({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
+  weight: ["400", "600", "700"],
   variable: "--font-poppins",
   display: "swap",
 });
