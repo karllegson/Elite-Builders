@@ -5,7 +5,7 @@ import {
   buildServiceAreaPermalinkUrl,
   slugifyServiceAreaPermalink,
 } from "@/lib/admin/postSeo";
-import { business } from "@/lib/site/config";
+import { useAdminSiteUrl } from "@/lib/admin/siteUrl";
 
 type ServiceAreaPermalinkBarProps = {
   slug: string;
@@ -18,12 +18,13 @@ export function ServiceAreaPermalinkBar({
   parentSlug = null,
   onSlugChange,
 }: ServiceAreaPermalinkBarProps) {
+  const siteUrl = useAdminSiteUrl();
   const [isEditing, setIsEditing] = useState(false);
   const [draftSlug, setDraftSlug] = useState(slug);
-  const permalinkUrl = buildServiceAreaPermalinkUrl(business.domain, slug, parentSlug);
+  const permalinkUrl = buildServiceAreaPermalinkUrl(siteUrl, slug, parentSlug);
   const permalinkBase = parentSlug
-    ? `${business.domain.replace(/\/$/, "")}/service-areas/${parentSlug}/`
-    : `${business.domain.replace(/\/$/, "")}/service-areas/`;
+    ? `${siteUrl}/service-areas/${parentSlug}/`
+    : `${siteUrl}/service-areas/`;
 
   useEffect(() => {
     if (!isEditing) {

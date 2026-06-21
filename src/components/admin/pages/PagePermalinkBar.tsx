@@ -1,9 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { buildPagePermalinkUrl } from "@/lib/admin/pageEditor";
 import { slugify } from "@/lib/admin/postSeo";
-import { business } from "@/lib/site/config";
+import { useAdminSiteUrl } from "@/lib/admin/siteUrl";
 
 type PagePermalinkBarProps = {
   slug: string;
@@ -11,10 +10,12 @@ type PagePermalinkBarProps = {
 };
 
 export function PagePermalinkBar({ slug, onSlugChange }: PagePermalinkBarProps) {
+  const siteUrl = useAdminSiteUrl();
   const [isEditing, setIsEditing] = useState(false);
   const [draftSlug, setDraftSlug] = useState(slug);
-  const permalinkUrl = buildPagePermalinkUrl(slug);
-  const permalinkBase = `${business.domain.replace(/\/$/, "")}/`;
+  const path = slug.trim() || "sample-page";
+  const permalinkUrl = `${siteUrl}/${path}/`;
+  const permalinkBase = `${siteUrl}/`;
 
   useEffect(() => {
     if (!isEditing) {

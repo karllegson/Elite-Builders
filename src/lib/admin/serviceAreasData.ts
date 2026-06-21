@@ -335,13 +335,24 @@ export function readServiceAreasStore(): ServiceAreasStore {
   }
 }
 
-export function writeServiceAreasStore(store: ServiceAreasStore): void {
+export function writeServiceAreasStore(
+  store: ServiceAreasStore,
+  options?: { skipSync?: boolean },
+): void {
   if (typeof window === "undefined") {
     return;
   }
 
   window.localStorage.setItem(SERVICE_AREAS_STORAGE_KEY, JSON.stringify(store));
   window.dispatchEvent(new CustomEvent(SERVICE_AREAS_CHANGED_EVENT));
+
+  if (options?.skipSync) {
+    return;
+  }
+
+  void import("@/lib/admin/serviceAreasSync.client").then(({ syncServiceAreasStoreToServer }) => {
+    syncServiceAreasStoreToServer(store);
+  });
 }
 
 export function resetServiceAreasStore(): ServiceAreasStore {

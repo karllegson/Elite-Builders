@@ -32,6 +32,7 @@ import {
   type ServiceAreaRecord,
 } from "@/lib/admin/serviceAreasData";
 import { getParentSlugForServiceArea } from "@/lib/site/serviceAreaUrls";
+import { ensureServiceAreasStoreReady } from "@/lib/admin/serviceAreasSync.client";
 
 const SERVICE_AREA_SAVE_TOAST_KEY = "elite-builders-service-area-save-toast";
 
@@ -149,20 +150,33 @@ export function ServiceAreaEditor({
   }, [defaultParentId, isEditing]);
 
   useEffect(() => {
-    if (!serviceAreaId) {
-      return;
-    }
+    let cancelled = false;
 
-    const record = getServiceAreaById(serviceAreaId);
+    void ensureServiceAreasStoreReady().then(() => {
+      if (cancelled) {
+        return;
+      }
 
-    if (!record) {
-      setMissing(true);
+      if (!serviceAreaId) {
+        setLoaded(true);
+        return;
+      }
+
+      const record = getServiceAreaById(serviceAreaId);
+
+      if (!record) {
+        setMissing(true);
+        setLoaded(true);
+        return;
+      }
+
+      applyLoadedRecord(record);
       setLoaded(true);
-      return;
-    }
+    });
 
-    applyLoadedRecord(record);
-    setLoaded(true);
+    return () => {
+      cancelled = true;
+    };
   }, [applyLoadedRecord, serviceAreaId]);
 
   useEffect(() => {

@@ -2,13 +2,14 @@
 
 import { CornerDownLeft, ExternalLink, Link2 } from "lucide-react";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAdminToast } from "@/components/admin/toast/useAdminToast";
 import {
   DEFAULT_SERVICE_AREA_AUTHOR,
   deleteServiceArea,
   listAllServiceAreas,
 } from "@/lib/admin/serviceAreasData";
+import { ensureServiceAreasStoreReady } from "@/lib/admin/serviceAreasSync.client";
 import {
   filterServiceAreaListItems,
   formatServiceAreaListDate,
@@ -210,6 +211,11 @@ function ServiceAreasTablenav({
 export function ServiceAreasList() {
   const toast = useAdminToast();
   const [refreshKey, setRefreshKey] = useState(0);
+
+  useEffect(() => {
+    void ensureServiceAreasStoreReady();
+  }, []);
+
   const allItems = useMemo(
     () =>
       listAllServiceAreas()
