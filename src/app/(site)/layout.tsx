@@ -1,9 +1,11 @@
-import Link from "next/link";
 import type { Metadata } from "next";
+import Link from "next/link";
+import { Suspense } from "react";
 import { Fira_Sans, Poppins } from "next/font/google";
 import { Phone } from "lucide-react";
 import SiteHeader from "@/components/site/SiteHeader";
 import SiteFooter from "@/components/site/SiteFooter";
+import SiteAnalytics from "@/components/site/SiteAnalytics";
 import { SiteAdminBar } from "@/components/site/SiteAdminBar";
 import { getSiteAdminSession } from "@/lib/admin/getSiteAdminSession";
 import { business } from "@/lib/site/config";
@@ -50,6 +52,9 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
       <SiteHeader hasAdminBar={adminSession.isAdmin} />
       <main className="flex-1 pb-16 sm:pb-0">{children}</main>
       <SiteFooter />
+      <Suspense fallback={null}>
+        <SiteAnalytics />
+      </Suspense>
 
       {/* Sticky mobile call-to-action bar */}
       <div className="fixed inset-x-0 bottom-0 z-50 grid grid-cols-2 sm:hidden">

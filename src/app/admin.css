@@ -7957,3 +7957,375 @@ a.admin-form-entries-settings-item {
   color: var(--admin-text-muted);
 }
 
+/* -------------------------------------------------------------------------- */
+/* Dashboard quick links                                                      */
+/* -------------------------------------------------------------------------- */
+.admin-dashboard-grid {
+  display: grid;
+  gap: 16px;
+}
+
+@media (min-width: 900px) {
+  .admin-dashboard-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.admin-dashboard-card-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.admin-dashboard-card-link:hover {
+  border-color: #c3dafe;
+  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.08);
+}
+
+.admin-dashboard-card-cta {
+  display: inline-block;
+  margin-top: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--admin-accent, #2563eb);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Analytics                                                                  */
+/* -------------------------------------------------------------------------- */
+.admin-analytics-page {
+  display: grid;
+  gap: 16px;
+}
+
+.admin-analytics-intro {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--admin-text-muted);
+}
+
+.admin-analytics-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.admin-analytics-tab {
+  padding: 8px 14px;
+  border: 1px solid var(--admin-border, #dcdcde);
+  border-radius: 4px;
+  background: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  color: #1d2327;
+  cursor: pointer;
+}
+
+.admin-analytics-tab.is-active {
+  border-color: #2271b1;
+  background: #f0f6fc;
+  color: #135e96;
+}
+
+.admin-analytics-cards {
+  display: grid;
+  gap: 12px;
+}
+
+@media (min-width: 900px) {
+  .admin-analytics-cards {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.admin-analytics-card {
+  padding: 16px;
+  border: 1px solid var(--admin-border, #dcdcde);
+  border-radius: 6px;
+  background: #fff;
+}
+
+.admin-analytics-card-label {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--admin-text-muted);
+}
+
+.admin-analytics-card-value {
+  margin: 8px 0 10px;
+  font-size: 20px;
+  font-weight: 700;
+  color: #1d2327;
+}
+
+.admin-analytics-card-value-sm {
+  font-size: 14px;
+  font-weight: 600;
+  word-break: break-all;
+}
+
+.admin-analytics-badge {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: #f0f0f1;
+  font-size: 11px;
+  font-weight: 600;
+  color: #646970;
+}
+
+.admin-analytics-badge.is-active {
+  background: #edfaef;
+  color: #008a20;
+}
+
+.admin-analytics-panel h3 {
+  margin: 0 0 12px;
+}
+
+.admin-analytics-links {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.admin-analytics-links li + li {
+  margin-top: 8px;
+}
+
+.admin-analytics-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--admin-border, #dcdcde);
+  border-radius: 6px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.admin-analytics-link:hover {
+  border-color: #c3dafe;
+  background: #f8fbff;
+}
+
+.admin-analytics-link-desc {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--admin-text-muted);
+}
+
+.admin-analytics-events-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.admin-analytics-events-table th,
+.admin-analytics-events-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--admin-border, #dcdcde);
+  text-align: left;
+  vertical-align: top;
+  font-size: 13px;
+}
+
+.admin-analytics-events-table th {
+  font-weight: 600;
+  color: #1d2327;
+}
+
+.admin-analytics-event-label {
+  display: block;
+  margin-top: 4px;
+  color: var(--admin-text-muted);
+}
+
+.admin-analytics-settings h3 {
+  margin: 0 0 12px;
+}
+
+.admin-analytics-settings-subheading {
+  margin-top: 24px;
+}
+
+.admin-analytics-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.admin-analytics-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.admin-analytics-toolbar-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.admin-analytics-period {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-analytics-notice {
+  padding: 12px 14px;
+  border: 1px solid #f0c33c;
+  border-radius: 6px;
+  background: #fcf9e8;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #614200;
+}
+
+.admin-analytics-card-hint {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--admin-text-muted);
+}
+
+.admin-analytics-split {
+  display: grid;
+  gap: 16px;
+}
+
+@media (min-width: 1100px) {
+  .admin-analytics-split {
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  }
+}
+
+.admin-analytics-empty {
+  margin: 0;
+  font-size: 13px;
+  color: var(--admin-text-muted);
+}
+
+.admin-analytics-integration-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 24px;
+  margin-bottom: 12px;
+  font-size: 13px;
+}
+
+.admin-analytics-integration-row strong {
+  margin-right: 8px;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Contact submissions                                                        */
+/* -------------------------------------------------------------------------- */
+.admin-contact-submissions-layout {
+  display: grid;
+  gap: 16px;
+}
+
+@media (min-width: 1100px) {
+  .admin-contact-submissions-layout {
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  }
+}
+
+.admin-contact-submission-row.is-unread {
+  background: #f0f6fc;
+}
+
+.admin-contact-submission-row.is-selected {
+  background: #eef4ff;
+}
+
+.admin-contact-submission-open {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.admin-contact-submission-open:hover {
+  color: #135e96;
+}
+
+.admin-contact-submissions-pagination {
+  justify-content: flex-end;
+  padding: 12px 0 0;
+}
+
+.admin-contact-submission-detail h3 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.admin-contact-submission-meta {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: var(--admin-text-muted);
+}
+
+.admin-contact-submission-detail-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.admin-contact-submission-detail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.admin-contact-submission-fields {
+  display: grid;
+  gap: 14px;
+  margin: 0;
+}
+
+.admin-contact-submission-fields dt {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--admin-text-muted);
+}
+
+.admin-contact-submission-fields dd {
+  margin: 4px 0 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #1d2327;
+}
+
+.admin-contact-submission-fields a {
+  color: #135e96;
+  text-decoration: none;
+}
+
+.admin-contact-submission-fields a:hover {
+  text-decoration: underline;
+}
+

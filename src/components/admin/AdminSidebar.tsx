@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  BarChart3,
   CalendarCheck,
   ClipboardList,
   FileText,
@@ -30,6 +31,7 @@ import {
 
 const iconMap: Record<string, LucideIcon> = {
   "layout-dashboard": LayoutDashboard,
+  "bar-chart": BarChart3,
   "file-text": FileText,
   image: Image,
   files: Files,

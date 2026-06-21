@@ -1,5 +1,5 @@
-import { FormEntriesList } from "@/components/admin/forms/FormEntriesList";
+import { ContactSubmissionsList } from "@/components/admin/forms/ContactSubmissionsList";
 
 export default function AdminFormEntriesPage() {
-  return <FormEntriesList />;
+  return <ContactSubmissionsList />;
 }
