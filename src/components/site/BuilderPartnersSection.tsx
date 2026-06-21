@@ -6,7 +6,7 @@ export default function BuilderPartnersSection() {
     <section className="border-y border-solid border-gray-100 bg-gray-50/80 py-10 sm:py-20">
       <div className="site-container">
         <div className="mx-auto max-w-3xl text-center">
-          <p className="text-[10px] font-medium uppercase tracking-[0.14em] text-site-accent sm:text-sm sm:tracking-[0.18em]">
+          <p className="text-xs font-medium uppercase tracking-[0.14em] text-brand-blue sm:text-sm sm:tracking-[0.18em]">
             Builders We Work With
           </p>
           <h2 className="mt-2 text-lg font-bold leading-snug text-brand-navy sm:mt-3 sm:text-3xl sm:leading-tight lg:text-4xl">
@@ -36,7 +36,7 @@ export default function BuilderPartnersSection() {
                   }`}
                 />
               </div>
-              <span className="mt-2 text-center text-[9px] font-medium uppercase tracking-[0.1em] text-gray-400 sm:mt-3 sm:text-[11px] sm:tracking-[0.12em]">
+              <span className="mt-2 text-center text-[10px] font-medium uppercase tracking-[0.1em] text-gray-500 sm:mt-3 sm:text-xs sm:tracking-[0.12em]">
                 {builder.category}
               </span>
             </li>

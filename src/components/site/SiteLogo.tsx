@@ -79,7 +79,7 @@ export default function SiteLogo({ variant = "header", linked = true }: SiteLogo
   }
 
   return (
-    <Link href="/" className={className} aria-label={`${displayName} — Home`}>
+    <Link href="/" className={className}>
       {inner}
     </Link>
   );

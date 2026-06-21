@@ -115,7 +115,7 @@ export default function EstimateForm({ variant = "card" }: EstimateFormProps) {
         </button>
         <p
           className={`text-center text-xs ${
-            variant === "card" ? "text-gray-400" : "text-white/50"
+            variant === "card" ? "text-gray-500" : "text-white/70"
           }`}
         >
           Licensed &amp; insured. Your information is never shared.

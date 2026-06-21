@@ -22,7 +22,7 @@ export default function SiteFooter() {
 
         {/* Services */}
         <nav aria-label="Footer services">
-          <h2 className="text-sm font-bold uppercase tracking-widest text-brand-red">
+          <h2 className="text-sm font-bold uppercase tracking-widest text-white">
             Services
           </h2>
           <ul className="mt-4 space-y-2.5 text-sm">
@@ -43,7 +43,7 @@ export default function SiteFooter() {
 
         {/* Service areas */}
         <nav aria-label="Footer service areas">
-          <h2 className="text-sm font-bold uppercase tracking-widest text-brand-red">
+          <h2 className="text-sm font-bold uppercase tracking-widest text-white">
             Service Areas
           </h2>
           <ul className="mt-4 space-y-2.5 text-sm">
@@ -64,7 +64,7 @@ export default function SiteFooter() {
 
         {/* Contact */}
         <div>
-          <h2 className="text-sm font-bold uppercase tracking-widest text-brand-red">
+          <h2 className="text-sm font-bold uppercase tracking-widest text-white">
             Contact Us
           </h2>
           <ul className="mt-4 space-y-3 text-sm">

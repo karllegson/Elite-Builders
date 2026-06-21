@@ -296,11 +296,11 @@ export default function HomePage() {
               >
                 <ContentImage src={img.src} alt={img.alt} className="h-36 sm:h-52" />
                 <div className="p-4 sm:p-6">
-                  <span className="text-[10px] font-bold uppercase tracking-wide text-brand-sky sm:text-xs">
+                  <span className="text-xs font-bold uppercase tracking-wide text-brand-blue sm:text-sm">
                     {project.type}
                   </span>
                   <h3 className="mt-1.5 text-base font-bold text-brand-navy sm:mt-2 sm:text-lg">{project.name}</h3>
-                  <p className="mt-1 flex items-center gap-1.5 text-xs text-gray-400 sm:text-sm">
+                  <p className="mt-1 flex items-center gap-1.5 text-xs text-gray-500 sm:text-sm">
                     <MapPin size={14} aria-hidden />
                     {project.location}
                   </p>
@@ -441,7 +441,7 @@ export default function HomePage() {
               className="hidden h-[32rem] rounded-xl lg:block"
             />
           </div>
-          <p className="mt-5 text-center text-xs text-gray-400 sm:mt-8 sm:text-sm">
+          <p className="mt-5 text-center text-xs text-gray-500 sm:mt-8 sm:text-sm">
             Prefer to talk?{" "}
             <a href={business.phoneHref} className="font-bold text-brand-blue hover:text-brand-blue-dark">
               Call {business.phone}

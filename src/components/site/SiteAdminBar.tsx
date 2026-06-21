@@ -116,8 +116,8 @@ export function SiteAdminBar({
               <button
                 type="submit"
                 className="site-admin-bar-avatar"
-                title="Log out"
-                aria-label="Log out"
+                title={`Log out (${displayName})`}
+                aria-label={`${initials}, log out`}
               >
                 {initials}
               </button>

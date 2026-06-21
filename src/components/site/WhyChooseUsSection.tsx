@@ -13,7 +13,7 @@ export default function WhyChooseUsSection({ items, lede }: WhyChooseUsSectionPr
     <section id="why-us" className="scroll-mt-28 bg-[#eef4fb] py-12 sm:py-24">
       <div className="site-container">
         <div className="mx-auto max-w-3xl text-center">
-          <p className="text-[10px] font-medium uppercase tracking-[0.14em] text-site-accent sm:text-sm sm:tracking-[0.18em]">
+          <p className="text-xs font-medium uppercase tracking-[0.14em] text-brand-blue sm:text-sm sm:tracking-[0.18em]">
             Why Choose Us
           </p>
           <h2 className="mt-2 text-lg font-bold leading-snug text-site-text-dark sm:mt-3 sm:text-3xl sm:leading-tight lg:text-4xl">
