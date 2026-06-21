@@ -266,7 +266,7 @@ export type TeamMember = {
   profile?: TeamMemberProfile;
 };
 
-/** Homepage team cards — replace placeholders when names and headshots are ready. */
+/** Homepage team cards — add members here when names and headshots are ready. */
 export const teamMembers: TeamMember[] = [
   {
     id: "fernando-gradilla",
@@ -277,27 +277,6 @@ export const teamMembers: TeamMember[] = [
       experience: "Construction & framing background",
       bio: "Fernando built his career in construction long before Elite Builders — learning the trade on job sites across Northern California. During a difficult time in his life, he met the Lord, and his Christian faith became the foundation for how he leads today. He founded Elite Builders on no cutting corners, real integrity, and promises kept — treating every residential and commercial project with the honesty and care he'd want on his own home.",
     },
-  },
-  {
-    id: "team-slot-lead-framer",
-    name: "Coming Soon",
-    role: "Lead Framer",
-    initials: "",
-    isPlaceholder: true,
-  },
-  {
-    id: "team-slot-project-manager",
-    name: "Coming Soon",
-    role: "Project Manager",
-    initials: "",
-    isPlaceholder: true,
-  },
-  {
-    id: "team-slot-crew-lead",
-    name: "Coming Soon",
-    role: "Crew Lead",
-    initials: "",
-    isPlaceholder: true,
   },
 ];
 

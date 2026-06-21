@@ -1,7 +1,9 @@
 import { siteConfig } from "@/lib/admin/config";
 import { slugify } from "@/lib/admin/postSeo";
 
-export const FAQS_STORAGE_KEY = "elite-builders-faqs-v1";
+import { homepageFaqs } from "@/lib/site/messaging";
+
+export const FAQS_STORAGE_KEY = "elite-builders-faqs-v2";
 export const DEFAULT_FAQ_AUTHOR = siteConfig.defaultUserRole;
 
 export type FaqStatus = "published" | "draft";
@@ -57,40 +59,31 @@ export function slugifyFaqCategoryName(name: string): string {
 }
 
 function createDefaultStore(): FaqsStore {
-  const categoryId = "faq-cat-alexandria-va-parent";
+  const categoryId = "faq-cat-general";
   const now = new Date().toISOString();
-  const publishedAt = "2026-06-09T10:53:00.000Z";
 
   const category: FaqCategory = {
     id: categoryId,
-    name: "Alexandria, VA – Parent",
-    slug: "alexandria-va-parent",
-    description: "",
+    name: "General",
+    slug: "general",
+    description: "Common questions about Elite Builders framing and construction services.",
     parentId: null,
     createdAt: now,
   };
 
-  const faqTitles = [
-    "Where Can I Find More Info About Owens Corning?",
-    "What Is Owens Corning Basement Finishing System?",
-    "How Long Does Basement Finishing Take?",
-    "Is Basement Finishing Worth The Investment?",
-    "Do You Offer Free Consultations In Alexandria?",
-  ];
-
-  const faqs: FaqRecord[] = faqTitles.map((title, index) => ({
+  const faqs: FaqRecord[] = homepageFaqs.map((faq, index) => ({
     id: `faq-seed-${index + 1}`,
-    numericId: 8840 - index,
-    title,
-    slug: slugify(title),
-    content: "",
+    numericId: 1000 + index,
+    title: faq.question,
+    slug: slugify(faq.question),
+    content: faq.answer,
     status: "published" as const,
     categoryId,
     author: DEFAULT_FAQ_AUTHOR,
-    publishedAt,
+    publishedAt: now,
     createdAt: now,
     updatedAt: now,
-    menuOrder: 0,
+    menuOrder: index,
     visibility: "public",
     password: "",
   }));

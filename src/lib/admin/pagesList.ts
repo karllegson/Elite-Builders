@@ -6,6 +6,7 @@ export type PageTreeItem = {
   id: string;
   title: string;
   status: PageStatus;
+  href?: string;
   suffix?: string;
   hidden?: boolean;
   isDefault?: boolean;
@@ -16,6 +17,7 @@ export type FlatPageRow = {
   id: string;
   title: string;
   status: PageStatus;
+  href?: string;
   suffix?: string;
   hidden?: boolean;
   isDefault?: boolean;
@@ -67,103 +69,53 @@ export const PAGE_LIST_VIEWS: { value: PageListView; label: string }[] = [
   { value: "default", label: "Default Pages" },
 ];
 
-export function getPlaceholderPages(): PageTreeItem[] {
+/** Live Next.js routes — read-only until a pages CMS is connected. */
+export function getSitePages(): PageTreeItem[] {
   return [
-    {
-      id: "resources",
-      title: "Resources",
-      status: "published",
-      children: [
-        { id: "careers", title: "Careers", status: "published" },
-        { id: "testimonials", title: "Testimonials", status: "published" },
-        { id: "financing", title: "Financing", status: "published" },
-        {
-          id: "blog",
-          title: "Blog",
-          status: "published",
-          suffix: "Posts Page",
-          isDefault: true,
-        },
-        { id: "service-areas", title: "Service Areas", status: "published" },
-      ],
-    },
-    {
-      id: "about-us",
-      title: "About Us",
-      status: "published",
-      children: [
-        { id: "our-story", title: "Our Story", status: "published" },
-        { id: "our-promises", title: "Our Promises", status: "published" },
-        { id: "company-faqs", title: "Company FAQs", status: "published" },
-        {
-          id: "awards-accolades",
-          title: "Awards & Accolades",
-          status: "published",
-        },
-        {
-          id: "lifetime-warranty",
-          title: "Lifetime Transferable Warranty",
-          status: "published",
-        },
-        { id: "reviews", title: "Reviews", status: "published" },
-      ],
-    },
-    { id: "terms-of-service", title: "Terms of service", status: "published" },
-    {
-      id: "basement-system",
-      title: "The Elite Builders Basement Finishing System",
-      status: "published",
-    },
-    {
-      id: "why-elite-builders",
-      title: "Why Elite Builders",
-      status: "published",
-      children: [
-        { id: "why-us-overview", title: "Why Us Overview", status: "published" },
-        {
-          id: "golden-standard",
-          title: "Golden-Standard System",
-          status: "published",
-        },
-        {
-          id: "certified-installers",
-          title: "Specialized Certified Installers",
-          status: "published",
-        },
-        {
-          id: "personalized-service",
-          title: "Personalized Service",
-          status: "published",
-        },
-        {
-          id: "values-driving-us",
-          title: "The Values Driving Us",
-          status: "published",
-        },
-        {
-          id: "family-focused",
-          title: "A Family-Focused Company",
-          status: "published",
-        },
-      ],
-    },
     {
       id: "home",
       title: "Home",
       status: "published",
+      href: "/",
       suffix: "Front Page",
       isDefault: true,
     },
-    { id: "contact-us", title: "Contact Us", status: "published" },
     {
-      id: "faqs",
-      title: "Frequently Asked Questions",
+      id: "services",
+      title: "Services",
       status: "published",
+      href: "/services",
+      children: [
+        { id: "services-framing", title: "Rough Framing", status: "published", href: "/services/framing" },
+        { id: "services-remodeling", title: "Remodeling", status: "published", href: "/services/remodeling" },
+        { id: "services-siding", title: "Siding", status: "published", href: "/services/siding" },
+        { id: "services-decks", title: "Decks & Porches", status: "published", href: "/services/decks" },
+        {
+          id: "services-general-contracting",
+          title: "General Contracting",
+          status: "draft",
+          href: "/services/general-contracting",
+        },
+      ],
     },
-    { id: "design-assets", title: "Design Assets", status: "published" },
-    { id: "thank-you", title: "Thank You", status: "published" },
-    { id: "privacy-policy", title: "Privacy Policy", status: "published" },
+    { id: "projects", title: "Projects", status: "published", href: "/projects" },
+    { id: "service-areas", title: "Service Areas", status: "published", href: "/service-areas" },
+    {
+      id: "blog",
+      title: "Blog",
+      status: "published",
+      href: "/blog",
+      suffix: "Posts Page",
+      isDefault: true,
+    },
+    { id: "about", title: "About", status: "published", href: "/about" },
+    { id: "contact", title: "Contact", status: "published", href: "/contact" },
   ];
+}
+
+/** @deprecated Use getSitePages — kept for imports during transition. */
+export function getPlaceholderPages(): PageTreeItem[] {
+  return getSitePages();
 }
 
 function collectParentIds(items: PageTreeItem[]): string[] {
@@ -198,6 +150,7 @@ export function flattenPageTree(
       id: item.id,
       title: item.title,
       status: item.status,
+      href: item.href,
       suffix: item.suffix,
       hidden: item.hidden,
       isDefault: item.isDefault,

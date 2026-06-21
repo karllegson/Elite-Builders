@@ -16,11 +16,13 @@ type PageEditorSidebarProps = {
 
 const PAGE_PARENT_OPTIONS = [
   { value: "", label: "(no parent)" },
-  { value: "resources", label: "Resources" },
-  { value: "about-us", label: "About Us" },
-  { value: "why-elite-builders", label: "Why Elite Builders" },
   { value: "home", label: "Home" },
-  { value: "contact-us", label: "Contact Us" },
+  { value: "services", label: "Services" },
+  { value: "projects", label: "Projects" },
+  { value: "service-areas", label: "Service Areas" },
+  { value: "blog", label: "Blog" },
+  { value: "about", label: "About" },
+  { value: "contact", label: "Contact" },
 ];
 
 const PAGE_TEMPLATE_OPTIONS = [

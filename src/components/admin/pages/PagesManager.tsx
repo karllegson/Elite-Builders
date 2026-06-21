@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import {
   ArrowDown,
   ArrowDownToLine,
@@ -27,7 +28,7 @@ import {
   filterPageRows,
   flattenPageTree,
   getDefaultExpandedPageIds,
-  getPlaceholderPages,
+  getSitePages,
   getViewLabel,
   PAGE_LIST_VIEWS,
   PAGE_ROW_MORE_MENU_ITEMS,
@@ -200,49 +201,31 @@ function PageRow({
         </span>
 
         <div className="admin-pages-row-title-wrap">
-          <button type="button" className="admin-pages-title-link">
-            {row.title}
-          </button>
+          {row.href ? (
+            <Link href={row.href} className="admin-pages-title-link" target="_blank" rel="noopener noreferrer">
+              {row.title}
+            </Link>
+          ) : (
+            <span className="admin-pages-title-link">{row.title}</span>
+          )}
           {row.suffix ? (
             <span className="admin-pages-title-suffix"> — {row.suffix}</span>
           ) : null}
-          <span className="admin-pages-row-hover-actions admin-pages-inline-actions">
-            <button type="button" className="admin-inline-link">
-              Download
-            </button>
-            <button type="button" className="admin-inline-link">
-              Duplicate
-            </button>
-          </span>
         </div>
       </div>
 
       <div className="admin-pages-row-actions">
         <div className="admin-pages-row-hover-actions admin-pages-row-hover-actions-end">
-          <PageRowMoreMenu
-            row={row}
-            isOpen={isMoreMenuOpen}
-            onToggle={() => onToggleMoreMenu(row.id)}
-            onClose={onCloseMoreMenu}
-            onSelect={(action) => onMoreMenuAction(row, action)}
-          />
-          <button
-            type="button"
-            className="admin-btn-secondary admin-pages-action-btn"
-            onClick={onQuickEdit}
-          >
-            Quick Edit
-          </button>
-          <button type="button" className="admin-btn-secondary admin-pages-action-btn">
-            View
-          </button>
-          <button
-            type="button"
-            className="admin-pages-trash-btn"
-            aria-label={`Trash ${row.title}`}
-          >
-            <Trash2 size={14} aria-hidden />
-          </button>
+          {row.href ? (
+            <Link
+              href={row.href}
+              className="admin-btn-secondary admin-pages-action-btn"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              View
+            </Link>
+          ) : null}
         </div>
         <label className="admin-pages-checkbox">
           <input
@@ -259,9 +242,9 @@ function PageRow({
 
 export function PagesManager({ initialView = "all" }: { initialView?: PageListView }) {
   const toast = useAdminToast();
-  const [pages] = useState<PageTreeItem[]>(() => getPlaceholderPages());
+  const [pages] = useState<PageTreeItem[]>(() => getSitePages());
   const [expandedIds, setExpandedIds] = useState<Set<string>>(
-    () => new Set(getDefaultExpandedPageIds(getPlaceholderPages())),
+    () => new Set(getDefaultExpandedPageIds(getSitePages())),
   );
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [view, setView] = useState<PageListView>(initialView);
@@ -391,6 +374,10 @@ export function PagesManager({ initialView = "all" }: { initialView?: PageListVi
 
   return (
     <div className="admin-pages-manager">
+      <p className="admin-categories-status-message" role="status">
+        Read-only list of live site routes. Page create/edit/trash requires a pages CMS (not connected yet).
+        Edit content in code or the relevant admin section (Posts, Service Areas, Site Config).
+      </p>
       <div className="admin-pages-toolbar-top">
         <label className="admin-pages-sync-menu">
           <input

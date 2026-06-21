@@ -27,6 +27,7 @@ import {
 import { createDefaultPublishSettings, type PublishSettings } from "@/lib/admin/postPublish";
 import { useAdminToast } from "@/components/admin/toast/useAdminToast";
 import {
+  deleteServiceArea,
   getServiceAreaById,
   upsertServiceArea,
   type ServiceAreaRecord,
@@ -284,6 +285,27 @@ export function ServiceAreaEditor({
     window.location.assign(`/admin/service-areas/${saved.id}`);
   };
 
+  const handleMoveToTrash = () => {
+    if (!serviceAreaId) {
+      toast.error("Save the service area before moving it to trash.");
+      return;
+    }
+
+    if (!window.confirm("Delete this service area permanently? This cannot be undone.")) {
+      return;
+    }
+
+    const deleted = deleteServiceArea(serviceAreaId);
+
+    if (!deleted) {
+      toast.error("Unable to delete this service area.");
+      return;
+    }
+
+    sessionStorage.setItem(SERVICE_AREA_SAVE_TOAST_KEY, "Service area deleted.");
+    window.location.assign("/admin/service-areas");
+  };
+
   if (!loaded) {
     return <p className="admin-post-editor-status">Loading service area…</p>;
   }
@@ -363,6 +385,7 @@ export function ServiceAreaEditor({
         publishSettings={publishSettings}
         onPublish={() => persistServiceArea("published")}
         onSaveDraft={() => persistServiceArea("draft")}
+        onMoveToTrash={handleMoveToTrash}
         primaryActionLabel={isEditing ? "Update" : "Publish"}
       />
     </div>

@@ -47,7 +47,7 @@ export function insertImageTag(textarea: HTMLTextAreaElement): string {
 
 export const PAGE_EDITOR_MEDIA_ACTIONS = [
   { label: "Add Media", icon: "media" as const },
-  { label: "Add L10 Gallery", icon: "gallery" as const },
+  { label: "Add Gallery", icon: "gallery" as const },
   { label: "Add Form", icon: "form" as const },
 ];
 

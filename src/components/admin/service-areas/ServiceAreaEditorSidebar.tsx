@@ -26,6 +26,7 @@ type ServiceAreaEditorSidebarProps = {
   publishSettings?: PublishSettings;
   onPublish?: () => void;
   onSaveDraft?: () => void;
+  onMoveToTrash?: () => void;
   primaryActionLabel?: string;
 };
 
@@ -49,6 +50,7 @@ export function ServiceAreaEditorSidebar({
   publishSettings,
   onPublish,
   onSaveDraft,
+  onMoveToTrash,
   primaryActionLabel = "Publish",
 }: ServiceAreaEditorSidebarProps) {
   const [internalPageAttributes, setInternalPageAttributes] =
@@ -83,6 +85,7 @@ export function ServiceAreaEditorSidebar({
           initialSettings={publishSettings}
           onPublish={onPublish}
           onSaveDraft={onSaveDraft}
+          onMoveToTrash={onMoveToTrash}
           primaryActionLabel={primaryActionLabel}
         />
 
