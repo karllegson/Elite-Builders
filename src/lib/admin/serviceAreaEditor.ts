@@ -20,6 +20,9 @@ export type ServiceAreaPageAttributes = {
   order: number;
 };
 
+/** Dropdown value when this service area is the top-level parent page (not a sub-page). */
+export const SERVICE_AREA_SELF_PARENT_OPTION = "";
+
 export type ServiceAreaExtraFields = {
   mapEmbed: string;
   archiveOnly: boolean;

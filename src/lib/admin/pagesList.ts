@@ -1,3 +1,8 @@
+import type { ServiceAreaRecord } from "@/lib/admin/serviceAreasData";
+import { isTopLevelServiceArea } from "@/lib/admin/serviceAreasData";
+import { serviceAreas as staticServiceAreas } from "@/lib/site/config";
+import { getServiceAreaPublicHref } from "@/lib/site/serviceAreaUrls";
+
 export type PageStatus = "published" | "draft";
 
 export type PageListView = "all" | "published" | "draft" | "hidden" | "default";
@@ -7,6 +12,7 @@ export type PageTreeItem = {
   title: string;
   status: PageStatus;
   href?: string;
+  adminHref?: string;
   suffix?: string;
   hidden?: boolean;
   isDefault?: boolean;
@@ -18,6 +24,7 @@ export type FlatPageRow = {
   title: string;
   status: PageStatus;
   href?: string;
+  adminHref?: string;
   suffix?: string;
   hidden?: boolean;
   isDefault?: boolean;
@@ -69,8 +76,63 @@ export const PAGE_LIST_VIEWS: { value: PageListView; label: string }[] = [
   { value: "default", label: "Default Pages" },
 ];
 
+function buildFallbackServiceAreaLandingPages(): PageTreeItem[] {
+  return staticServiceAreas.map((area) => ({
+    id: `sa-static-${area.slug}`,
+    title: area.city === "Bay Area" ? area.city : `${area.city}, CA`,
+    status: "published" as const,
+    href: area.href,
+    suffix: "Landing page",
+  }));
+}
+
+function buildServiceAreaLandingPages(areas: ServiceAreaRecord[]): PageTreeItem[] {
+  const active = areas.filter((area) => !area.unused);
+
+  const topLevel = active
+    .filter((area) => isTopLevelServiceArea(area))
+    .sort(
+      (left, right) =>
+        left.sortOrder - right.sortOrder || left.title.localeCompare(right.title),
+    );
+
+  return topLevel.map((parent) => {
+    const subPages = active
+      .filter((area) => area.parentId === parent.id)
+      .sort(
+        (left, right) =>
+          left.sortOrder - right.sortOrder || left.title.localeCompare(right.title),
+      )
+      .map((subPage) => ({
+        id: `sa-${subPage.id}`,
+        title: subPage.title,
+        status: subPage.status,
+        href: getServiceAreaPublicHref(subPage, areas),
+        adminHref: `/admin/service-areas/${subPage.id}`,
+        hidden: subPage.hidden,
+        suffix: "Sub-page",
+      }));
+
+    return {
+      id: `sa-${parent.id}`,
+      title: parent.title,
+      status: parent.status,
+      href: getServiceAreaPublicHref(parent, areas),
+      adminHref: `/admin/service-areas/${parent.id}`,
+      hidden: parent.hidden,
+      suffix: "Landing page",
+      children: subPages.length > 0 ? subPages : undefined,
+    };
+  });
+}
+
 /** Live Next.js routes — read-only until a pages CMS is connected. */
-export function getSitePages(): PageTreeItem[] {
+export function getSitePages(serviceAreas: ServiceAreaRecord[] = []): PageTreeItem[] {
+  const serviceAreaChildren =
+    serviceAreas.length > 0
+      ? buildServiceAreaLandingPages(serviceAreas)
+      : buildFallbackServiceAreaLandingPages();
+
   return [
     {
       id: "home",
@@ -99,7 +161,13 @@ export function getSitePages(): PageTreeItem[] {
       ],
     },
     { id: "projects", title: "Projects", status: "published", href: "/projects" },
-    { id: "service-areas", title: "Service Areas", status: "published", href: "/service-areas" },
+    {
+      id: "service-areas",
+      title: "Service Areas",
+      status: "published",
+      href: "/service-areas",
+      children: serviceAreaChildren,
+    },
     {
       id: "blog",
       title: "Blog",
@@ -151,6 +219,7 @@ export function flattenPageTree(
       title: item.title,
       status: item.status,
       href: item.href,
+      adminHref: item.adminHref,
       suffix: item.suffix,
       hidden: item.hidden,
       isDefault: item.isDefault,

@@ -400,8 +400,9 @@ export function ServiceAreaNestedViewManager() {
       </div>
 
       <p className="admin-sa-nested-footnote">
-        Top-level service areas (no parent) appear in Sorting. Sub-pages with a parent appear
-        nested under that service area here.
+        Parent service areas (when Parent page is set to <strong>This page is the parent</strong>)
+        appear in Sorting. Sub-pages with another city selected as parent appear nested under that
+        service area here.
       </p>
     </div>
   );

@@ -289,9 +289,9 @@ export function ServiceAreaSortingManager() {
   return (
     <div className="admin-sa-sort-page">
       <p className="admin-sa-sort-intro">
-        Sort top-level service areas by dragging and dropping them in the desired order. Only pages
-        with <strong>(no parent)</strong> in Page Attributes appear here — sub-pages are managed in
-        Nested View under their parent.
+        Sort top-level parent service areas by dragging and dropping them in the desired order. Only
+        pages with <strong>This page is the parent</strong> in Page Attributes appear here — sub-pages
+        are managed in Nested View under their parent.
       </p>
 
       <div className="admin-sa-sort-toolbar">

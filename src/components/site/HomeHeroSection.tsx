@@ -4,7 +4,7 @@ import type { ComponentPropsWithoutRef, ReactNode } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { homeImages } from "@/lib/site/images";
 
-const HERO_VIDEO_SRC = "/videos/elite-builders-hero-loop.mp4?v=1";
+const HERO_VIDEO_SRC = "/videos/elite-builders-hero.mp4?v=5";
 const READY_FALLBACK_MS = 10_000;
 
 type HomeHeroSectionProps = {

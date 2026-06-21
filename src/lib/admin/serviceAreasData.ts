@@ -136,6 +136,7 @@ export function formatServiceAreaLabel(city: string, stateCode: string): string 
   return `${city}, ${stateCode.toUpperCase()}`;
 }
 
+/** Top-level service area — no parentId means this record IS the parent page at /service-areas/{slug}. */
 export function isTopLevelServiceArea(area: Pick<ServiceAreaRecord, "parentId">): boolean {
   return area.parentId === null;
 }

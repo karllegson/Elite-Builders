@@ -2,24 +2,29 @@
 
 import { useMemo } from "react";
 import { useServiceAreaParentOptions } from "@/hooks/useServiceAreaParentOptions";
-import type { ServiceAreaPageAttributes } from "@/lib/admin/serviceAreaEditor";
+import {
+  SERVICE_AREA_SELF_PARENT_OPTION,
+  type ServiceAreaPageAttributes,
+} from "@/lib/admin/serviceAreaEditor";
 
 type PageAttributesMetaboxProps = {
   attributes: ServiceAreaPageAttributes;
   onChange: (attributes: ServiceAreaPageAttributes) => void;
   excludeParentId?: string;
+  pageSlug?: string;
 };
 
 export function PageAttributesMetabox({
   attributes,
   onChange,
   excludeParentId,
+  pageSlug,
 }: PageAttributesMetaboxProps) {
   const { options: parentOptions, ready } = useServiceAreaParentOptions(excludeParentId);
 
   const selectedParentId = useMemo(() => {
     if (!attributes.parentId) {
-      return "";
+      return SERVICE_AREA_SELF_PARENT_OPTION;
     }
 
     const match = parentOptions.find((option) => option.id === attributes.parentId);
@@ -28,8 +33,19 @@ export function PageAttributesMetabox({
       return match.id;
     }
 
-    return ready ? "" : attributes.parentId;
+    return ready ? SERVICE_AREA_SELF_PARENT_OPTION : attributes.parentId;
   }, [attributes.parentId, parentOptions, ready]);
+
+  const selectedParentLabel = useMemo(() => {
+    if (!attributes.parentId) {
+      return null;
+    }
+
+    return parentOptions.find((option) => option.id === attributes.parentId)?.label ?? null;
+  }, [attributes.parentId, parentOptions]);
+
+  const slugPreview = pageSlug?.trim() || "your-slug";
+  const isParentPage = !attributes.parentId;
 
   return (
     <div className="admin-metabox">
@@ -43,7 +59,7 @@ export function PageAttributesMetabox({
         <div className="admin-page-attributes">
           <div className="admin-page-attributes-field">
             <label className="admin-page-attributes-label" htmlFor="service-area-parent">
-              Parent
+              Parent page
             </label>
             <select
               id="service-area-parent"
@@ -57,7 +73,9 @@ export function PageAttributesMetabox({
                 })
               }
             >
-              <option value="">(no parent)</option>
+              <option value={SERVICE_AREA_SELF_PARENT_OPTION}>
+                This page is the parent
+              </option>
               {parentOptions.map((option) => (
                 <option key={option.id} value={option.id}>
                   {option.label}
@@ -67,11 +85,20 @@ export function PageAttributesMetabox({
           </div>
 
           <p className="admin-page-attributes-help">
-            Choose <strong>(no parent)</strong> for a service area that appears in Sorting at{" "}
-            <strong>/service-areas/your-slug</strong>. Choose a parent (e.g. Stockton, CA) to
-            create a landing page at{" "}
-            <strong>/service-areas/parent-slug/your-slug</strong> — it appears under that parent in
-            Nested View only.
+            {isParentPage ? (
+              <>
+                Leave <strong>This page is the parent</strong> selected when this service area
+                should be its own top-level page at{" "}
+                <strong>/service-areas/{slugPreview}</strong>. It appears in Sorting, not under
+                another city.
+              </>
+            ) : (
+              <>
+                This is a sub-page under <strong>{selectedParentLabel ?? "the selected parent"}</strong>{" "}
+                at <strong>/service-areas/parent-slug/{slugPreview}</strong>. It appears in Nested
+                View only.
+              </>
+            )}
           </p>
 
           <div className="admin-page-attributes-field">

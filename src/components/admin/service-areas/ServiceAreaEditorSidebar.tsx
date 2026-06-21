@@ -21,6 +21,7 @@ type ServiceAreaEditorSidebarProps = {
   pageAttributes?: ServiceAreaPageAttributes;
   onPageAttributesChange?: (attributes: ServiceAreaPageAttributes) => void;
   excludeParentId?: string;
+  pageSlug?: string;
   featuredImage?: ServiceAreaFeaturedImage | null;
   onFeaturedImageChange?: (image: ServiceAreaFeaturedImage | null) => void;
   publishSettings?: PublishSettings;
@@ -45,6 +46,7 @@ export function ServiceAreaEditorSidebar({
   pageAttributes: pageAttributesProp,
   onPageAttributesChange,
   excludeParentId,
+  pageSlug,
   featuredImage = null,
   onFeaturedImageChange,
   publishSettings,
@@ -93,6 +95,7 @@ export function ServiceAreaEditorSidebar({
           attributes={pageAttributes}
           onChange={handlePageAttributesChange}
           excludeParentId={excludeParentId}
+          pageSlug={pageSlug}
         />
 
         <div className="admin-metabox">

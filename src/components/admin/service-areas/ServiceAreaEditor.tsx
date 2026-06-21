@@ -380,6 +380,7 @@ export function ServiceAreaEditor({
         pageAttributes={pageAttributes}
         onPageAttributesChange={setPageAttributes}
         excludeParentId={serviceAreaId}
+        pageSlug={snippet.permalink}
         featuredImage={featuredImage}
         onFeaturedImageChange={setFeaturedImage}
         publishSettings={publishSettings}
