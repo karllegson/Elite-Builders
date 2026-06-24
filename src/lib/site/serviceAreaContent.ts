@@ -260,6 +260,9 @@ export function buildQuickSummaryBoxHtml(bodyHtml: string): string {
   return `<aside class="site-quick-summary" aria-label="Quick Summary"><p class="site-quick-summary__title">Quick Summary</p><div class="site-quick-summary__body">${body}</div></aside>`;
 }
 
+const QUICK_SUMMARY_LABEL_PATTERN =
+  /<(?:h[1-6]|p|span)\b[^>]*>\s*(?:<(?:strong|em|b|i)[^>]*>\s*)*Quick\s+Summary(?:\s*<\/(?:strong|em|b|i)\s*>\s*)*(?:<\/(?:strong|em|b|i)\s*>\s*)*\s*<\/(?:h[1-6]|p|span)>/i;
+
 function stripQuickSummaryHeadingMarkup(html: string): string {
   return html
     .replace(/<h[1-6][^>]*>\s*Quick\s+Summary\s*<\/h[1-6]>/gi, "")
@@ -267,11 +270,57 @@ function stripQuickSummaryHeadingMarkup(html: string): string {
       /<p[^>]*>\s*(?:<(?:strong|em|b|i)[^>]*>\s*)*Quick\s+Summary(?:\s*<\/(?:strong|em|b|i)\s*>\s*)*(?:<\/(?:strong|em|b|i)\s*>\s*)*\s*<\/p>/gi,
       "",
     )
+    .replace(
+      /<span[^>]*>\s*(?:<(?:strong|em|b|i)[^>]*>\s*)*Quick\s+Summary(?:\s*<\/(?:strong|em|b|i)\s*>\s*)*(?:<\/(?:strong|em|b|i)\s*>\s*)*\s*<\/span>/gi,
+      "",
+    )
+    .replace(
+      /<(?:strong|em|b|i)[^>]*>\s*Quick\s+Summary\s*<\/(?:strong|em|b|i)>/gi,
+      "",
+    )
     .trim();
+}
+
+function containsQuickSummaryLabel(html: string): boolean {
+  return QUICK_SUMMARY_LABEL_PATTERN.test(stripWrapperComments(html));
+}
+
+function isInsideDivWithClass(html: string, index: number, className: string): boolean {
+  const before = html.slice(0, index);
+  const openPattern = new RegExp(
+    `<div[^>]*class=["'][^"']*\\b${className}\\b[^"']*["'][^>]*>`,
+    "gi",
+  );
+  const opens = [...before.matchAll(openPattern)];
+
+  if (opens.length === 0) {
+    return false;
+  }
+
+  const lastOpen = opens[opens.length - 1];
+  const openEnd = lastOpen.index! + lastOpen[0].length;
+  const segment = html.slice(openEnd, index);
+  let depth = 1;
+
+  for (const tag of segment.match(/<\/?div\b[^>]*>/gi) ?? []) {
+    if (tag.startsWith("</")) {
+      depth -= 1;
+    } else if (!/\/>\s*$/.test(tag)) {
+      depth += 1;
+    }
+  }
+
+  return depth > 0;
 }
 
 function stripWrapperComments(html: string): string {
   return html.replace(/<!--[\s\S]*?-->/g, "").trim();
+}
+
+function stripHighlightBoxComments(html: string): string {
+  return html
+    .replace(/<!--\s*Start Highlight Box\s*-->\s*/gi, "")
+    .replace(/\s*<!--\s*End Highlight Box\s*-->/gi, "");
 }
 
 function extractQuickSummaryAsideFromWrapperContent(inner: string): string | null {
@@ -379,11 +428,33 @@ function unwrapQuickSummaryContainers(html: string): string {
   return flattenQuickSummaryShells(result);
 }
 
+function pickQuickSummaryDividerHr(match: string, aside: string): string {
+  const asideIndex = match.indexOf(aside);
+  const beforeAside = match.slice(0, asideIndex);
+  const afterAside = match.slice(asideIndex + aside.length);
+  const trailingHrs = [...afterAside.matchAll(/<hr[^>]*>/gi)];
+
+  if (trailingHrs.length > 0) {
+    return trailingHrs[trailingHrs.length - 1][0];
+  }
+
+  const leadingHrs = [...beforeAside.matchAll(/<hr[^>]*>/gi)];
+
+  if (leadingHrs.length > 0) {
+    return leadingHrs[leadingHrs.length - 1][0];
+  }
+
+  return "";
+}
+
+const QUICK_SUMMARY_DIVIDER_PATTERN =
+  /(?:<hr[^>]*>\s*)*(?:<!--[\s\S]*?-->\s*)*(<aside\b[^>]*\bsite-quick-summary\b[^>]*>[\s\S]*?<\/aside>)(?:<!--[\s\S]*?-->\s*)*(?:\s*<hr[^>]*>\s*)*(?:<!--[\s\S]*?-->\s*)*/gi;
+
 function normalizeQuickSummaryDividers(html: string): string {
-  return html.replace(
-    /(?:<hr[^>]*>\s*)*(<aside\b[^>]*\bsite-quick-summary\b[^>]*>[\s\S]*?<\/aside>)(?:\s*<hr[^>]*>\s*)*/gi,
-    "$1<hr>",
-  );
+  return html.replace(QUICK_SUMMARY_DIVIDER_PATTERN, (match, aside: string) => {
+    const hr = pickQuickSummaryDividerHr(match, aside);
+    return hr ? `${aside}\n${hr}\n` : aside;
+  });
 }
 
 function replaceHighlightBoxQuickSummaryNested(html: string): string {
@@ -417,37 +488,40 @@ function replaceHighlightBoxQuickSummaryNested(html: string): string {
 
       const quickOpenMatch = innerTrimmed.match(/^<div[^>]*\bquick-summary\b[^>]*>/i);
 
-      if (!quickOpenMatch) {
-        continue;
+      if (quickOpenMatch) {
+        const quickContentStart = quickOpenMatch[0].length;
+        const afterQuickOpen = innerTrimmed.slice(quickContentStart);
+        const quickCloseIndex = findBalancedDivClose(afterQuickOpen);
+
+        if (quickCloseIndex !== -1) {
+          const afterQuickClose = innerTrimmed
+            .slice(quickContentStart + quickCloseIndex + "</div>".length)
+            .trim();
+
+          if (!afterQuickClose) {
+            const quickBody = afterQuickOpen.slice(0, quickCloseIndex);
+            const box = buildQuickSummaryBoxHtml(stripQuickSummaryHeadingMarkup(quickBody));
+
+            if (box) {
+              const fullEnd = openEnd + closeIndex + "</div>".length;
+              result = result.slice(0, match.index) + box + result.slice(fullEnd);
+              changed = true;
+              break;
+            }
+          }
+        }
       }
 
-      const quickContentStart = quickOpenMatch[0].length;
-      const afterQuickOpen = innerTrimmed.slice(quickContentStart);
-      const quickCloseIndex = findBalancedDivClose(afterQuickOpen);
+      if (containsQuickSummaryLabel(innerTrimmed)) {
+        const box = buildQuickSummaryBoxHtml(stripQuickSummaryHeadingMarkup(innerTrimmed));
 
-      if (quickCloseIndex === -1) {
-        continue;
+        if (box) {
+          const fullEnd = openEnd + closeIndex + "</div>".length;
+          result = result.slice(0, match.index) + box + result.slice(fullEnd);
+          changed = true;
+          break;
+        }
       }
-
-      const afterQuickClose = innerTrimmed
-        .slice(quickContentStart + quickCloseIndex + "</div>".length)
-        .trim();
-
-      if (afterQuickClose) {
-        continue;
-      }
-
-      const quickBody = afterQuickOpen.slice(0, quickCloseIndex);
-      const box = buildQuickSummaryBoxHtml(stripQuickSummaryHeadingMarkup(quickBody));
-
-      if (!box) {
-        continue;
-      }
-
-      const fullEnd = openEnd + closeIndex + "</div>".length;
-      result = result.slice(0, match.index) + box + result.slice(fullEnd);
-      changed = true;
-      break;
     }
   }
 
@@ -559,6 +633,13 @@ function upgradeLegacyQuickSummary(html: string): string {
 
   const labelMatch = /Quick Summary/i.exec(result);
   if (!labelMatch || labelMatch.index === undefined) {
+    return result;
+  }
+
+  if (
+    isInsideDivWithClass(result, labelMatch.index, "highlight-box") ||
+    isInsideDivWithClass(result, labelMatch.index, "quick-summary")
+  ) {
     return result;
   }
 
@@ -771,8 +852,10 @@ export function prepareServiceAreaHtml(
     result = result.replace(CTA_BTN_SHORTCODE_PATTERN, button);
   }
 
-  return stripUnrenderedShortcodes(
-    normalizeQuickSummaryDividers(unwrapQuickSummaryContainers(result)),
+  return stripHighlightBoxComments(
+    stripUnrenderedShortcodes(
+      normalizeQuickSummaryDividers(unwrapQuickSummaryContainers(result)),
+    ),
   );
 }
 
