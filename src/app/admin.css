@@ -818,6 +818,10 @@
   background: #32373c;
   border: none;
   resize: vertical;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  overflow-x: hidden;
 }
 
 .admin-post-content-input {
@@ -834,6 +838,7 @@
 }
 
 .admin-html-ide {
+  width: 100%;
   border: 1px solid var(--admin-border);
   background: #1e1e1e;
   overflow: hidden;
@@ -845,16 +850,37 @@
 }
 
 .admin-html-ide-surface {
-  min-height: 520px;
-  height: 58vh;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+  min-height: 320px;
+  height: clamp(320px, 58vh, 720px);
+  overflow: hidden;
+}
+
+.admin-html-ide-surface > section {
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.admin-html-ide-surface .monaco-editor,
+.admin-html-ide-surface .monaco-editor .overflow-guard {
+  width: 100% !important;
+  overflow-x: hidden !important;
 }
 
 .admin-html-ide-loading {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 520px;
-  height: 58vh;
+  width: 100%;
+  min-height: 320px;
+  height: clamp(320px, 58vh, 720px);
   background: #1e1e1e;
   color: #c3c4c7;
   font-size: 13px;

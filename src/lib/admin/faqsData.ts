@@ -58,7 +58,7 @@ export function slugifyFaqCategoryName(name: string): string {
   return slugify(name);
 }
 
-function createDefaultStore(): FaqsStore {
+export function createDefaultStore(): FaqsStore {
   const categoryId = "faq-cat-general";
   const now = new Date().toISOString();
 
@@ -121,7 +121,7 @@ export function readFaqsStore(): FaqsStore {
   }
 }
 
-function normalizeFaqsStore(store: FaqsStore): FaqsStore {
+export function normalizeFaqsStore(store: FaqsStore): FaqsStore {
   return {
     ...store,
     faqs: store.faqs.map((faq) => normalizeFaqRecord(faq as FaqRecord)),

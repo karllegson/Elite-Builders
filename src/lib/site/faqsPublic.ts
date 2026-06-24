@@ -1,10 +1,5 @@
-import {
-  listFaqCategories,
-  listFaqs,
-  slugifyFaqCategoryName,
-  type FaqCategory,
-  type FaqRecord,
-} from "@/lib/admin/faqsData";
+import type { FaqCategory, FaqRecord, FaqsStore } from "@/lib/admin/faqsData";
+import { slugifyFaqCategoryName } from "@/lib/admin/faqsData";
 
 export type PublicFaqItem = {
   id: string;
@@ -12,23 +7,28 @@ export type PublicFaqItem = {
   answer: string;
 };
 
-export function findFaqCategoryByRef(categoryRef: string): FaqCategory | null {
+export function findFaqCategoryByRefInStore(
+  categoryRef: string,
+  store: FaqsStore,
+): FaqCategory | null {
   const trimmed = categoryRef.trim();
-  const categories = listFaqCategories();
   const normalizedSlug = slugifyFaqCategoryName(trimmed);
 
   return (
-    categories.find((category) => category.slug === trimmed) ??
-    categories.find((category) => category.slug === normalizedSlug) ??
-    categories.find(
+    store.categories.find((category) => category.slug === trimmed) ??
+    store.categories.find((category) => category.slug === normalizedSlug) ??
+    store.categories.find(
       (category) => category.name.toLowerCase() === trimmed.toLowerCase(),
     ) ??
     null
   );
 }
 
-export function listPublishedFaqsForCategory(categoryId: string): PublicFaqItem[] {
-  return listFaqs()
+export function listPublishedFaqsForCategoryInStore(
+  categoryId: string,
+  store: FaqsStore,
+): PublicFaqItem[] {
+  return store.faqs
     .filter(
       (faq) =>
         faq.status === "published" &&

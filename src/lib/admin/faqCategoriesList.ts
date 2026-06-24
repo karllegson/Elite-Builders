@@ -1,12 +1,9 @@
 import { buildCategoryOptions } from "@/lib/admin/postCategories";
-import type { FaqCategory } from "@/lib/admin/faqsData";
+import type { FaqCategory, FaqRecord } from "@/lib/admin/faqsData";
 import {
   countFaqsInCategory,
-  listFaqCategories,
-  listFaqs,
   slugifyFaqCategoryName,
 } from "@/lib/admin/faqsData";
-import type { FaqRecord } from "@/lib/admin/faqsData";
 
 export type FaqCategoryListItem = FaqCategory & {
   faqCount: number;
@@ -78,10 +75,10 @@ export function buildFaqCategoryParentOptions(categories: FaqCategory[]) {
 }
 
 export function buildFaqCategoryEditorOptions(
+  categories: FaqCategory[],
+  faqs: FaqRecord[],
   tab: "all" | "most-used",
 ): { id: string; label: string }[] {
-  const categories = listFaqCategories();
-  const faqs = listFaqs();
   const options = buildCategoryOptions(
     categories.map((category) => ({
       id: category.id,

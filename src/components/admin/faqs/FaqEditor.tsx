@@ -3,12 +3,15 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import {
+  fetchFaqForEditAction,
+  saveFaqAction,
+} from "@/app/admin/(shell)/faqs/actions";
 import { AdminPostContentEditor } from "@/components/admin/posts/AdminPostContentEditor";
 import { PostEditorToolbar } from "@/components/admin/posts/PostEditorToolbar";
 import { FaqEditorSidebar } from "@/components/admin/faqs/FaqEditorSidebar";
 import { countWords } from "@/lib/admin/postEditor";
 import { useAdminToast } from "@/components/admin/toast/useAdminToast";
-import { getFaqById, upsertFaq } from "@/lib/admin/faqsData";
 
 type FaqEditorProps = {
   faqId?: string;
@@ -22,6 +25,7 @@ export function FaqEditor({ faqId }: FaqEditorProps) {
   const [recordId, setRecordId] = useState<string | undefined>(faqId);
   const [loaded, setLoaded] = useState(!isEditing);
   const [missing, setMissing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [categoryId, setCategoryId] = useState<string | null>(null);
@@ -32,27 +36,36 @@ export function FaqEditor({ faqId }: FaqEditorProps) {
       return;
     }
 
-    const record = getFaqById(faqId);
+    void (async () => {
+      const result = await fetchFaqForEditAction(faqId);
 
-    if (!record) {
-      setMissing(true);
+      if (!result.faq) {
+        setMissing(true);
+        setLoaded(true);
+        return;
+      }
+
+      setTitle(result.faq.title);
+      setContent(result.faq.content);
+      setCategoryId(result.faq.categoryId);
       setLoaded(true);
-      return;
-    }
-
-    setTitle(record.title);
-    setContent(record.content);
-    setCategoryId(record.categoryId);
-    setLoaded(true);
+    })();
   }, [faqId]);
 
-  const persistFaq = (status: "published" | "draft") => {
+  const persistFaq = async (status: "published" | "draft") => {
     if (!title.trim()) {
       toast.error("Add a title before saving.");
       return;
     }
 
-    const saved = upsertFaq({
+    if (!categoryId) {
+      toast.error("Select a category before saving.");
+      return;
+    }
+
+    setIsSaving(true);
+
+    const result = await saveFaqAction({
       id: recordId,
       title,
       content,
@@ -60,9 +73,16 @@ export function FaqEditor({ faqId }: FaqEditorProps) {
       categoryId,
     });
 
+    setIsSaving(false);
+
+    if (result.error || !result.faq) {
+      toast.error(result.error ?? "Could not save FAQ.");
+      return;
+    }
+
     if (!recordId) {
-      setRecordId(saved.id);
-      router.replace(`/admin/faqs/${saved.id}`);
+      setRecordId(result.faq.id);
+      router.replace(`/admin/faqs/${result.faq.id}`);
     }
 
     toast.success(
@@ -124,9 +144,12 @@ export function FaqEditor({ faqId }: FaqEditorProps) {
         content={content}
         categoryId={categoryId}
         onCategoryIdChange={setCategoryId}
-        onPublish={() => persistFaq("published")}
-        onSaveDraft={() => persistFaq("draft")}
-        primaryActionLabel={recordId || isEditing ? "Update" : "Publish"}
+        onPublish={() => void persistFaq("published")}
+        onSaveDraft={() => void persistFaq("draft")}
+        primaryActionLabel={
+          isSaving ? "Saving…" : recordId || isEditing ? "Update" : "Publish"
+        }
+        isSaving={isSaving}
       />
     </div>
   );

@@ -15,6 +15,7 @@ type FaqEditorSidebarProps = {
   onPublish?: () => void;
   onSaveDraft?: () => void;
   primaryActionLabel?: string;
+  isSaving?: boolean;
 };
 
 export function FaqEditorSidebar({
@@ -25,6 +26,7 @@ export function FaqEditorSidebar({
   onPublish,
   onSaveDraft,
   primaryActionLabel = "Publish",
+  isSaving = false,
 }: FaqEditorSidebarProps) {
   const [featuredImage, setFeaturedImage] = useState<MediaAttachment | null>(null);
   const [featuredImageModalOpen, setFeaturedImageModalOpen] = useState(false);

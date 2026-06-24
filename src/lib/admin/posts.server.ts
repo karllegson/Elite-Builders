@@ -14,6 +14,7 @@ import type {
   UpsertPostInput,
 } from "@/lib/admin/posts.types";
 import { createTagId } from "@/lib/admin/tagsList";
+import { stripQuickSummaryForExcerpt } from "@/lib/site/postContent";
 import { createAdminClient, hasAdminClient } from "@/lib/supabase/admin";
 
 export const DEFAULT_POST_AUTHOR = siteConfig.defaultUserRole;
@@ -41,7 +42,7 @@ export function buildExcerpt(content: string, excerpt?: string): string {
     return trimmed;
   }
 
-  const plain = stripHtml(content);
+  const plain = stripHtml(stripQuickSummaryForExcerpt(content));
   return plain.length > 160 ? `${plain.slice(0, 157)}...` : plain;
 }
 

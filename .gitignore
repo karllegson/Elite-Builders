@@ -44,3 +44,4 @@ next-env.d.ts
 # local CMS data (dev)
 /data/posts.local.json
 /data/service-areas.local.json
+/data/faqs.local.json

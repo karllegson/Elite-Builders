@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { Fragment, useEffect, useMemo, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useState, useTransition } from "react";
 import { FaqQuickEditRow } from "@/components/admin/faqs/FaqQuickEditRow";
 import { useAdminToast } from "@/components/admin/toast/useAdminToast";
 import {
@@ -17,11 +17,10 @@ import {
   type FaqListView,
 } from "@/lib/admin/faqsList";
 import {
-  deleteFaqs,
-  getFaqCategoryById,
-  listFaqCategories,
-  listFaqs,
-} from "@/lib/admin/faqsData";
+  deleteFaqsAction,
+  fetchFaqsForAdminAction,
+  fetchFaqCategoryByIdAction,
+} from "@/app/admin/(shell)/faqs/actions";
 import type { FaqListItem } from "@/lib/admin/faqsList";
 
 const PER_PAGE = 20;
@@ -154,26 +153,47 @@ export function FaqsList() {
   const toast = useAdminToast();
   const searchParams = useSearchParams();
   const categoryFilterId = searchParams.get("category");
-  const [ready, setReady] = useState(false);
-  const [refreshKey, setRefreshKey] = useState(0);
+  const [allItems, setAllItems] = useState<FaqListItem[]>([]);
+  const [activeCategory, setActiveCategory] = useState<{ id: string; name: string } | null>(
+    null,
+  );
+  const [isLoading, setIsLoading] = useState(true);
+  const [, startTransition] = useTransition();
+
+  const loadFaqs = useCallback(() => {
+    startTransition(async () => {
+      setIsLoading(true);
+
+      const [faqsResult, categoryResult] = await Promise.all([
+        fetchFaqsForAdminAction(),
+        categoryFilterId
+          ? fetchFaqCategoryByIdAction(categoryFilterId)
+          : Promise.resolve({ category: null }),
+      ]);
+
+      if (faqsResult.error) {
+        toast.error(faqsResult.error);
+        setAllItems([]);
+      } else {
+        setAllItems(
+          faqsResult.faqs.map((faq) =>
+            toFaqListItem(faq, faqsResult.categories, DEFAULT_FAQ_AUTHOR),
+          ),
+        );
+      }
+
+      setActiveCategory(
+        categoryResult.category
+          ? { id: categoryResult.category.id, name: categoryResult.category.name }
+          : null,
+      );
+      setIsLoading(false);
+    });
+  }, [categoryFilterId, toast]);
 
   useEffect(() => {
-    setReady(true);
-  }, []);
-
-  const allItems = useMemo(() => {
-    if (!ready) {
-      return [];
-    }
-
-    const categories = listFaqCategories();
-    return listFaqs().map((faq) => toFaqListItem(faq, categories, DEFAULT_FAQ_AUTHOR));
-  }, [ready, refreshKey]);
-
-  const activeCategory = useMemo(
-    () => (categoryFilterId ? getFaqCategoryById(categoryFilterId) : null),
-    [categoryFilterId],
-  );
+    loadFaqs();
+  }, [loadFaqs]);
 
   const viewCounts = useMemo(() => getFaqViewCounts(allItems), [allItems]);
 
@@ -243,7 +263,7 @@ export function FaqsList() {
     });
   };
 
-  const handleApplyBulkAction = () => {
+  const handleApplyBulkAction = async () => {
     if (!bulkAction) {
       return;
     }
@@ -254,8 +274,14 @@ export function FaqsList() {
     }
 
     if (bulkAction === "trash") {
-      deleteFaqs([...selectedIds]);
-      setRefreshKey((current) => current + 1);
+      const result = await deleteFaqsAction([...selectedIds]);
+
+      if (result.error) {
+        toast.error(result.error);
+        return;
+      }
+
+      loadFaqs();
       showStatus(`Moved ${selectedIds.size} FAQ(s) to trash.`);
       setSelectedIds(new Set());
       setBulkAction("");
@@ -267,13 +293,19 @@ export function FaqsList() {
     setBulkAction("");
   };
 
-  const handleTrashFaq = (item: FaqListItem) => {
+  const handleTrashFaq = async (item: FaqListItem) => {
     if (!window.confirm(`Move "${item.title}" to trash?`)) {
       return;
     }
 
-    deleteFaqs([item.id]);
-    setRefreshKey((current) => current + 1);
+    const result = await deleteFaqsAction([item.id]);
+
+    if (result.error) {
+      toast.error(result.error);
+      return;
+    }
+
+    loadFaqs();
     setSelectedIds((current) => {
       const next = new Set(current);
       next.delete(item.id);
@@ -282,7 +314,7 @@ export function FaqsList() {
     showStatus(`"${item.title}" moved to trash.`);
   };
 
-  if (!ready) {
+  if (isLoading) {
     return <p className="admin-faqs-loading">Loading FAQs…</p>;
   }
 
@@ -463,7 +495,7 @@ export function FaqsList() {
                       onCancel={() => setQuickEditId(null)}
                       onUpdated={(title) => {
                         setQuickEditId(null);
-                        setRefreshKey((current) => current + 1);
+                        loadFaqs();
                         showStatus(`"${title}" updated.`);
                       }}
                     />

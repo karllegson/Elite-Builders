@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { adminPageTitles } from "@/lib/admin/config";
 import { FORMS_OPEN_TEMPLATES_EVENT } from "@/lib/admin/formTemplates";
-import { getFaqById } from "@/lib/admin/faqsData";
+import { fetchFaqForEditAction } from "@/app/admin/(shell)/faqs/actions";
 
 type PageActionLink = { type?: "link"; href: string; label: string };
 type PageActionTrigger = { type: "trigger"; label: string; event: string };
@@ -63,21 +63,37 @@ function isLinkAction(action: PageAction): action is PageActionLink {
 
 export function AdminContentHeader() {
   const pathname = usePathname();
-  const [editFaqTitle, setEditFaqTitle] = useState<string | null>(null);
-
-  useEffect(() => {
+  const faqEditId = useMemo(() => {
     const match = pathname.match(/^\/admin\/faqs\/([^/]+)$/);
     if (!match || match[1] === "new" || match[1] === "categories") {
-      setEditFaqTitle(null);
+      return null;
+    }
+    return match[1];
+  }, [pathname]);
+  const [editFaqMeta, setEditFaqMeta] = useState<{ id: string; title: string } | null>(null);
+
+  useEffect(() => {
+    if (!faqEditId) {
       return;
     }
 
-    const faq = getFaqById(match[1]);
-    setEditFaqTitle(faq?.title ?? null);
-  }, [pathname]);
+    let cancelled = false;
+
+    void fetchFaqForEditAction(faqEditId).then((result) => {
+      if (!cancelled && result.faq) {
+        setEditFaqMeta({ id: faqEditId, title: result.faq.title });
+      }
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [faqEditId]);
 
   const title =
-    editFaqTitle !== null ? `Edit FAQ: ${editFaqTitle}` : resolvePageTitle(pathname);
+    faqEditId && editFaqMeta?.id === faqEditId
+      ? `Edit FAQ: ${editFaqMeta.title}`
+      : resolvePageTitle(pathname);
   const action = resolvePageAction(pathname);
 
   if (

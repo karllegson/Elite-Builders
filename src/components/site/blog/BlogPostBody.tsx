@@ -1,6 +1,9 @@
+import { listPublishedPublicFaqsForCategoryRef } from "@/lib/admin/faqs.server";
+import { ServiceAreaContentPanel } from "@/components/site/ServiceAreaContentPanel";
 import { ServiceAreaFeaturedImage } from "@/components/site/ServiceAreaFeaturedImage";
-import { ServiceAreaHtmlContent } from "@/components/site/ServiceAreaHtmlContent";
 import type { PostFeaturedImage } from "@/lib/admin/resolveMediaById";
+import { shouldShowPostExcerpt } from "@/lib/site/postContent";
+import { parseServiceAreaContent } from "@/lib/site/serviceAreaContent";
 
 type BlogPostBodyProps = {
   content: string;
@@ -8,11 +11,17 @@ type BlogPostBodyProps = {
   featuredImage?: PostFeaturedImage | null;
 };
 
-export function BlogPostBody({
+export async function BlogPostBody({
   content,
   excerpt = "",
   featuredImage = null,
 }: BlogPostBodyProps) {
+  const showExcerpt = shouldShowPostExcerpt(content, excerpt);
+  const parsed = parseServiceAreaContent(content);
+  const faqItems = parsed.faqCategoryRef
+    ? await listPublishedPublicFaqsForCategoryRef(parsed.faqCategoryRef)
+    : undefined;
+
   return (
     <div className="service-area-featured-intro">
       {featuredImage?.src ? (
@@ -25,13 +34,13 @@ export function BlogPostBody({
         </>
       ) : null}
 
-      {excerpt.trim() ? (
+      {showExcerpt ? (
         <div className="service-area-html-content service-area-default-intro">
           <p>{excerpt.trim()}</p>
         </div>
       ) : null}
 
-      <ServiceAreaHtmlContent html={content} />
+      <ServiceAreaContentPanel content={content} faqItems={faqItems} />
     </div>
   );
 }
