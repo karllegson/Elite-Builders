@@ -855,46 +855,7 @@ body {
     transform: scale(1);
   }
 
-  .site .service-area-html-content .site-quick-summary {
-    margin: 1.5rem 0 2rem;
-    padding: 1.25rem 1.5rem;
-    background: #f5f5f5;
-    border: 1px solid #e0e0e0;
-    border-radius: 0.5rem;
-  }
-
-  .site .service-area-html-content .site-quick-summary__title {
-    margin: 0 0 0.5rem;
-    color: var(--color-brand-blue);
-    font-size: 1rem;
-    font-weight: 600;
-    line-height: 1.4;
-  }
-
-  .site .service-area-html-content .site-quick-summary__body {
-    color: #555;
-    font-size: 0.9375rem;
-    line-height: 1.65;
-  }
-
-  .site .service-area-html-content .site-quick-summary__body p {
-    margin: 0;
-    color: inherit;
-  }
-
-  .site .service-area-html-content .site-quick-summary__body p + p {
-    margin-top: 0.75rem;
-  }
-
-  .site .service-area-html-content .site-quick-summary__body a {
-    color: var(--color-brand-blue);
-    text-decoration: underline;
-  }
-
-  .site .service-area-html-content .site-quick-summary__body a:hover,
-  .site .service-area-html-content .site-quick-summary__body a:focus-visible {
-    color: var(--color-brand-blue-dark);
-  }
+  /* Quick Summary card styles live outside @layer (see bottom of file). */
 
   /* WordPress-style quick links blocks (fallback if markup is not transformed) */
   .site .service-area-html-content .block-title:has(+ .block-content) {
@@ -1360,8 +1321,56 @@ body {
 }
 
 /* Highlight / Quick Summary boxes — outside @layer so .site * reset cannot strip borders */
-.site .service-area-html-content .highlight-box,
-.site .service-area-html-content .quick-summary {
+.site .service-area-html-content .site-quick-summary {
+  display: block;
+  margin: 0 0 1.5rem;
+  padding: 1.5rem 1.75rem;
+  background: #f7f8f9;
+  border: 1px solid #e2e5e9;
+  border-radius: 0.625rem;
+}
+
+.site .service-area-html-content .site-quick-summary__title {
+  margin: 0 0 0.75rem;
+  color: var(--color-brand-blue);
+  font-size: 1.125rem;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.site .service-area-html-content .site-quick-summary__body {
+  color: var(--color-site-text-dark);
+  font-size: 1rem;
+  line-height: 1.75;
+}
+
+.site .service-area-html-content .site-quick-summary__body p {
+  margin: 0;
+  color: inherit;
+  font-style: normal;
+}
+
+.site .service-area-html-content .site-quick-summary__body em,
+.site .service-area-html-content .site-quick-summary__body i {
+  font-style: normal;
+}
+
+.site .service-area-html-content .site-quick-summary__body p + p {
+  margin-top: 0.75rem;
+}
+
+.site .service-area-html-content .site-quick-summary__body a {
+  color: var(--color-brand-blue);
+  text-decoration: underline;
+}
+
+.site .service-area-html-content .site-quick-summary__body a:hover,
+.site .service-area-html-content .site-quick-summary__body a:focus-visible {
+  color: var(--color-brand-blue-dark);
+}
+
+.site .service-area-html-content .highlight-box:not(:has(.site-quick-summary)),
+.site .service-area-html-content .quick-summary:not(:has(.site-quick-summary)) {
   margin: 0 0 1.5rem;
   padding: 1.25rem 1.5rem;
   background: #f7f8f9;
@@ -1369,40 +1378,49 @@ body {
   border-radius: 0.375rem;
 }
 
-.site .service-area-html-content .highlight-box > :first-child,
-.site .service-area-html-content .quick-summary > :first-child {
+.site .service-area-html-content .highlight-box:has(.site-quick-summary),
+.site .service-area-html-content .quick-summary:has(.site-quick-summary) {
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+}
+
+.site .service-area-html-content .highlight-box:not(:has(.site-quick-summary)) > :first-child,
+.site .service-area-html-content .quick-summary:not(:has(.site-quick-summary)) > :first-child {
   margin-top: 0;
 }
 
-.site .service-area-html-content .highlight-box > :last-child,
-.site .service-area-html-content .quick-summary > :last-child {
+.site .service-area-html-content .highlight-box:not(:has(.site-quick-summary)) > :last-child,
+.site .service-area-html-content .quick-summary:not(:has(.site-quick-summary)) > :last-child {
   margin-bottom: 0;
 }
 
-.site .service-area-html-content .quick-summary h2 {
+.site .service-area-html-content .quick-summary:not(:has(.site-quick-summary)) h2 {
   margin: 0 0 0.75rem;
   font-size: clamp(1.35rem, 2.2vw, 1.75rem);
   font-weight: 700;
   color: var(--color-brand-navy);
 }
 
-.site .service-area-html-content .quick-summary h1,
-.site .service-area-html-content .quick-summary h3,
-.site .service-area-html-content .quick-summary h4 {
+.site .service-area-html-content .quick-summary:not(:has(.site-quick-summary)) h1,
+.site .service-area-html-content .quick-summary:not(:has(.site-quick-summary)) h3,
+.site .service-area-html-content .quick-summary:not(:has(.site-quick-summary)) h4 {
   margin: 0 0 0.75rem;
   font-size: 1.125rem;
   font-weight: 700;
   color: var(--color-brand-navy);
 }
 
-.site .service-area-html-content .quick-summary p {
+.site .service-area-html-content .quick-summary:not(:has(.site-quick-summary)) p {
   margin: 0;
   color: var(--color-site-text-dark);
   font-style: normal;
   line-height: 1.75;
 }
 
-.site .service-area-html-content .quick-summary em,
-.site .service-area-html-content .quick-summary i {
+.site .service-area-html-content .quick-summary:not(:has(.site-quick-summary)) em,
+.site .service-area-html-content .quick-summary:not(:has(.site-quick-summary)) i {
   font-style: normal;
 }

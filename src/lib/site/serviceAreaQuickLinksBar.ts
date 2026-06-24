@@ -55,8 +55,11 @@ function ensureQuickLinksNav(
   container: HTMLElement,
   fullContent: string,
 ): HTMLElement | null {
-  const contentRoot = container.querySelector<HTMLElement>(".service-area-html-content");
-  if (!contentRoot) {
+  const contentRoots = Array.from(
+    container.querySelectorAll<HTMLElement>(".service-area-html-content"),
+  );
+
+  if (contentRoots.length === 0) {
     return null;
   }
 
@@ -65,13 +68,15 @@ function ensureQuickLinksNav(
     return nav;
   }
 
-  if (!/quick links/i.test(contentRoot.innerHTML)) {
-    return null;
-  }
+  for (const contentRoot of contentRoots) {
+    if (!/quick links/i.test(contentRoot.innerHTML)) {
+      continue;
+    }
 
-  const upgraded = prepareServiceAreaHtml(contentRoot.innerHTML, fullContent);
-  if (upgraded !== contentRoot.innerHTML) {
-    contentRoot.innerHTML = upgraded;
+    const upgraded = prepareServiceAreaHtml(contentRoot.innerHTML, fullContent);
+    if (upgraded !== contentRoot.innerHTML) {
+      contentRoot.innerHTML = upgraded;
+    }
   }
 
   return container.querySelector<HTMLElement>(".site-quick-links");

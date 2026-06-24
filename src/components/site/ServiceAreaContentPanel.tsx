@@ -57,12 +57,9 @@ export function ServiceAreaContentPanel({
     }
 
     panel.querySelectorAll(".service-area-html-content").forEach((root) => {
-      const currentHtml = root.innerHTML;
-      if (/Quick Links|Quick Summary|site-btn btn-pill|\[cta/i.test(currentHtml)) {
-        const upgraded = prepareServiceAreaHtml(currentHtml, content, { ctaButton });
-        if (upgraded !== currentHtml) {
-          root.innerHTML = upgraded;
-        }
+      const upgraded = prepareServiceAreaHtml(root.innerHTML, content, { ctaButton });
+      if (upgraded !== root.innerHTML) {
+        root.innerHTML = upgraded;
       }
     });
 
