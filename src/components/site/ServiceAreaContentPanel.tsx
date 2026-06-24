@@ -1,12 +1,20 @@
 "use client";
 
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, useTransition } from "react";
 import { fetchPublishedFaqsForCategoryRefAction } from "@/app/admin/(shell)/faqs/actions";
+import { useServiceAreaQuickLinkNavigation } from "@/hooks/useServiceAreaQuickLinkNavigation";
+import { initServiceAreaQuickLinksBar } from "@/lib/site/serviceAreaQuickLinksBar";
 import { ServiceAreaFaqAccordion } from "@/components/site/ServiceAreaFaqAccordion";
+import { ServiceAreaFaqEmpty } from "@/components/site/ServiceAreaFaqEmpty";
 import { ServiceAreaHtmlContent } from "@/components/site/ServiceAreaHtmlContent";
 import { ServiceAreaMapEmbed } from "@/components/site/ServiceAreaMapEmbed";
+import { ServiceAreaReviewsSection } from "@/components/site/ServiceAreaReviewsSection";
 import type { PublicFaqItem } from "@/lib/site/faqsPublic";
-import { parseServiceAreaContent } from "@/lib/site/serviceAreaContent";
+import { getCtaButtonConfig } from "@/lib/site/runtimeSiteConfig";
+import {
+  parseServiceAreaContent,
+  prepareServiceAreaHtml,
+} from "@/lib/site/serviceAreaContent";
 
 type ServiceAreaContentPanelProps = {
   content: string;
@@ -19,9 +27,52 @@ export function ServiceAreaContentPanel({
   mapEmbed = "",
   faqItems: initialFaqItems,
 }: ServiceAreaContentPanelProps) {
-  const parsed = useMemo(() => parseServiceAreaContent(content), [content]);
+  const contentPanelRef = useRef<HTMLDivElement>(null);
+  const ctaButton = useMemo(() => getCtaButtonConfig(), []);
   const [fetchedFaqItems, setFetchedFaqItems] = useState<PublicFaqItem[] | null>(null);
   const [, startTransition] = useTransition();
+
+  const preparedContent = useMemo(
+    () => prepareServiceAreaHtml(content, content, { ctaButton }),
+    [content, ctaButton],
+  );
+
+  const parsed = useMemo(
+    () => parseServiceAreaContent(preparedContent),
+    [preparedContent],
+  );
+
+  const contentRenderKey = [
+    parsed.htmlBeforeReviews,
+    parsed.htmlAfterReviews,
+    parsed.reviewsBlock?.amount,
+    parsed.reviewsBlock?.categoryRef,
+    parsed.faqCategoryRef,
+  ].join("|");
+
+  useLayoutEffect(() => {
+    const panel = contentPanelRef.current;
+    if (!panel) {
+      return;
+    }
+
+    panel.querySelectorAll(".service-area-html-content").forEach((root) => {
+      const currentHtml = root.innerHTML;
+      if (/Quick Links|Quick Summary|site-btn btn-pill|\[cta/i.test(currentHtml)) {
+        const upgraded = prepareServiceAreaHtml(currentHtml, content, { ctaButton });
+        if (upgraded !== currentHtml) {
+          root.innerHTML = upgraded;
+        }
+      }
+    });
+
+    const cleanup = initServiceAreaQuickLinksBar(panel, content);
+    return () => {
+      cleanup?.();
+    };
+  }, [content, contentRenderKey, ctaButton]);
+
+  useServiceAreaQuickLinkNavigation(contentPanelRef, preparedContent);
 
   useEffect(() => {
     if (initialFaqItems !== undefined || !parsed.faqCategoryRef) {
@@ -48,8 +99,18 @@ export function ServiceAreaContentPanel({
     initialFaqItems === undefined && Boolean(parsed.faqCategoryRef) && fetchedFaqItems === null;
 
   return (
-    <div className="service-area-content-panel">
-      <ServiceAreaHtmlContent html={parsed.htmlBeforeFaqs} />
+    <div ref={contentPanelRef} className="service-area-content-panel">
+      {parsed.htmlBeforeReviews ? (
+        <ServiceAreaHtmlContent html={parsed.htmlBeforeReviews} skipPrepare />
+      ) : null}
+
+      {parsed.reviewsBlock ? (
+        <ServiceAreaReviewsSection config={parsed.reviewsBlock} />
+      ) : null}
+
+      {parsed.htmlAfterReviews ? (
+        <ServiceAreaHtmlContent html={parsed.htmlAfterReviews} skipPrepare />
+      ) : null}
 
       {parsed.faqCategoryRef ? (
         isLoading ? (
@@ -60,12 +121,7 @@ export function ServiceAreaContentPanel({
             Loading FAQs…
           </p>
         ) : faqItems.length === 0 ? (
-          <p
-            className="mt-8 rounded-lg border border-dashed border-gray-300 p-4 text-sm text-gray-500"
-            role="status"
-          >
-            No published FAQs were found for category &ldquo;{parsed.faqCategoryRef}&rdquo;.
-          </p>
+          <ServiceAreaFaqEmpty />
         ) : (
           <ServiceAreaFaqAccordion items={faqItems} />
         )

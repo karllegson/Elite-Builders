@@ -33,9 +33,13 @@ export function ServiceAreaFaqAccordion({ items }: ServiceAreaFaqAccordionProps)
 
   return (
     <section
+      data-quick-link-id="faq"
       className="mt-8 border-t border-solid border-gray-200 pt-8"
-      aria-label="Frequently asked questions"
+      aria-labelledby="service-area-faq-heading"
     >
+      <h2 id="service-area-faq-heading" className="sr-only">
+        FAQ
+      </h2>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}

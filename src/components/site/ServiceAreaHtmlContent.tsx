@@ -1,20 +1,28 @@
-import { transformQuickSummaryBlocks } from "@/lib/site/postContent";
+import { prepareServiceAreaHtml } from "@/lib/site/serviceAreaContent";
 
 type ServiceAreaHtmlContentProps = {
   html: string;
+  linkSourceHtml?: string;
+  skipPrepare?: boolean;
 };
 
-export function ServiceAreaHtmlContent({ html }: ServiceAreaHtmlContentProps) {
-  const normalizedHtml = transformQuickSummaryBlocks(html);
-
-  if (!normalizedHtml.trim()) {
+export function ServiceAreaHtmlContent({
+  html,
+  linkSourceHtml,
+  skipPrepare = false,
+}: ServiceAreaHtmlContentProps) {
+  if (!html.trim()) {
     return null;
   }
+
+  const prepared = skipPrepare
+    ? html
+    : prepareServiceAreaHtml(html, linkSourceHtml ?? html);
 
   return (
     <div
       className="service-area-html-content"
-      dangerouslySetInnerHTML={{ __html: normalizedHtml }}
+      dangerouslySetInnerHTML={{ __html: prepared }}
     />
   );
 }
