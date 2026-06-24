@@ -2,15 +2,13 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   fetchFaqForEditAction,
   saveFaqAction,
 } from "@/app/admin/(shell)/faqs/actions";
-import { AdminPostContentEditor } from "@/components/admin/posts/AdminPostContentEditor";
-import { PostEditorToolbar } from "@/components/admin/posts/PostEditorToolbar";
+import { HtmlIdeEditor } from "@/components/admin/HtmlIdeEditor";
 import { FaqEditorSidebar } from "@/components/admin/faqs/FaqEditorSidebar";
-import { countWords } from "@/lib/admin/postEditor";
 import { useAdminToast } from "@/components/admin/toast/useAdminToast";
 
 type FaqEditorProps = {
@@ -21,7 +19,6 @@ export function FaqEditor({ faqId }: FaqEditorProps) {
   const toast = useAdminToast();
   const router = useRouter();
   const isEditing = Boolean(faqId);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [recordId, setRecordId] = useState<string | undefined>(faqId);
   const [loaded, setLoaded] = useState(!isEditing);
   const [missing, setMissing] = useState(false);
@@ -29,7 +26,6 @@ export function FaqEditor({ faqId }: FaqEditorProps) {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [categoryId, setCategoryId] = useState<string | null>(null);
-  const wordCount = countWords(content);
 
   useEffect(() => {
     if (!faqId) {
@@ -124,19 +120,12 @@ export function FaqEditor({ faqId }: FaqEditorProps) {
           autoComplete="off"
         />
 
-        <PostEditorToolbar textareaRef={textareaRef} onContentChange={setContent} />
-
-        <AdminPostContentEditor
+        <HtmlIdeEditor
           id="faq-content"
           value={content}
           onChange={setContent}
-          textareaRef={textareaRef}
-          ariaLabel="FAQ content"
+          ariaLabel="FAQ HTML content"
         />
-
-        <div className="admin-post-editor-footer">
-          <span>Word count: {wordCount}</span>
-        </div>
       </div>
 
       <FaqEditorSidebar
