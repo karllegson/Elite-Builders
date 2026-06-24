@@ -12,6 +12,8 @@ export type RuntimeSiteConfig = {
   heroHeadline: string;
   homepagePrimaryCtaText: string;
   homepagePrimaryCtaLink: string;
+  ctaButtonText: string;
+  ctaButtonPage: string;
 };
 
 function toRuntime(values: Record<string, string>): RuntimeSiteConfig {
@@ -26,6 +28,8 @@ function toRuntime(values: Record<string, string>): RuntimeSiteConfig {
     heroHeadline: merged.heroHeadline || defaults.heroHeadline,
     homepagePrimaryCtaText: merged.homepagePrimaryCtaText || defaults.homepagePrimaryCtaText,
     homepagePrimaryCtaLink: merged.homepagePrimaryCtaLink || defaults.homepagePrimaryCtaLink,
+    ctaButtonText: merged.ctaButtonText || defaults.ctaButtonText,
+    ctaButtonPage: merged.ctaButtonPage || defaults.ctaButtonPage,
   };
 }
 
@@ -52,5 +56,27 @@ export function readRuntimeSiteConfig(): RuntimeSiteConfig {
 export function phoneToHref(phone: string): string {
   const digits = phone.replace(/[^\d+]/g, "");
   return digits ? `tel:${digits}` : "tel:+12094842743";
+}
+
+export function normalizeCtaButtonHref(href: string): string {
+  const trimmed = href.trim() || "/contact";
+
+  if (/^https?:\/\//i.test(trimmed) || trimmed.startsWith("mailto:") || trimmed.startsWith("tel:")) {
+    return trimmed;
+  }
+
+  const withLeadingSlash = trimmed.startsWith("/") ? trimmed : `/${trimmed}`;
+  return withLeadingSlash.endsWith("/") ? withLeadingSlash : `${withLeadingSlash}/`;
+}
+
+export function getCtaButtonConfig(
+  config: Pick<RuntimeSiteConfig, "ctaButtonText" | "ctaButtonPage"> = readRuntimeSiteConfig(),
+): { label: string; href: string } {
+  const defaults = createDefaultSiteConfigValues();
+
+  return {
+    label: config.ctaButtonText.trim() || defaults.ctaButtonText,
+    href: normalizeCtaButtonHref(config.ctaButtonPage || defaults.ctaButtonPage),
+  };
 }
 
