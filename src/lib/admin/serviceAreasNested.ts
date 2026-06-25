@@ -150,6 +150,35 @@ export function flattenServiceAreaTree(
   return rows;
 }
 
+export type ServiceAreaDateSortDirection = "asc" | "desc";
+
+function getServiceAreaSortDate(area: ServiceAreaRecord): number {
+  return new Date(area.publishedAt ?? area.updatedAt).getTime();
+}
+
+export function sortServiceAreaTreeByDate(
+  nodes: NestedServiceAreaNode[],
+  direction: ServiceAreaDateSortDirection,
+): NestedServiceAreaNode[] {
+  const multiplier = direction === "asc" ? 1 : -1;
+
+  return [...nodes]
+    .sort((left, right) => {
+      const dateDiff =
+        (getServiceAreaSortDate(left.area) - getServiceAreaSortDate(right.area)) * multiplier;
+
+      if (dateDiff !== 0) {
+        return dateDiff;
+      }
+
+      return left.area.title.localeCompare(right.area.title);
+    })
+    .map((node) => ({
+      area: node.area,
+      children: sortServiceAreaTreeByDate(node.children, direction),
+    }));
+}
+
 export function collectExpandableIds(nodes: NestedServiceAreaNode[]): string[] {
   const ids: string[] = [];
 

@@ -1,6 +1,14 @@
 "use client";
 
-import { ChevronDown, ChevronRight, CornerDownLeft, ExternalLink, Link2 } from "lucide-react";
+import {
+  ArrowDown,
+  ArrowUp,
+  ChevronDown,
+  ChevronRight,
+  CornerDownLeft,
+  ExternalLink,
+  Link2,
+} from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useAdminToast } from "@/components/admin/toast/useAdminToast";
@@ -14,6 +22,8 @@ import { ensureServiceAreasStoreReady } from "@/lib/admin/serviceAreasSync.clien
 import {
   buildFilteredServiceAreaTree,
   flattenServiceAreaTree,
+  sortServiceAreaTreeByDate,
+  type ServiceAreaDateSortDirection,
 } from "@/lib/admin/serviceAreasNested";
 import {
   filterServiceAreaListItems,
@@ -32,6 +42,37 @@ import {
 } from "@/lib/admin/serviceAreasList";
 
 const PER_PAGE = 20;
+
+type SortableDateHeaderProps = {
+  isActive: boolean;
+  sortDirection: ServiceAreaDateSortDirection;
+  onSort: () => void;
+};
+
+function SortableDateHeader({ isActive, sortDirection, onSort }: SortableDateHeaderProps) {
+  return (
+    <th scope="col" className="admin-posts-col-date">
+      <button
+        type="button"
+        className={`admin-categories-sort${isActive ? " is-active" : ""}`}
+        onClick={onSort}
+      >
+        <span>Date</span>
+        {isActive ? (
+          sortDirection === "asc" ? (
+            <ArrowUp size={12} aria-hidden />
+          ) : (
+            <ArrowDown size={12} aria-hidden />
+          )
+        ) : (
+          <span className="admin-categories-sort-idle" aria-hidden>
+            ↕
+          </span>
+        )}
+      </button>
+    </th>
+  );
+}
 
 function ServiceAreaStatusLabel({ item }: { item: ServiceAreaListItem }) {
   if (item.status === "draft") {
@@ -240,6 +281,9 @@ export function ServiceAreasList() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkAction, setBulkAction] = useState("");
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+  const [dateSortActive, setDateSortActive] = useState(false);
+  const [dateSortDirection, setDateSortDirection] =
+    useState<ServiceAreaDateSortDirection>("desc");
 
   useEffect(() => {
     const refresh = () => {
@@ -279,9 +323,17 @@ export function ServiceAreasList() {
     );
   }, [activeAreas, filteredItems]);
 
+  const displayTree = useMemo(() => {
+    if (!dateSortActive) {
+      return filteredTree;
+    }
+
+    return sortServiceAreaTreeByDate(filteredTree, dateSortDirection);
+  }, [dateSortActive, dateSortDirection, filteredTree]);
+
   const pagination = useMemo(
-    () => paginateServiceAreaTreeRoots(filteredTree, page, PER_PAGE),
-    [filteredTree, page],
+    () => paginateServiceAreaTreeRoots(displayTree, page, PER_PAGE),
+    [displayTree, page],
   );
 
   const visibleRows = useMemo(
@@ -333,6 +385,18 @@ export function ServiceAreasList() {
   };
 
   const handleFilter = () => {
+    setPage(1);
+    setSelectedIds(new Set());
+  };
+
+  const handleDateSort = () => {
+    if (dateSortActive) {
+      setDateSortDirection((current) => (current === "asc" ? "desc" : "asc"));
+    } else {
+      setDateSortActive(true);
+      setDateSortDirection("desc");
+    }
+
     setPage(1);
     setSelectedIds(new Set());
   };
@@ -450,9 +514,11 @@ export function ServiceAreasList() {
               <th scope="col" className="admin-posts-col-author">
                 Author
               </th>
-              <th scope="col" className="admin-posts-col-date">
-                Date
-              </th>
+              <SortableDateHeader
+                isActive={dateSortActive}
+                sortDirection={dateSortDirection}
+                onSort={handleDateSort}
+              />
               <th scope="col" className="admin-posts-col-id">
                 ID
               </th>
