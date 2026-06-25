@@ -25,6 +25,11 @@ function shouldServeFeaturedImageUnoptimized(src: string): boolean {
     return true;
   }
 
+  // Remote URLs (WordPress, CDN, etc.) — skip the optimizer to avoid hostname config errors.
+  if (src.startsWith("http://") || src.startsWith("https://")) {
+    return true;
+  }
+
   return false;
 }
 

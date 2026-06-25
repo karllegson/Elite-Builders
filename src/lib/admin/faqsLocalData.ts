@@ -28,9 +28,8 @@ export async function readFaqsStoreFromDisk(): Promise<FaqsStore> {
       "code" in error &&
       (error as NodeJS.ErrnoException).code === "ENOENT"
     ) {
-      const seeded = createDefaultStore();
-      await writeFaqsStoreToDisk(seeded);
-      return seeded;
+      // Production (e.g. Vercel) has a read-only filesystem — seed in memory only.
+      return createDefaultStore();
     }
 
     return createDefaultStore();
