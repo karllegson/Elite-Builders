@@ -19,7 +19,7 @@ export async function BlogPostBody({
   const showExcerpt = shouldShowPostExcerpt(content, excerpt);
   const parsed = parseServiceAreaContent(content);
   const faqItems = parsed.faqCategoryRef
-    ? await listPublishedPublicFaqsForCategoryRef(parsed.faqCategoryRef)
+    ? await listPublishedPublicFaqsForCategoryRef(parsed.faqCategoryRef).catch(() => [])
     : undefined;
 
   return (
