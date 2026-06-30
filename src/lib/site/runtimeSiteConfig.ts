@@ -55,7 +55,7 @@ export function readRuntimeSiteConfig(): RuntimeSiteConfig {
 
 export function phoneToHref(phone: string): string {
   const digits = phone.replace(/[^\d+]/g, "");
-  return digits ? `tel:${digits}` : "tel:+12094842743";
+  return digits ? `tel:${digits}` : "tel:+12093456727";
 }
 
 export function normalizeCtaButtonHref(href: string): string {
