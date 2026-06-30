@@ -4,20 +4,7 @@ import { serviceAreas, services } from "@/lib/site/config";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
-  const staticRoutes = [
-    "",
-    "/about",
-    "/contact",
-    "/projects",
-    "/services",
-    "/service-areas",
-    "/blog",
-    "/services/framing",
-    "/services/remodeling",
-    "/services/siding",
-    "/services/decks",
-    "/services/general-contracting",
-  ];
+  const staticRoutes = ["", "/about", "/contact", "/projects", "/services", "/service-areas", "/blog"];
 
   return [
     ...staticRoutes.map((path) => ({

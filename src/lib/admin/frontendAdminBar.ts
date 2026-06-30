@@ -71,11 +71,23 @@ const ROUTE_MATCHERS: RouteMatcher[] = [
     ],
   },
   {
-    test: (pathname) => pathname.startsWith("/services"),
+    test: (pathname) => pathname === "/services",
     items: () => [
-      { label: "Edit Pages", href: "/admin/pages" },
+      { label: "Edit Service Pages", href: "/admin/pages" },
       { label: "Dashboard", href: "/admin" },
     ],
+  },
+  {
+    test: (pathname) => /^\/services\/[^/]+\/?$/.test(pathname),
+    items: (pathname) => {
+      const slug = pathname.match(/^\/services\/([^/]+)\/?$/)?.[1] ?? "";
+
+      return [
+        { label: "Edit Service Page", href: `/admin/services/${slug}` },
+        { label: "All Service Pages", href: "/admin/pages" },
+        { label: "Dashboard", href: "/admin" },
+      ];
+    },
   },
   {
     test: (pathname) => pathname in PAGE_EDIT_ROUTES,

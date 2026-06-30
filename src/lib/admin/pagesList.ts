@@ -1,5 +1,7 @@
 import type { ServiceAreaRecord } from "@/lib/admin/serviceAreasData";
 import { isTopLevelServiceArea } from "@/lib/admin/serviceAreasData";
+import type { ServicePageRecord } from "@/lib/admin/servicesData";
+import { createDefaultServicePagesStore } from "@/lib/admin/servicesData";
 import { serviceAreas as staticServiceAreas } from "@/lib/site/config";
 import { getServiceAreaPublicHref } from "@/lib/site/serviceAreaUrls";
 
@@ -126,12 +128,36 @@ function buildServiceAreaLandingPages(areas: ServiceAreaRecord[]): PageTreeItem[
   });
 }
 
-/** Live Next.js routes — read-only until a pages CMS is connected. */
-export function getSitePages(serviceAreas: ServiceAreaRecord[] = []): PageTreeItem[] {
+function buildServicePages(servicePages: ServicePageRecord[]): PageTreeItem[] {
+  return servicePages
+    .slice()
+    .sort(
+      (left, right) =>
+        left.sortOrder - right.sortOrder || left.title.localeCompare(right.title),
+    )
+    .map((page) => ({
+      id: page.id,
+      title: page.title,
+      status: page.status,
+      href: `/services/${page.slug}`,
+      adminHref: `/admin/services/${page.slug}`,
+    }));
+}
+
+/** Live Next.js routes — service pages sync from the services store; service areas from their store. */
+export function getSitePages(
+  serviceAreas: ServiceAreaRecord[] = [],
+  servicePages: ServicePageRecord[] = [],
+): PageTreeItem[] {
   const serviceAreaChildren =
     serviceAreas.length > 0
       ? buildServiceAreaLandingPages(serviceAreas)
       : buildFallbackServiceAreaLandingPages();
+
+  const serviceChildren =
+    servicePages.length > 0
+      ? buildServicePages(servicePages)
+      : buildServicePages(createDefaultServicePagesStore().pages);
 
   return [
     {
@@ -147,18 +173,7 @@ export function getSitePages(serviceAreas: ServiceAreaRecord[] = []): PageTreeIt
       title: "Services",
       status: "published",
       href: "/services",
-      children: [
-        { id: "services-framing", title: "Rough Framing", status: "published", href: "/services/framing" },
-        { id: "services-remodeling", title: "Remodeling", status: "published", href: "/services/remodeling" },
-        { id: "services-siding", title: "Siding", status: "published", href: "/services/siding" },
-        { id: "services-decks", title: "Decks & Porches", status: "published", href: "/services/decks" },
-        {
-          id: "services-general-contracting",
-          title: "General Contracting",
-          status: "draft",
-          href: "/services/general-contracting",
-        },
-      ],
+      children: serviceChildren,
     },
     { id: "projects", title: "Projects", status: "published", href: "/projects" },
     {

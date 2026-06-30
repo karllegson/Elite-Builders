@@ -37,40 +37,76 @@ export type SiteService = {
 
 export const services: SiteService[] = [
   {
-    title: "Rough Framing",
-    slug: "framing",
-    href: "/services/framing",
-    shortDescription:
-      "Precision rough carpentry — walls, floors, roofs, trusses, shear panels, and structural hardware for residential and commercial builds.",
-    icon: "hammer",
-    image: "residentialRoofFraming",
-  },
-  {
     title: "Remodeling",
     slug: "remodeling",
     href: "/services/remodeling",
     shortDescription:
-      "Structural modifications, renovations, additions, and upgrades to existing residential and commercial spaces.",
+      "Structural modifications, renovations, and upgrades to existing residential and commercial spaces.",
     icon: "clipboard",
     image: "customKitchenRemodel",
   },
   {
-    title: "Siding",
-    slug: "siding",
-    href: "/services/siding",
+    title: "Home Addition Construction",
+    slug: "home-addition-construction",
+    href: "/services/home-addition-construction",
     shortDescription:
-      "Fiber cement, wood, and composite siding and trim installation that protects your building and boosts curb appeal.",
-    icon: "layers",
-    image: "sidingInstallation",
+      "Room expansions, second stories, and structural additions that integrate seamlessly with your existing home.",
+    icon: "building",
+    image: "twoStoryHomeFramingExterior",
   },
   {
-    title: "Decks & Porches",
-    slug: "decks",
-    href: "/services/decks",
+    title: "Home Building",
+    slug: "home-building",
+    href: "/services/home-building",
     shortDescription:
-      "Custom wood and composite decks and porches built with the same structural precision we bring to framing.",
+      "Custom and production new home construction — framing-first builds across Northern California.",
+    icon: "hammer",
+    image: "customHomeFramingCrew",
+  },
+  {
+    title: "Luxury Home Building",
+    slug: "luxury-home-building",
+    href: "/services/luxury-home-building",
+    shortDescription:
+      "High-end custom homes built with framing-first precision for homeowners who expect excellence.",
+    icon: "building",
+    image: "luxuryHomeInterior",
+  },
+  {
+    title: "Fence Building",
+    slug: "fence-building",
+    href: "/services/fence-building",
+    shortDescription:
+      "Durable wood and composite fences — privacy, security, and curb appeal built to last.",
     icon: "fence",
     image: "deckPorch",
+  },
+  {
+    title: "Deck Construction",
+    slug: "deck-construction",
+    href: "/services/deck-construction",
+    shortDescription:
+      "Custom wood and composite decks built with the same structural precision we bring to every build.",
+    icon: "fence",
+    image: "deckPorch",
+  },
+  {
+    title: "Patio Construction",
+    slug: "patio-construction",
+    href: "/services/patio-construction",
+    shortDescription:
+      "Patios and covered outdoor living spaces designed for California entertaining.",
+    icon: "layers",
+    image: "patioDoorsOutdoorLiving",
+  },
+  {
+    title: "Tiny Home Building",
+    slug: "tiny-home-building",
+    href: "/services/tiny-home-building",
+    shortDescription:
+      "Tiny homes and ADUs — compact, code-compliant builds for extra living space on your property.",
+    icon: "building",
+    image: "residentialWallFramingSky",
   },
 ];
 
@@ -289,43 +325,49 @@ export const utilityNavLinks = [
 
 export const serviceMenuGroups = [
   {
-    title: "Rough Framing",
+    title: "Remodeling & Additions",
     description:
-      "Precision rough carpentry — walls, floors, roofs, trusses, shear panels, and structural hardware.",
-    href: "/services/framing",
-    links: [
-      { label: "Residential Framing", href: "/services/framing" },
-      { label: "Commercial & Multi-Family", href: "/services/framing" },
-      { label: "Production-Builder Framing", href: "/services/framing" },
-    ],
-  },
-  {
-    title: "Remodeling",
-    description:
-      "Structural modifications, renovations, additions, and upgrades to existing spaces.",
+      "Renovations, structural modifications, and home additions for growing families.",
     href: "/services/remodeling",
     links: [
-      { label: "Home Remodels & Additions", href: "/services/remodeling" },
-      { label: "Structural Modifications", href: "/services/remodeling" },
-      { label: "Renovations & Upgrades", href: "/services/remodeling" },
+      { label: "Remodeling", href: "/services/remodeling" },
+      { label: "Home Addition Construction", href: "/services/home-addition-construction" },
     ],
   },
   {
-    title: "Siding & Decks",
+    title: "New Construction",
     description:
-      "Siding, trim, decks, and porches — built with framing-first precision.",
+      "Custom homes, luxury builds, and tiny homes — framing-first construction across Northern California.",
+    href: "/services/home-building",
+    links: [
+      { label: "Home Building", href: "/services/home-building" },
+      { label: "Luxury Home Building", href: "/services/luxury-home-building" },
+      { label: "Tiny Home Building", href: "/services/tiny-home-building" },
+    ],
+  },
+  {
+    title: "Outdoor Structures",
+    description:
+      "Decks, patios, and fences — outdoor living built with structural precision.",
     href: "/services",
     links: [
-      { label: "Siding Installation", href: "/services/siding" },
-      { label: "Decks & Porches", href: "/services/decks" },
+      { label: "Deck Construction", href: "/services/deck-construction" },
+      { label: "Patio Construction", href: "/services/patio-construction" },
+      { label: "Fence Building", href: "/services/fence-building" },
       { label: "All Services", href: "/services" },
     ],
   },
 ] as const;
 
+/** Flat service list for mobile nav — matches Elite Builders' official service lineup. */
+export const serviceNavLinks = services.map((service) => ({
+  label: service.title,
+  href: service.href,
+}));
+
 export const whyUsNavLinks = [
   { label: "Why Choose Elite Builders", href: "/#why-us" },
-  { label: "Framing-First Expertise", href: "/services/framing" },
+  { label: "Home Building Expertise", href: "/services/home-building" },
   { label: "Meet Our Team", href: "/#team" },
   { label: "Featured Projects", href: "/projects" },
   { label: "Customer Reviews", href: "/#reviews" },

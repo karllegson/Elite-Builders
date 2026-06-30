@@ -24,10 +24,14 @@ export type ContactSubmission = {
 };
 
 export const CONTACT_FORM_SERVICE_LABELS: Record<string, string> = {
-  "rough-framing": "Rough Framing",
   remodeling: "Remodeling",
-  siding: "Siding",
-  decks: "Decks & Porches",
+  "home-addition-construction": "Home Addition Construction",
+  "home-building": "Home Building",
+  "luxury-home-building": "Luxury Home Building",
+  "fence-building": "Fence Building",
+  "deck-construction": "Deck Construction",
+  "patio-construction": "Patio Construction",
+  "tiny-home-building": "Tiny Home Building",
   other: "Other",
 };
 

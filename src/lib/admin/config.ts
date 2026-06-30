@@ -128,6 +128,7 @@ export const adminPageTitles: Record<string, string> = {
   "/admin/service-areas/new": "Add New Service Area",
   "/admin/service-areas/sorting": "Sorting",
   "/admin/service-areas/nested": "Nested View",
+  "/admin/services/[slug]": "Edit Service Page",
   "/admin/faqs": "All FAQs",
   "/admin/faqs/new": "Add New FAQ",
   "/admin/faqs/categories": "Categories",
