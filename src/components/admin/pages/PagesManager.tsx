@@ -27,6 +27,12 @@ import {
   listAllServiceAreas,
   SERVICE_AREAS_CHANGED_EVENT,
 } from "@/lib/admin/serviceAreasData";
+import { ensureServicePagesStoreReady } from "@/lib/admin/servicesSync.client";
+import {
+  listAllServicePages,
+  SERVICE_PAGES_CHANGED_EVENT,
+  updateServicePageQuickEdit,
+} from "@/lib/admin/servicesData";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import {
   countPages,
@@ -287,11 +293,12 @@ export function PagesManager({ initialView = "all" }: { initialView?: PageListVi
 
   useEffect(() => {
     const refreshPages = () => {
-      const nextPages = getSitePages(listAllServiceAreas());
+      const nextPages = getSitePages(listAllServiceAreas(), listAllServicePages());
       setPages(nextPages);
       setExpandedIds((current) => {
         const next = new Set(current);
         next.add("service-areas");
+        next.add("services");
         for (const id of getDefaultExpandedPageIds(nextPages)) {
           next.add(id);
         }
@@ -299,13 +306,17 @@ export function PagesManager({ initialView = "all" }: { initialView?: PageListVi
       });
     };
 
-    void ensureServiceAreasStoreReady().then(refreshPages);
+    void Promise.all([ensureServiceAreasStoreReady(), ensureServicePagesStoreReady()]).then(
+      refreshPages,
+    );
 
     window.addEventListener(SERVICE_AREAS_CHANGED_EVENT, refreshPages);
+    window.addEventListener(SERVICE_PAGES_CHANGED_EVENT, refreshPages);
     window.addEventListener("storage", refreshPages);
 
     return () => {
       window.removeEventListener(SERVICE_AREAS_CHANGED_EVENT, refreshPages);
+      window.removeEventListener(SERVICE_PAGES_CHANGED_EVENT, refreshPages);
       window.removeEventListener("storage", refreshPages);
     };
   }, []);
@@ -400,7 +411,24 @@ export function PagesManager({ initialView = "all" }: { initialView?: PageListVi
   const handleQuickEditUpdate = () => {
     const row = flatRows.find((item) => item.id === quickEditRowId);
 
-    if (row) {
+    if (!row || !quickEditDraft) {
+      closeQuickEdit();
+      return;
+    }
+
+    if (row.id.startsWith("services-") && row.id !== "services") {
+      const updated = updateServicePageQuickEdit(row.id, {
+        title: quickEditDraft.title,
+        status: quickEditDraft.status,
+      });
+
+      if (updated) {
+        toast.success(`Service page updated — ${updated.title}`);
+        setPages(getSitePages(listAllServiceAreas(), listAllServicePages()));
+      } else {
+        toast.error("Could not update this service page.");
+      }
+    } else if (row) {
       toast.success(`Page updated — ${row.title}`);
     }
 
@@ -410,10 +438,11 @@ export function PagesManager({ initialView = "all" }: { initialView?: PageListVi
   return (
     <div className="admin-pages-manager">
       <p className="admin-categories-status-message" role="status">
-        Read-only mirror of live routes. <strong>Service Areas</strong> is a page — city landing
-        pages (e.g. Stockton, CA) and their sub-pages nest underneath. Edit those in{" "}
-        <Link href="/admin/service-areas">Service Areas</Link>. Other pages still require a pages
-        CMS or code changes.
+        <strong>Service pages</strong> and <strong>Service Areas</strong> sync to the live site when
+        you save. Edit service pages from the <strong>Edit</strong> button on each row (or quick
+        edit title/status). Service area city pages nest under Service Areas — edit those in{" "}
+        <Link href="/admin/service-areas">Service Areas</Link>. Other static pages still require
+        code changes.
       </p>
       <div className="admin-pages-toolbar-top">
         <label className="admin-pages-sync-menu">

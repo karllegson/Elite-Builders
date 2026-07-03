@@ -19,6 +19,7 @@ import {
   aboutNavLinks,
   business,
   serviceMenuGroups,
+  serviceNavLinks,
   utilityNavLinks,
   whyUsNavLinks,
 } from "@/lib/site/config";
@@ -353,31 +354,27 @@ export default function SiteHeader({ hasAdminBar = false }: SiteHeaderProps) {
                   />
                 </button>
                 {mobileSection === id && id === "services" && (
-                  <ul className="pb-3 pl-3">
-                    {serviceMenuGroups.map((group) => (
-                      <li key={group.title} className="mt-2">
+                  <ul className="space-y-1 pb-3 pl-3">
+                    {serviceNavLinks.map((link) => (
+                      <li key={link.href}>
                         <Link
-                          href={group.href}
-                          className="block py-1.5 text-sm font-semibold text-brand-blue"
+                          href={link.href}
+                          className="block py-1.5 text-sm text-gray-600"
                           onClick={closeMenus}
                         >
-                          {group.title}
+                          {link.label}
                         </Link>
-                        <ul className="mt-1 space-y-1 pl-3">
-                          {group.links.map((link) => (
-                            <li key={link.label}>
-                              <Link
-                                href={link.href}
-                                className="block py-1 text-sm text-gray-600"
-                                onClick={closeMenus}
-                              >
-                                {link.label}
-                              </Link>
-                            </li>
-                          ))}
-                        </ul>
                       </li>
                     ))}
+                    <li>
+                      <Link
+                        href="/services"
+                        className="block py-1.5 text-sm font-semibold text-brand-blue"
+                        onClick={closeMenus}
+                      >
+                        All Services
+                      </Link>
+                    </li>
                   </ul>
                 )}
                 {mobileSection === id && id === "why-us" && (

@@ -37,112 +37,6 @@ export type ServiceDetail = {
 };
 
 export const serviceDetails: Record<string, ServiceDetail> = {
-  framing: {
-    slug: "framing",
-    name: "Rough Framing",
-    h1: "Rough Framing Contractor — Bay Area & Northern California",
-    metaTitle: "Rough Framing Contractor Bay Area CA",
-    metaDescription:
-      "Residential and commercial rough carpentry and framing across the Bay Area, Central Valley, and Southern California — walls, floors, roofs, trusses, shear panels, and structural hardware. CSLB #970551.",
-    heroImage: "residentialRoofFraming",
-    intro: [
-      "Framing is the backbone of every build — and it is our specialty, not a side service. Elite Builders IX delivers precise, code-compliant rough carpentry for walls, floors, and roof systems across the Bay Area, Central Valley, and Southern California.",
-      "From a single custom home to a multi-plan production community, our experienced crews frame square, plumb, and to spec so every structure passes inspection the first time.",
-    ],
-    scopeHeading: "Our Rough Carpentry Scope",
-    scope: roughCarpentryScope,
-    residential: {
-      heading: "Residential Framing",
-      body: "Custom homes, additions, and remodels framed with the precision and structural know-how that protects everything built on top of the frame.",
-    },
-    commercial: {
-      heading: "Commercial & Production-Builder Framing",
-      body: "We are a trusted rough-carpentry subcontractor for production builders and general contractors, delivering multi-plan tract communities, condominiums, and multi-family projects on schedule.",
-    },
-    faqs: [
-      {
-        question: "Do you frame for production builders and general contractors?",
-        answer:
-          "Yes. Elite Builders IX is a rough-carpentry subcontractor for production builders and GCs including City Ventures, Thomas James Homes, Chadha Construction, Durkin Inc, and Precision General — handling full framing packages from single homes to multi-plan communities.",
-      },
-      {
-        question: "What does your framing scope include?",
-        answer:
-          "Our rough carpentry scope covers framing of walls, floors, and roofs; trusses and beams; decks and porches; siding and trim; vapor barrier at siding; structural shear panels; structural hardware and strapping; interior wood stairs; forklift services; lumber certifications; and material cleanup.",
-      },
-    ],
-  },
-  siding: {
-    slug: "siding",
-    name: "Siding",
-    h1: "Siding Installation — Bay Area & Northern California",
-    metaTitle: "Siding Installation Bay Area CA",
-    metaDescription:
-      "Siding and trim installation, replacement, and weather protection across the Bay Area and Northern California — installed by framing-first specialists. CSLB #970551.",
-    heroImage: "sidingInstallation",
-    intro: [
-      "We install and replace siding and trim per plans and specifications, enhancing both the durability and appearance of your building while protecting it against the elements.",
-      "Because we are framing-first specialists, our siding work is built on a structurally sound envelope — including vapor barrier at siding locations and full wrap where required.",
-    ],
-    scopeHeading: "What Our Siding Work Covers",
-    scope: [
-      "Siding and trim installation per plans and specifications",
-      "Siding replacement and weatherproofing upgrades",
-      "Vapor barrier installation at siding locations",
-      "Full structural wrap when required by the scope of work",
-      "Coordination with framing and shear-panel work for a tight building envelope",
-    ],
-    residential: {
-      heading: "Residential Siding",
-      body: "Protect your home and boost curb appeal with siding and trim installed to last through California seasons.",
-    },
-    commercial: {
-      heading: "Production & Multi-Family Siding",
-      body: "Siding packages for production communities and multi-family builds, coordinated with our framing scope to keep your schedule moving.",
-    },
-    faqs: [
-      {
-        question: "Do you install vapor barrier with siding?",
-        answer:
-          "Yes — we install vapor barrier at siding locations and provide full structural wrap when the scope of work requires it.",
-      },
-    ],
-  },
-  decks: {
-    slug: "decks",
-    name: "Decks & Porches",
-    h1: "Deck & Porch Construction — Bay Area & Northern California",
-    metaTitle: "Deck Construction Bay Area CA",
-    metaDescription:
-      "Custom deck and porch construction across the Bay Area and Northern California, built by structural framing specialists. CSLB #970551.",
-    heroImage: "deckPorch",
-    intro: [
-      "Decks and porches are part of our core rough-carpentry scope. We build outdoor living structures that are square, solid, and built to last through California seasons.",
-      "Every deck and porch is framed with the same structural precision we bring to walls, floors, and roofs.",
-    ],
-    scopeHeading: "What We Build",
-    scope: [
-      "New deck and porch framing and construction",
-      "Structural posts, beams, and joist systems",
-      "Integration with home framing and exterior siding",
-      "Structural hardware and strapping for code compliance",
-    ],
-    residential: {
-      heading: "Residential Decks & Porches",
-      body: "Custom wood and composite outdoor living spaces designed and built to match your home.",
-    },
-    commercial: {
-      heading: "Production & Multi-Family",
-      body: "Deck and porch packages for production homes and multi-family communities, delivered alongside the framing scope.",
-    },
-    faqs: [
-      {
-        question: "Are decks part of your framing scope?",
-        answer:
-          "Yes. Building decks and porches is included in our standard rough-carpentry scope of work.",
-      },
-    ],
-  },
   remodeling: {
     slug: "remodeling",
     name: "Remodeling",
@@ -152,39 +46,302 @@ export const serviceDetails: Record<string, ServiceDetail> = {
       "Remodeling across the Bay Area and Northern California — structural modifications, renovations, additions, and upgrades for residential and commercial spaces. CSLB #970551.",
     heroImage: "customKitchenRemodel",
     intro: [
-      "Beyond framing, Elite Builders IX provides remodeling services including structural modifications, renovations, additions, and upgrades to existing spaces.",
+      "Elite Builders IX provides remodeling services including structural modifications, renovations, additions, and upgrades to existing spaces.",
       "We work closely with clients to complete projects efficiently, safely, and according to design specifications — committed to quality assurance, reliability, and on-time delivery.",
     ],
     scopeHeading: "What Our Remodeling Covers",
     scope: [
       "Structural modifications to existing homes and buildings",
       "Renovations and full-room remodels",
-      "Additions and expansions",
+      "Kitchen and bath remodels",
       "Upgrades to existing residential and commercial spaces",
       "Code-compliant structural work with required certifications",
       "Coordination with architects, engineers, and general contractors",
     ],
     residential: {
       heading: "Homeowners",
-      body: "Remodels, additions, and upgrades managed with clear communication from estimate to final walkthrough.",
+      body: "Remodels and upgrades managed with clear communication from estimate to final walkthrough.",
     },
     commercial: {
       heading: "Builders & General Contractors",
-      body: "Dependable subcontracting capacity and resources to support renovations and structural modifications across Northern California.",
+      body: "Dependable subcontracting capacity for renovations and structural modifications across Northern California.",
     },
     faqs: [
       {
         question: "What types of remodeling projects do you take on?",
         answer:
-          "Elite Builders IX handles structural modifications, renovations, additions, and upgrades for both residential and commercial projects — working with homeowners, production builders, and general contractors.",
+          "Elite Builders IX handles structural modifications, renovations, and upgrades for both residential and commercial projects — working with homeowners, production builders, and general contractors.",
+      },
+    ],
+  },
+  "home-addition-construction": {
+    slug: "home-addition-construction",
+    name: "Home Addition Construction",
+    h1: "Home Addition Contractor — Bay Area & Northern California",
+    metaTitle: "Home Addition Contractor Bay Area CA",
+    metaDescription:
+      "Home addition construction across the Bay Area and Northern California — room expansions, second stories, and structural additions built to code. CSLB #970551.",
+    heroImage: "twoStoryHomeFramingExterior",
+    intro: [
+      "Need more space without moving? Elite Builders IX builds home additions that integrate seamlessly with your existing structure — from single-room expansions to second-story builds.",
+      "Our framing-first approach ensures every addition is structurally sound, permit-ready, and built to match the quality of your original home.",
+    ],
+    scopeHeading: "Home Addition Services",
+    scope: [
+      "Room and footprint expansions",
+      "Second-story and pop-top additions",
+      "Structural tie-ins to existing framing",
+      "Foundation and framing coordination",
+      "Permit and inspection support",
+      "Exterior integration with siding and trim",
+    ],
+    residential: {
+      heading: "Homeowners",
+      body: "Add the space your family needs with an addition designed and built for long-term durability.",
+    },
+    commercial: {
+      heading: "Builders & Developers",
+      body: "Addition framing packages for production communities and multi-family expansions.",
+    },
+    faqs: [
+      {
+        question: "Do you handle permits for home additions?",
+        answer:
+          "We coordinate with local jurisdictions and work alongside architects and engineers to keep your addition permit-ready and inspection-compliant.",
+      },
+    ],
+  },
+  "home-building": {
+    slug: "home-building",
+    name: "Home Building",
+    h1: "Home Builder — Bay Area & Northern California",
+    metaTitle: "Home Builder Bay Area CA",
+    metaDescription:
+      "Custom and production home building across the Bay Area, Central Valley, and Southern California — framing-first construction from foundation to finish. CSLB #970551.",
+    heroImage: "customHomeFramingCrew",
+    intro: [
+      "Elite Builders IX builds new homes with the structural precision that protects everything above the foundation. From custom residences to production-builder communities, we deliver code-compliant framing and construction on schedule.",
+      "Framing is our specialty — walls, floors, roofs, trusses, and structural hardware installed square, plumb, and to spec.",
+    ],
+    scopeHeading: "Our Home Building Scope",
+    scope: [
+      "Custom and production new home construction",
+      "Framing of walls, floors, and roof systems",
+      "Trusses, beams, and structural hardware",
+      "Structural shear panels and strapping",
+      "Decks, porches, and exterior structural work",
+      "Coordination with architects, engineers, and GCs",
+    ],
+    residential: {
+      heading: "Custom Homes",
+      body: "Ground-up homes framed and built with the craftsmanship your family deserves.",
+    },
+    commercial: {
+      heading: "Production & Multi-Family",
+      body: "Trusted framing and construction capacity for production builders across Northern California.",
+    },
+    faqs: [
+      {
+        question: "Do you build for production builders?",
+        answer:
+          "Yes. Elite Builders IX partners with production builders and GCs on tract communities, condominiums, and multi-family projects.",
+      },
+    ],
+  },
+  "luxury-home-building": {
+    slug: "luxury-home-building",
+    name: "Luxury Home Building",
+    h1: "Luxury Home Builder — Bay Area & Northern California",
+    metaTitle: "Luxury Home Builder Bay Area CA",
+    metaDescription:
+      "Luxury custom home building across the Bay Area and Northern California — precision framing and construction for high-end residences. CSLB #970551.",
+    heroImage: "luxuryHomeInterior",
+    intro: [
+      "Luxury homes demand flawless structural execution. Elite Builders IX brings framing-first precision to high-end custom builds where every detail matters.",
+      "We partner with architects, designers, and homeowners to deliver structurally superior residences across the Bay Area and Central Valley.",
+    ],
+    scopeHeading: "Luxury Home Building Services",
+    scope: [
+      "High-end custom home framing and construction",
+      "Complex roof and beam systems",
+      "Premium structural detailing and hardware",
+      "Large-format window and door rough openings",
+      "Outdoor living structural packages",
+      "Tight coordination with design and finish trades",
+    ],
+    residential: {
+      heading: "Luxury Homeowners",
+      body: "Custom estates and premium residences built with the structural integrity your investment demands.",
+    },
+    commercial: {
+      heading: "Developers & Architects",
+      body: "Reliable framing-first partners for luxury communities and architect-driven custom builds.",
+    },
+    faqs: [
+      {
+        question: "What sets your luxury home building apart?",
+        answer:
+          "Our framing-first expertise ensures the structural backbone of your luxury home is built square, plumb, and to spec — the foundation for flawless finishes.",
+      },
+    ],
+  },
+  "fence-building": {
+    slug: "fence-building",
+    name: "Fence Building",
+    h1: "Fence Builder — Bay Area & Northern California",
+    metaTitle: "Fence Builder Bay Area CA",
+    metaDescription:
+      "Fence building and installation across the Bay Area and Northern California — wood, composite, and custom fence construction. CSLB #970551.",
+    heroImage: "deckPorch",
+    intro: [
+      "A well-built fence adds privacy, security, and curb appeal. Elite Builders IX constructs durable wood and composite fences with the same structural attention we bring to every project.",
+      "From property-line fencing to custom gates and enclosures, we build fences that stand up to California weather.",
+    ],
+    scopeHeading: "Fence Building Services",
+    scope: [
+      "Wood and composite fence construction",
+      "Privacy and perimeter fencing",
+      "Custom gates and entry features",
+      "Post and footing installation",
+      "Fence replacement and repairs",
+      "Coordination with property lines and HOA requirements",
+    ],
+    residential: {
+      heading: "Homeowners",
+      body: "Privacy, security, and style — fences built to complement your home and landscape.",
+    },
+    commercial: {
+      heading: "Commercial & Multi-Family",
+      body: "Perimeter and courtyard fencing for commercial properties and communities.",
+    },
+    faqs: [
+      {
+        question: "What fence materials do you work with?",
+        answer:
+          "We build wood and composite fence systems — matching materials to your property, budget, and maintenance preferences.",
+      },
+    ],
+  },
+  "deck-construction": {
+    slug: "deck-construction",
+    name: "Deck Construction",
+    h1: "Deck Construction — Bay Area & Northern California",
+    metaTitle: "Deck Construction Bay Area CA",
+    metaDescription:
+      "Custom deck construction across the Bay Area and Northern California, built by structural framing specialists. CSLB #970551.",
+    heroImage: "deckPorch",
+    intro: [
+      "Decks are part of our core construction scope. We build outdoor living structures that are square, solid, and built to last through California seasons.",
+      "Every deck is framed with the same structural precision we bring to walls, floors, and roofs.",
+    ],
+    scopeHeading: "Deck Construction Services",
+    scope: [
+      "New deck framing and construction",
+      "Wood and composite decking systems",
+      "Structural posts, beams, and joist systems",
+      "Railings, stairs, and built-in features",
+      "Structural hardware and strapping for code compliance",
+      "Integration with home framing and exterior finishes",
+    ],
+    residential: {
+      heading: "Residential Decks",
+      body: "Custom wood and composite outdoor living spaces designed and built to match your home.",
+    },
+    commercial: {
+      heading: "Production & Multi-Family",
+      body: "Deck packages for production homes and multi-family communities.",
+    },
+    faqs: [
+      {
+        question: "Do you build composite decks?",
+        answer:
+          "Yes — we build both wood and composite deck systems, selected to match your climate, maintenance preferences, and budget.",
+      },
+    ],
+  },
+  "patio-construction": {
+    slug: "patio-construction",
+    name: "Patio Construction",
+    h1: "Patio Construction — Bay Area & Northern California",
+    metaTitle: "Patio Construction Bay Area CA",
+    metaDescription:
+      "Patio construction across the Bay Area and Northern California — covered patios, pavers, and outdoor living spaces. CSLB #970551.",
+    heroImage: "patioDoorsOutdoorLiving",
+    intro: [
+      "Extend your living space outdoors with a patio built for California entertaining. Elite Builders IX constructs patios and covered outdoor areas that integrate with your home's structure.",
+      "From simple concrete pads to covered entertaining spaces, we build patios designed for durability and daily use.",
+    ],
+    scopeHeading: "Patio Construction Services",
+    scope: [
+      "New patio and hardscape construction",
+      "Covered patio and pergola structures",
+      "Concrete, paver, and stone patio surfaces",
+      "Outdoor kitchen and fireplace foundations",
+      "Drainage and grading coordination",
+      "Integration with doors, decking, and landscaping",
+    ],
+    residential: {
+      heading: "Homeowners",
+      body: "Outdoor living spaces built for family gatherings, dining, and relaxation year-round.",
+    },
+    commercial: {
+      heading: "Multi-Family & Commercial",
+      body: "Courtyard and common-area patio construction for communities and commercial properties.",
+    },
+    faqs: [
+      {
+        question: "Can you build covered patios?",
+        answer:
+          "Yes — we construct covered patios and pergola structures with proper structural support and weather protection.",
+      },
+    ],
+  },
+  "tiny-home-building": {
+    slug: "tiny-home-building",
+    name: "Tiny Home Building",
+    h1: "Tiny Home Builder — Bay Area & Northern California",
+    metaTitle: "Tiny Home Builder Bay Area CA",
+    metaDescription:
+      "Tiny home and ADU construction across the Bay Area and Northern California — compact, code-compliant builds from a licensed contractor. CSLB #970551.",
+    heroImage: "residentialWallFramingSky",
+    intro: [
+      "Tiny homes and ADUs are a smart way to add living space on your property. Elite Builders IX builds compact, code-compliant structures with full framing and construction expertise.",
+      "Whether you need a backyard ADU, guest cottage, or standalone tiny home, we deliver efficient builds without cutting corners on structure.",
+    ],
+    scopeHeading: "Tiny Home Building Services",
+    scope: [
+      "Custom tiny home and ADU construction",
+      "Compact framing and structural systems",
+      "Foundation and utility coordination",
+      "Permit and zoning compliance support",
+      "Efficient floor plans and structural layouts",
+      "Turnkey and shell-only build options",
+    ],
+    residential: {
+      heading: "Homeowners",
+      body: "ADUs, guest units, and tiny homes that add value and flexibility to your property.",
+    },
+    commercial: {
+      heading: "Developers",
+      body: "Small-footprint housing solutions for infill and accessory dwelling projects.",
+    },
+    faqs: [
+      {
+        question: "Do you build ADUs as well as tiny homes?",
+        answer:
+          "Yes — we build accessory dwelling units (ADUs), backyard cottages, and standalone tiny homes across Northern California.",
       },
     ],
   },
 };
 
 export const serviceOrder = [
-  "framing",
   "remodeling",
-  "siding",
-  "decks",
+  "home-addition-construction",
+  "home-building",
+  "luxury-home-building",
+  "fence-building",
+  "deck-construction",
+  "patio-construction",
+  "tiny-home-building",
 ] as const;

@@ -4,6 +4,18 @@ import { getSupabaseStorageHostname } from "./src/lib/supabase/storage";
 const supabaseHostname = getSupabaseStorageHostname();
 
 const nextConfig: NextConfig = {
+  async redirects() {
+    return [
+      { source: "/services/framing", destination: "/services/home-building", permanent: true },
+      { source: "/services/siding", destination: "/services/home-building", permanent: true },
+      { source: "/services/decks", destination: "/services/deck-construction", permanent: true },
+      {
+        source: "/services/general-contracting",
+        destination: "/services/home-building",
+        permanent: true,
+      },
+    ];
+  },
   experimental: {
     optimizePackageImports: [
       "lucide-react",

@@ -4,17 +4,21 @@ import { ArrowRight } from "lucide-react";
 import ContentImage from "@/components/site/ContentImage";
 import { business } from "@/lib/site/config";
 import { homeImages } from "@/lib/site/images";
-import { serviceDetails, serviceOrder } from "@/lib/site/scope";
+import { listPublishedPublicServicePages } from "@/lib/admin/services.server";
+import { getPublicServicePagesFallback } from "@/lib/site/servicesPublic";
 import { buildPageMetadata } from "@/lib/site/seo";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Framing & Construction Services",
   description:
-    "Framing-first construction services — rough framing, remodeling, siding, and deck construction across the Bay Area, Central Valley, and Southern California. CSLB #970551.",
+    "Remodeling, home additions, new construction, luxury homes, decks, patios, fences, and tiny homes across the Bay Area, Central Valley, and Southern California. CSLB #970551.",
   path: "/services",
 });
 
-export default function ServicesPage() {
+export default async function ServicesPage() {
+  const published = await listPublishedPublicServicePages();
+  const services = published.length > 0 ? published : getPublicServicePagesFallback();
+
   return (
     <>
       <section className="bg-brand-navy py-20 text-white">
@@ -26,9 +30,9 @@ export default function ServicesPage() {
             Framing-First Construction Services
           </h1>
           <p className="mt-5 max-w-2xl text-base leading-relaxed text-white/85">
-            Elite Builders IX is a framing-first contractor — rough framing is our core, and every
-            remodeling, siding, and deck project is built on the same structural precision and code
-            compliance.
+            Elite Builders IX offers remodeling, home additions, new construction, luxury builds, and
+            outdoor structures — all built with framing-first precision across the Bay Area, Central
+            Valley, and Southern California.
           </p>
           <p className="mt-4 text-sm font-semibold text-brand-sky">{business.license}</p>
         </div>
@@ -37,20 +41,19 @@ export default function ServicesPage() {
       <section className="bg-white py-20">
         <div className="site-container">
           <div className="grid gap-6 sm:grid-cols-2">
-            {serviceOrder.map((slug) => {
-              const detail = serviceDetails[slug];
+            {services.map((detail) => {
               const img = homeImages[detail.heroImage];
               return (
                 <Link
-                  key={slug}
-                  href={`/services/${slug}`}
+                  key={detail.slug}
+                  href={detail.href}
                   className="group overflow-hidden rounded-xl border border-solid border-gray-200 bg-white transition-all hover:-translate-y-1 hover:border-brand-sky/60 hover:shadow-lg"
                 >
                   <ContentImage src={img.src} alt={img.alt} className="h-52" />
                   <div className="p-7">
                     <h2 className="text-lg font-bold text-brand-navy">{detail.name}</h2>
                     <p className="mt-2 text-sm leading-relaxed text-gray-500">
-                      {detail.intro[0]}
+                      {detail.intro[0] ?? detail.shortDescription}
                     </p>
                     <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-bold text-brand-blue group-hover:text-brand-red">
                       Learn More

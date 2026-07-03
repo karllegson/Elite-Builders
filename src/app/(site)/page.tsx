@@ -16,9 +16,10 @@ import {
   business,
   featuredHomeServiceAreas,
   serviceAreas,
-  services,
   teamMembers,
 } from "@/lib/site/config";
+import { listPublishedPublicServicePages } from "@/lib/admin/services.server";
+import { getPublicServicePagesFallback } from "@/lib/site/servicesPublic";
 import { homepageFaqs, integrityStatement, framingFirstTagline } from "@/lib/site/messaging";
 import { homeImages, homepageGalleryImageKeys } from "@/lib/site/images";
 import { completedProjects, currentProjects, type Project } from "@/lib/site/projects";
@@ -126,7 +127,10 @@ const faqSchema = {
   })),
 };
 
-export default function HomePage() {
+export default async function HomePage() {
+  const publishedServices = await listPublishedPublicServicePages();
+  const services =
+    publishedServices.length > 0 ? publishedServices : getPublicServicePagesFallback();
   return (
     <>
       <script
@@ -154,8 +158,8 @@ export default function HomePage() {
         <div className="site-container">
           <SectionIntro
             eyebrow="Our Services"
-            title="Framing-First — Then Remodeling, Siding & Decks"
-            lede="Rough framing is our specialty and our starting point. Every other service — remodeling, siding, decks — is built on the same structural precision."
+            title="Remodeling, New Construction & Outdoor Living"
+            lede="From kitchen remodels and home additions to custom builds, decks, patios, and fences — Elite Builders delivers framing-first construction across Northern California."
           />
 
           <div className="mt-8 grid gap-4 sm:mt-14 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
@@ -163,13 +167,13 @@ export default function HomePage() {
               const img = homeImages[service.image];
               return (
                 <Link
-                  key={service.title}
+                  key={service.slug}
                   href={service.href}
                   className="group overflow-hidden rounded-xl border border-solid border-gray-200 bg-white transition-all hover:-translate-y-1 hover:border-brand-sky/60 hover:shadow-lg"
                 >
                   <ContentImage src={img.src} alt={img.alt} className="h-36 sm:h-48" />
                   <div className="p-4 sm:p-7">
-                    <h3 className="text-base font-bold text-brand-navy sm:text-lg">{service.title}</h3>
+                    <h3 className="text-base font-bold text-brand-navy sm:text-lg">{service.name}</h3>
                     <p className="mt-1.5 text-xs leading-relaxed text-gray-500 sm:mt-2 sm:text-sm">
                       {service.shortDescription}
                     </p>
