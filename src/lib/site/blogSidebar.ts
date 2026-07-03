@@ -1,9 +1,21 @@
 import type { PostRecordDTO } from "@/lib/admin/posts.dto";
+import {
+  getServiceAreaSidebarReview,
+  type SidebarPostItem,
+} from "@/lib/site/serviceAreaSidebar";
 import { homeImages } from "@/lib/site/images";
-import type { SidebarPostItem } from "@/lib/site/serviceAreaSidebar";
 
 export const blogEstimateDescription =
   "Planning a remodel or new build? Tell us about your framing, siding, or deck needs and our team will follow up within one business day.";
+
+const sidebarReview = getServiceAreaSidebarReview();
+
+export const blogSidebarReview = {
+  initial: sidebarReview.reviewerName.charAt(0),
+  name: sidebarReview.reviewerName,
+  quote: sidebarReview.excerpt,
+  reviewsHref: sidebarReview.href,
+} as const;
 
 const FALLBACK_SIDEBAR_IMAGES = [
   homeImages.residentialRoofFraming,
