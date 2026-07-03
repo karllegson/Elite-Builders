@@ -1,5 +1,9 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
+import {
+  assertCanUseLocalFileStore,
+  canUseLocalFileStore,
+} from "@/lib/admin/localFileStore";
 import type { PostsStore } from "@/lib/admin/posts.types";
 
 export const POSTS_LOCAL_FILE = path.join(process.cwd(), "data", "posts.local.json");
@@ -35,7 +39,9 @@ export async function readPostsStore(): Promise<PostsStore> {
       (error as NodeJS.ErrnoException).code === "ENOENT"
     ) {
       const empty = createEmptyStore();
-      await writePostsStore(empty);
+      if (canUseLocalFileStore()) {
+        await writePostsStore(empty);
+      }
       return empty;
     }
 
@@ -44,6 +50,7 @@ export async function readPostsStore(): Promise<PostsStore> {
 }
 
 export async function writePostsStore(store: PostsStore): Promise<void> {
+  assertCanUseLocalFileStore();
   await mkdir(path.dirname(POSTS_LOCAL_FILE), { recursive: true });
   await writeFile(POSTS_LOCAL_FILE, `${JSON.stringify(store, null, 2)}\n`, "utf8");
 }

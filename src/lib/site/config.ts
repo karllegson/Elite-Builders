@@ -9,8 +9,8 @@ export const business = {
   heroHeadline: "Framing California's Future.",
   companyStory:
     "Family-owned framing-first specialists since 2012 — known for integrity, straight answers, and experienced crews who treat every structure like their own across the Bay Area, Central Valley, and Southern California.",
-  phone: "1 (209) 345-6727",
-  phoneHref: "tel:+12093456727",
+  phone: "(209) 484-2743",
+  phoneHref: "tel:+12094842743",
   email: "marketing@elitebuildersco.com",
   foundedYear: 2012,
   address: {

@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import type { ContactFormType } from "@/lib/contact/submissions.types";
 import { trackAnalyticsEvent } from "@/lib/site/analytics";
-import { services } from "@/lib/site/config";
+import { business, services } from "@/lib/site/config";
 
 type ContactFormProps = {
   variant?: "card" | "inline";
@@ -177,7 +177,7 @@ export default function ContactForm({
               name="phone"
               required
               autoComplete="tel"
-              placeholder="(209) 345-6727"
+              placeholder={business.phone}
               className="rounded-md border border-solid border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 placeholder:text-gray-400"
             />
           </label>

@@ -1,5 +1,6 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { assertCanUseLocalFileStore } from "@/lib/admin/localFileStore";
 import {
   createDefaultStore,
   normalizeFaqsStore,
@@ -37,6 +38,7 @@ export async function readFaqsStoreFromDisk(): Promise<FaqsStore> {
 }
 
 export async function writeFaqsStoreToDisk(store: FaqsStore): Promise<void> {
+  assertCanUseLocalFileStore();
   await mkdir(path.dirname(FAQS_LOCAL_FILE), { recursive: true });
   await writeFile(FAQS_LOCAL_FILE, `${JSON.stringify(store, null, 2)}\n`, "utf8");
 }

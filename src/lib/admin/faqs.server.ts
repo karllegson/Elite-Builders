@@ -12,30 +12,130 @@ import {
   type UpsertFaqInput,
 } from "@/lib/admin/faqsData";
 import { readFaqsStoreFromDisk, writeFaqsStoreToDisk } from "@/lib/admin/faqsLocalData";
+import {
+  MISSING_FAQS_TABLE_MESSAGE,
+  SUPABASE_REQUIRED_MESSAGE,
+  canUseLocalFileStore,
+} from "@/lib/admin/localFileStore";
 import { slugify } from "@/lib/admin/postSeo";
 import {
   findFaqCategoryByRefInStore,
   listPublishedFaqsForCategoryInStore,
   type PublicFaqItem,
 } from "@/lib/site/faqsPublic";
+import { createAdminClient, hasAdminClient } from "@/lib/supabase/admin";
 
-async function withLocalStore<T>(
-  fn: (store: FaqsStore) => T | Promise<T>,
-): Promise<T> {
-  const store = await readFaqsStoreFromDisk();
-  const result = await fn(store);
-  await writeFaqsStoreToDisk(store);
-  return result;
+const FAQS_STORE_ROW_ID = "default";
+
+function shouldUseLocalStore(): boolean {
+  return !hasAdminClient() && canUseLocalFileStore();
 }
 
-async function withLocalStoreRead<T>(fn: (store: FaqsStore) => T): Promise<T> {
+function assertFaqsStorageConfigured(): void {
+  if (!hasAdminClient() && !canUseLocalFileStore()) {
+    throw new Error(SUPABASE_REQUIRED_MESSAGE);
+  }
+}
+
+function isMissingFaqsStoreError(error: unknown): boolean {
+  if (!error || typeof error !== "object") {
+    return false;
+  }
+
+  const candidate = error as { code?: string; message?: string };
+
+  return (
+    candidate.code === "PGRST205" ||
+    Boolean(candidate.message?.includes("Could not find the table 'public.faqs_store'"))
+  );
+}
+
+async function withFaqsStoreFallback<T>(
+  supabaseFn: () => Promise<T>,
+  localFn: () => Promise<T>,
+): Promise<T> {
+  assertFaqsStorageConfigured();
+
+  if (shouldUseLocalStore()) {
+    return localFn();
+  }
+
+  try {
+    return await supabaseFn();
+  } catch (error) {
+    if (isMissingFaqsStoreError(error)) {
+      throw new Error(MISSING_FAQS_TABLE_MESSAGE);
+    }
+
+    throw error;
+  }
+}
+
+async function loadFaqsStoreFromSupabase(): Promise<FaqsStore> {
+  const client = createAdminClient();
+  const { data, error } = await client
+    .from("faqs_store")
+    .select("payload")
+    .eq("id", FAQS_STORE_ROW_ID)
+    .maybeSingle();
+
+  if (error) {
+    throw error;
+  }
+
+  if (!data?.payload || typeof data.payload !== "object") {
+    return createDefaultStore();
+  }
+
+  return normalizeFaqsStore(data.payload as FaqsStore);
+}
+
+async function saveFaqsStoreToSupabase(store: FaqsStore): Promise<void> {
+  const normalized = normalizeFaqsStore(store);
+  const client = createAdminClient();
+  const { error } = await client.from("faqs_store").upsert({
+    id: FAQS_STORE_ROW_ID,
+    version: normalized.version,
+    payload: normalized,
+    updated_at: new Date().toISOString(),
+  });
+
+  if (error) {
+    throw error;
+  }
+}
+
+async function loadFaqsStoreFromDisk(): Promise<FaqsStore> {
   const store = await readFaqsStoreFromDisk();
-  return fn(store);
+  return normalizeFaqsStore(store);
+}
+
+async function withFaqsStore<T>(fn: (store: FaqsStore) => T | Promise<T>): Promise<T> {
+  return withFaqsStoreFallback(
+    async () => {
+      const store = await loadFaqsStoreFromSupabase();
+      const result = await fn(store);
+      await saveFaqsStoreToSupabase(store);
+      return result;
+    },
+    async () => {
+      const store = await loadFaqsStoreFromDisk();
+      const result = await fn(store);
+      await writeFaqsStoreToDisk(store);
+      return result;
+    },
+  );
+}
+
+async function withFaqsStoreRead<T>(fn: (store: FaqsStore) => T): Promise<T> {
+  return withFaqsStoreFallback(
+    async () => fn(await loadFaqsStoreFromSupabase()),
+    async () => fn(await loadFaqsStoreFromDisk()),
+  );
 }
 
 export async function loadFaqsStore(): Promise<FaqsStore> {
-  const store = await readFaqsStoreFromDisk();
-  return normalizeFaqsStore(store);
+  return withFaqsStoreRead((store) => store);
 }
 
 function sanitizeCategorySlug(value: string, fallbackName: string): string {
@@ -63,19 +163,19 @@ function nextFaqNumericId(faqs: FaqRecord[]): number {
 }
 
 export async function listFaqCategories(): Promise<FaqCategory[]> {
-  return withLocalStoreRead((store) =>
+  return withFaqsStoreRead((store) =>
     [...store.categories].sort((left, right) => left.name.localeCompare(right.name)),
   );
 }
 
 export async function getFaqCategoryById(id: string): Promise<FaqCategory | null> {
-  return withLocalStoreRead(
+  return withFaqsStoreRead(
     (store) => store.categories.find((category) => category.id === id) ?? null,
   );
 }
 
 export async function createFaqCategory(input: CreateFaqCategoryInput): Promise<FaqCategory> {
-  return withLocalStore((store) => {
+  return withFaqsStore((store) => {
     const trimmedName = input.name.trim();
 
     if (!trimmedName) {
@@ -107,7 +207,7 @@ export async function updateFaqCategory(
   id: string,
   input: CreateFaqCategoryInput,
 ): Promise<FaqCategory | null> {
-  return withLocalStore((store) => {
+  return withFaqsStore((store) => {
     const index = store.categories.findIndex((category) => category.id === id);
 
     if (index === -1) {
@@ -142,7 +242,7 @@ export async function updateFaqCategory(
 }
 
 export async function deleteFaqCategories(ids: string[]): Promise<number> {
-  return withLocalStore((store) => {
+  return withFaqsStore((store) => {
     const idSet = new Set(ids);
     const before = store.categories.length;
 
@@ -156,7 +256,7 @@ export async function deleteFaqCategories(ids: string[]): Promise<number> {
 }
 
 export async function listFaqs(): Promise<FaqRecord[]> {
-  return withLocalStoreRead((store) =>
+  return withFaqsStoreRead((store) =>
     [...store.faqs].sort(
       (left, right) =>
         new Date(right.publishedAt ?? right.updatedAt).getTime() -
@@ -166,11 +266,11 @@ export async function listFaqs(): Promise<FaqRecord[]> {
 }
 
 export async function getFaqById(id: string): Promise<FaqRecord | null> {
-  return withLocalStoreRead((store) => store.faqs.find((item) => item.id === id) ?? null);
+  return withFaqsStoreRead((store) => store.faqs.find((item) => item.id === id) ?? null);
 }
 
 export async function upsertFaq(input: UpsertFaqInput): Promise<FaqRecord> {
-  return withLocalStore((store) => {
+  return withFaqsStore((store) => {
     const now = new Date().toISOString();
     const trimmedTitle = input.title.trim();
 
@@ -219,7 +319,7 @@ export async function upsertFaq(input: UpsertFaqInput): Promise<FaqRecord> {
 }
 
 export async function deleteFaqs(ids: string[]): Promise<number> {
-  return withLocalStore((store) => {
+  return withFaqsStore((store) => {
     const idSet = new Set(ids);
     const before = store.faqs.length;
     store.faqs = store.faqs.filter((faq) => !idSet.has(faq.id));

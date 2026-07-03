@@ -15,6 +15,11 @@ import type {
 } from "@/lib/admin/posts.types";
 import { createTagId } from "@/lib/admin/tagsList";
 import { stripQuickSummaryForExcerpt } from "@/lib/site/postContent";
+import {
+  MISSING_POSTS_TABLES_MESSAGE,
+  SUPABASE_REQUIRED_MESSAGE,
+  canUseLocalFileStore,
+} from "@/lib/admin/localFileStore";
 import { createAdminClient, hasAdminClient } from "@/lib/supabase/admin";
 
 export const DEFAULT_POST_AUTHOR = siteConfig.defaultUserRole;
@@ -711,7 +716,13 @@ async function deleteTagsSupabase(ids: string[]): Promise<number> {
 // ─── Public API ────────────────────────────────────────────────────────────────
 
 function shouldUseLocalStore(): boolean {
-  return !hasAdminClient();
+  return !hasAdminClient() && canUseLocalFileStore();
+}
+
+function assertPostsStorageConfigured(): void {
+  if (!hasAdminClient() && !canUseLocalFileStore()) {
+    throw new Error(SUPABASE_REQUIRED_MESSAGE);
+  }
 }
 
 function isMissingPostsTableError(error: unknown): boolean {
@@ -732,6 +743,8 @@ async function withPostsStoreFallback<T>(
   supabaseFn: () => Promise<T>,
   localFn: () => Promise<T>,
 ): Promise<T> {
+  assertPostsStorageConfigured();
+
   if (shouldUseLocalStore()) {
     return localFn();
   }
@@ -740,7 +753,7 @@ async function withPostsStoreFallback<T>(
     return await supabaseFn();
   } catch (error) {
     if (isMissingPostsTableError(error)) {
-      return localFn();
+      throw new Error(MISSING_POSTS_TABLES_MESSAGE);
     }
 
     throw error;

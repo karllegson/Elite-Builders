@@ -14,6 +14,11 @@ import {
   type PublicServiceArea,
   type PublicServiceAreaSubPage,
 } from "@/lib/site/serviceAreasPublic";
+import {
+  MISSING_SERVICE_AREAS_TABLE_MESSAGE,
+  SUPABASE_REQUIRED_MESSAGE,
+  canUseLocalFileStore,
+} from "@/lib/admin/localFileStore";
 import { createAdminClient, hasAdminClient } from "@/lib/supabase/admin";
 
 const SERVICE_AREAS_STORE_ROW_ID = "default";
@@ -32,7 +37,13 @@ function normalizeStore(raw: ServiceAreasStore): ServiceAreasStore {
 }
 
 function shouldUseLocalStore(): boolean {
-  return !hasAdminClient();
+  return !hasAdminClient() && canUseLocalFileStore();
+}
+
+function assertServiceAreasStorageConfigured(): void {
+  if (!hasAdminClient() && !canUseLocalFileStore()) {
+    throw new Error(SUPABASE_REQUIRED_MESSAGE);
+  }
 }
 
 function isMissingServiceAreasStoreError(error: unknown): boolean {
@@ -54,6 +65,8 @@ async function withServiceAreasStoreFallback<T>(
   supabaseFn: () => Promise<T>,
   localFn: () => Promise<T>,
 ): Promise<T> {
+  assertServiceAreasStorageConfigured();
+
   if (shouldUseLocalStore()) {
     return localFn();
   }
@@ -62,7 +75,7 @@ async function withServiceAreasStoreFallback<T>(
     return await supabaseFn();
   } catch (error) {
     if (isMissingServiceAreasStoreError(error)) {
-      return localFn();
+      throw new Error(MISSING_SERVICE_AREAS_TABLE_MESSAGE);
     }
 
     throw error;

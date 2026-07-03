@@ -61,7 +61,7 @@ These are pre-filled from what we have. **Ask him to verify every line.**
 | Founded | 2012 | ☐ | |
 | Owner | Fernando Gradilla | ☐ | |
 | Address | 450 Burney Street, Modesto, CA 95354 | ☐ | |
-| Phone | 1 (209) 484-2743 | ☐ | |
+| Phone | (209) 484-2743 | ☐ | |
 | Email | support@elitebuildersco.com | ☐ | |
 | License # | Licensed California Contractor | ☐ | **Get exact CSLB number** |
 | Insurance | Liability + workers' comp | ☐ | Carrier name? Certificate on file? |

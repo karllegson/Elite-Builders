@@ -1,5 +1,6 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { assertCanUseLocalFileStore } from "@/lib/admin/localFileStore";
 import {
   createDefaultStore,
   normalizeServiceAreaRecord,
@@ -43,6 +44,7 @@ export async function readServiceAreasStoreFromDisk(): Promise<ServiceAreasStore
 export async function writeServiceAreasStoreToDisk(
   store: ServiceAreasStore,
 ): Promise<void> {
+  assertCanUseLocalFileStore();
   await mkdir(path.dirname(SERVICE_AREAS_LOCAL_FILE), { recursive: true });
   await writeFile(
     SERVICE_AREAS_LOCAL_FILE,

@@ -1,3 +1,4 @@
+import { business } from "@/lib/site/config";
 import {
   SITE_CONFIG_STORAGE_KEY,
   createDefaultSiteConfigValues,
@@ -55,7 +56,7 @@ export function readRuntimeSiteConfig(): RuntimeSiteConfig {
 
 export function phoneToHref(phone: string): string {
   const digits = phone.replace(/[^\d+]/g, "");
-  return digits ? `tel:${digits}` : "tel:+12093456727";
+  return digits ? `tel:${digits}` : business.phoneHref;
 }
 
 export function normalizeCtaButtonHref(href: string): string {
