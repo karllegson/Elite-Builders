@@ -24,15 +24,22 @@ export type ContactSubmission = {
 };
 
 export const CONTACT_FORM_SERVICE_LABELS: Record<string, string> = {
-  remodeling: "Remodeling",
-  "home-addition-construction": "Home Addition Construction",
-  "home-building": "Home Building",
-  "luxury-home-building": "Luxury Home Building",
-  "fence-building": "Fence Building",
-  "deck-construction": "Deck Construction",
-  "patio-construction": "Patio Construction",
-  "tiny-home-building": "Tiny Home Building",
+  "home-builder": "Home Builder",
+  "general-contractor": "General Contractor",
+  remodeler: "Remodeler",
+  "deck-builder": "Deck Builder",
+  "siding-contractor": "Siding Contractor",
+  "construction-company": "Construction Company",
   other: "Other",
+  // Legacy slugs kept so historical submissions still display a readable label.
+  remodeling: "Remodeler",
+  "home-addition-construction": "Home Builder",
+  "home-building": "Home Builder",
+  "luxury-home-building": "Home Builder",
+  "fence-building": "Deck Builder",
+  "deck-construction": "Deck Builder",
+  "patio-construction": "Deck Builder",
+  "tiny-home-building": "Home Builder",
 };
 
 export function formatContactService(value: string): string {

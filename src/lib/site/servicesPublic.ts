@@ -43,6 +43,8 @@ export function toPublicServicePage(record: ServicePageRecord): PublicServicePag
     residential: record.residential,
     commercial: record.commercial,
     faqs: record.faqs,
+    relatedServices: record.relatedServices,
+    featured: record.featured,
     id: record.id,
     title: record.title,
     href: `/services/${record.slug}`,

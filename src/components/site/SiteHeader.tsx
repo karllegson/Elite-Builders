@@ -4,22 +4,29 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
+  ArrowRight,
+  Building2,
   ChevronDown,
   ChevronRight,
   ClipboardCheck,
+  Fence,
   FolderOpen,
+  HardHat,
+  Home,
   MapPin,
   Menu,
   MessageSquare,
+  PaintRoller,
+  PanelsTopLeft,
   Phone,
   X,
+  type LucideIcon,
 } from "lucide-react";
 import SiteLogo from "@/components/site/SiteLogo";
 import {
   aboutNavLinks,
   business,
   serviceMenuGroups,
-  serviceNavLinks,
   utilityNavLinks,
   whyUsNavLinks,
 } from "@/lib/site/config";
@@ -33,6 +40,15 @@ const utilityIcons = {
   Reviews: MessageSquare,
   Projects: FolderOpen,
 } as const;
+
+const serviceGroupIcons: Record<string, LucideIcon> = {
+  home: Home,
+  hardhat: HardHat,
+  paintbrush: PaintRoller,
+  fence: Fence,
+  panels: PanelsTopLeft,
+  building: Building2,
+};
 
 type SiteHeaderProps = {
   hasAdminBar?: boolean;
@@ -114,8 +130,8 @@ export default function SiteHeader({ hasAdminBar = false }: SiteHeaderProps) {
 
   function navLinkClass(active: boolean) {
     return active
-      ? "flex items-center gap-1 rounded-lg bg-site-nav-cta px-4 py-2.5 text-[15px] font-medium text-white"
-      : "flex items-center gap-1 rounded-lg px-4 py-2.5 text-[15px] font-medium text-site-text transition-colors hover:bg-site-nav-hover";
+      ? "flex items-center gap-1 rounded-lg bg-brand-blue/10 px-4 py-2.5 text-[15px] font-semibold text-brand-blue"
+      : "flex items-center gap-1 rounded-lg px-4 py-2.5 text-[15px] font-medium text-site-text transition-colors hover:bg-brand-blue/10 hover:text-brand-blue";
   }
 
   return (
@@ -165,23 +181,80 @@ export default function SiteHeader({ hasAdminBar = false }: SiteHeaderProps) {
 
           <div className="flex items-center gap-3 lg:gap-4">
             <nav aria-label="Main navigation" className="hidden items-center gap-0.5 lg:flex">
-              <Link href="/" className={navLinkClass(pathname === "/")}>
+              <Link href="/" className={navLinkClass(false)}>
                 Home
               </Link>
 
-              <button
-                type="button"
-                className={navLinkClass(openMenu === "services")}
-                aria-expanded={openMenu === "services"}
-                onClick={() => toggleMenu("services")}
-              >
-                Services
-                <ChevronDown
-                  size={15}
-                  aria-hidden
-                  className={`transition-transform ${openMenu === "services" ? "rotate-180" : ""}`}
-                />
-              </button>
+              <div className="relative">
+                <button
+                  type="button"
+                  className={navLinkClass(openMenu === "services" || pathname.startsWith("/services"))}
+                  aria-expanded={openMenu === "services"}
+                  onClick={() => toggleMenu("services")}
+                >
+                  Services
+                  <ChevronDown
+                    size={15}
+                    aria-hidden
+                    className={`transition-transform ${openMenu === "services" ? "rotate-180" : ""}`}
+                  />
+                </button>
+
+                {/* Services dropdown — compact, anchored under the button */}
+                {openMenu === "services" && (
+                  <div className="absolute left-0 top-full z-50 mt-1 w-[34rem] max-w-[calc(100vw-2rem)] overflow-hidden rounded-xl border border-solid border-gray-100 bg-white shadow-lg">
+                    <div className="grid grid-cols-2 gap-x-6 gap-y-4 p-5">
+                      {serviceMenuGroups.map((group) => {
+                        const Icon = serviceGroupIcons[group.icon] ?? Home;
+                        return (
+                          <div key={group.title}>
+                            <Link
+                              href={group.href}
+                              className="flex items-center gap-2 text-[13px] font-bold text-brand-navy hover:text-brand-blue"
+                              onClick={closeMenus}
+                            >
+                              <Icon size={15} strokeWidth={2} aria-hidden className="text-brand-blue" />
+                              {group.title}
+                            </Link>
+                            <ul className="mt-1.5 space-y-0.5">
+                              {group.links.map((link) => (
+                                <li key={link.label}>
+                                  <Link
+                                    href={link.href}
+                                    className="group flex items-center justify-between gap-2 rounded-md px-2 py-1 text-[12px] text-gray-600 transition-colors hover:bg-site-nav-hover hover:text-brand-navy"
+                                    onClick={closeMenus}
+                                  >
+                                    {link.label}
+                                    <ChevronRight
+                                      size={13}
+                                      aria-hidden
+                                      className="shrink-0 text-gray-300 transition-colors group-hover:text-brand-blue"
+                                    />
+                                  </Link>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {/* Sleek footer link */}
+                    <Link
+                      href="/services"
+                      onClick={closeMenus}
+                      className="group flex items-center justify-center gap-1.5 border-t border-solid border-gray-100 bg-gray-50/70 py-2.5 text-[13px] font-semibold text-brand-blue transition-colors hover:bg-site-nav-hover"
+                    >
+                      View All Services
+                      <ArrowRight
+                        size={14}
+                        aria-hidden
+                        className="transition-transform group-hover:translate-x-0.5"
+                      />
+                    </Link>
+                  </div>
+                )}
+              </div>
 
               <div className="relative">
                 <button
@@ -199,7 +272,7 @@ export default function SiteHeader({ hasAdminBar = false }: SiteHeaderProps) {
                 </button>
 
                 {openMenu === "why-us" && (
-                  <div className="absolute right-0 top-full z-50 mt-1 w-72 border border-solid border-gray-100 bg-white py-2 shadow-lg">
+                  <div className="absolute left-0 top-full z-50 mt-1 w-72 border border-solid border-gray-100 bg-white py-2 shadow-lg">
                     <ul>
                       {whyUsNavLinks.map((link) => (
                         <li key={link.href}>
@@ -271,48 +344,6 @@ export default function SiteHeader({ hasAdminBar = false }: SiteHeaderProps) {
           </div>
         </div>
 
-        {/* Services mega menu */}
-        {openMenu === "services" && (
-          <div className="absolute inset-x-0 top-full z-50 hidden border-t border-solid border-gray-100 bg-white shadow-lg lg:block">
-            <div className="site-container grid gap-8 py-8 lg:grid-cols-3">
-              {serviceMenuGroups.map((group) => (
-                  <div key={group.title}>
-                    <div>
-                        <Link
-                          href={group.href}
-                          className="text-base font-semibold text-site-nav-cta hover:text-brand-navy"
-                          onClick={closeMenus}
-                        >
-                          {group.title}
-                        </Link>
-                        <p className="mt-2 text-sm leading-relaxed text-gray-500">
-                          {group.description}
-                        </p>
-                    </div>
-                    <ul className="mt-4 space-y-2">
-                      {group.links.map((link) => (
-                        <li key={link.label}>
-                          <Link
-                            href={link.href}
-                            className="group flex items-center gap-1 text-sm font-medium text-site-nav-cta hover:text-brand-navy"
-                            onClick={closeMenus}
-                          >
-                            {link.label}
-                            <ChevronRight
-                              size={14}
-                              aria-hidden
-                              className="opacity-0 transition-all group-hover:translate-x-0.5 group-hover:opacity-100"
-                            />
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-              ))}
-            </div>
-          </div>
-        )}
-
       </div>
 
       {/* Mobile menu */}
@@ -354,28 +385,43 @@ export default function SiteHeader({ hasAdminBar = false }: SiteHeaderProps) {
                   />
                 </button>
                 {mobileSection === id && id === "services" && (
-                  <ul className="space-y-1 pb-3 pl-3">
-                    {serviceNavLinks.map((link) => (
-                      <li key={link.href}>
-                        <Link
-                          href={link.href}
-                          className="block py-1.5 text-sm text-gray-600"
-                          onClick={closeMenus}
-                        >
-                          {link.label}
-                        </Link>
-                      </li>
-                    ))}
-                    <li>
-                      <Link
-                        href="/services"
-                        className="block py-1.5 text-sm font-semibold text-brand-blue"
-                        onClick={closeMenus}
-                      >
-                        All Services
-                      </Link>
-                    </li>
-                  </ul>
+                  <div className="space-y-3 pb-3 pl-3">
+                    {serviceMenuGroups.map((group) => {
+                      const Icon = serviceGroupIcons[group.icon] ?? Home;
+                      return (
+                        <div key={group.title}>
+                          <Link
+                            href={group.href}
+                            className="flex items-center gap-2 py-1 text-sm font-bold text-brand-navy"
+                            onClick={closeMenus}
+                          >
+                            <Icon size={16} strokeWidth={2} aria-hidden className="text-brand-blue" />
+                            {group.title}
+                          </Link>
+                          <ul className="mt-0.5 space-y-0.5 pl-6">
+                            {group.links.map((link) => (
+                              <li key={link.label}>
+                                <Link
+                                  href={link.href}
+                                  className="block py-1 text-sm text-gray-600"
+                                  onClick={closeMenus}
+                                >
+                                  {link.label}
+                                </Link>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      );
+                    })}
+                    <Link
+                      href="/services"
+                      className="block py-1.5 text-sm font-semibold text-brand-blue"
+                      onClick={closeMenus}
+                    >
+                      All Services →
+                    </Link>
+                  </div>
                 )}
                 {mobileSection === id && id === "why-us" && (
                   <ul className="space-y-1 pb-3 pl-3">

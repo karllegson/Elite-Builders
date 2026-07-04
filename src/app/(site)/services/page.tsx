@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Check } from "lucide-react";
 import ContentImage from "@/components/site/ContentImage";
 import { business } from "@/lib/site/config";
 import { homeImages } from "@/lib/site/images";
@@ -9,9 +9,9 @@ import { getPublicServicePagesFallback } from "@/lib/site/servicesPublic";
 import { buildPageMetadata } from "@/lib/site/seo";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Framing & Construction Services",
+  title: "Construction Services — Home Builder, General Contractor & Framing",
   description:
-    "Remodeling, home additions, new construction, luxury homes, decks, patios, fences, and tiny homes across the Bay Area, Central Valley, and Southern California. CSLB #970551.",
+    "Home building, general contracting, framing, remodeling, deck building, siding, and construction across the Bay Area, Central Valley, and Southern California. Framing is our signature specialty. CSLB #970551.",
   path: "/services",
 });
 
@@ -27,12 +27,12 @@ export default async function ServicesPage() {
             Our Services
           </p>
           <h1 className="mt-3 max-w-3xl text-3xl font-bold leading-tight text-white sm:text-4xl lg:text-5xl">
-            Framing-First Construction Services
+            Home Builder, General Contractor & Framing Specialists
           </h1>
           <p className="mt-5 max-w-2xl text-base leading-relaxed text-white/85">
-            Elite Builders IX offers remodeling, home additions, new construction, luxury builds, and
-            outdoor structures — all built with framing-first precision across the Bay Area, Central
-            Valley, and Southern California.
+            Elite Builders offers home building, general contracting, remodeling, deck building,
+            siding, and construction — all built with framing-first precision across the Bay Area,
+            Central Valley, and Southern California. Framing is our signature specialty.
           </p>
           <p className="mt-4 text-sm font-semibold text-brand-sky">{business.license}</p>
         </div>
@@ -53,9 +53,19 @@ export default async function ServicesPage() {
                   <div className="p-7">
                     <h2 className="text-lg font-bold text-brand-navy">{detail.name}</h2>
                     <p className="mt-2 text-sm leading-relaxed text-gray-500">
-                      {detail.intro[0] ?? detail.shortDescription}
+                      {detail.shortDescription ?? detail.intro[0]}
                     </p>
-                    <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-bold text-brand-blue group-hover:text-brand-red">
+                    {detail.scope.length > 0 && (
+                      <ul className="mt-4 space-y-1.5">
+                        {detail.scope.slice(0, 3).map((item) => (
+                          <li key={item} className="flex items-start gap-2 text-sm text-gray-600">
+                            <Check size={16} aria-hidden className="mt-0.5 shrink-0 text-brand-sky" />
+                            {item}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                    <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-bold text-brand-blue group-hover:text-brand-red">
                       Learn More
                       <ArrowRight
                         size={15}

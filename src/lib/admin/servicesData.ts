@@ -5,7 +5,7 @@ import {
   type ServiceDetail,
 } from "@/lib/site/scope";
 
-export const SERVICE_PAGES_STORAGE_KEY = "elite-builders-service-pages-v2";
+export const SERVICE_PAGES_STORAGE_KEY = "elite-builders-service-pages-v3";
 export const SERVICE_PAGES_CHANGED_EVENT = "elite-builders-service-pages-changed";
 
 export type ServicePageStatus = "published" | "draft";
@@ -19,19 +19,17 @@ export type ServicePageRecord = ServiceDetail & {
 };
 
 export type ServicePagesStore = {
-  version: 2;
+  version: 3;
   pages: ServicePageRecord[];
 };
 
 const PAGE_ID_BY_SLUG: Record<string, string> = {
-  remodeling: "services-remodeling",
-  "home-addition-construction": "services-home-addition-construction",
-  "home-building": "services-home-building",
-  "luxury-home-building": "services-luxury-home-building",
-  "fence-building": "services-fence-building",
-  "deck-construction": "services-deck-construction",
-  "patio-construction": "services-patio-construction",
-  "tiny-home-building": "services-tiny-home-building",
+  "home-builder": "services-home-builder",
+  "general-contractor": "services-general-contractor",
+  remodeler: "services-remodeler",
+  "deck-builder": "services-deck-builder",
+  "siding-contractor": "services-siding-contractor",
+  "construction-company": "services-construction-company",
 };
 
 export function servicePageIdForSlug(slug: string): string {
@@ -56,6 +54,8 @@ export function normalizeServicePageRecord(
     residential: page.residential ?? seed?.residential ?? { heading: "", body: "" },
     commercial: page.commercial ?? seed?.commercial ?? { heading: "", body: "" },
     faqs: page.faqs ?? seed?.faqs ?? [],
+    relatedServices: page.relatedServices ?? seed?.relatedServices ?? [],
+    featured: page.featured ?? seed?.featured,
     id: page.id ?? servicePageIdForSlug(page.slug),
     title: page.title ?? page.name,
     sortOrder: page.sortOrder ?? 0,
@@ -80,7 +80,7 @@ export function createDefaultServicePagesStore(): ServicePagesStore {
     seedPageFromDetail(slug, serviceDetails[slug], index),
   );
 
-  return { version: 2, pages };
+  return { version: 3, pages };
 }
 
 function mergeMissingDefaultPages(pages: ServicePageRecord[]): ServicePageRecord[] {
@@ -113,7 +113,7 @@ export function readServicePagesStore(): ServicePagesStore {
 
     const parsed = JSON.parse(raw) as ServicePagesStore;
 
-    if (parsed.version !== 2 || !Array.isArray(parsed.pages)) {
+    if (parsed.version !== 3 || !Array.isArray(parsed.pages)) {
       return createDefaultServicePagesStore();
     }
 
@@ -122,10 +122,10 @@ export function readServicePagesStore(): ServicePagesStore {
     );
 
     if (pages.length !== parsed.pages.length) {
-      writeServicePagesStore({ version: 2, pages }, { skipSync: false });
+      writeServicePagesStore({ version: 3, pages }, { skipSync: false });
     }
 
-    return { version: 2, pages };
+    return { version: 3, pages };
   } catch {
     return createDefaultServicePagesStore();
   }
@@ -190,7 +190,7 @@ export function upsertServicePage(input: UpsertServicePageInput): ServicePageRec
       ? store.pages.map((page, index) => (index === existingIndex ? nextRecord : page))
       : [...store.pages, nextRecord];
 
-  writeServicePagesStore({ version: 2, pages });
+  writeServicePagesStore({ version: 3, pages });
   return nextRecord;
 }
 
@@ -218,7 +218,7 @@ export function updateServicePageQuickEdit(
     pageIndex === index ? nextRecord : page,
   );
 
-  writeServicePagesStore({ version: 2, pages });
+  writeServicePagesStore({ version: 3, pages });
   return nextRecord;
 }
 

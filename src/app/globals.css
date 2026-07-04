@@ -1054,6 +1054,72 @@ body {
     }
   }
 
+  /* Builder logo marquee (homepage) — pixel-measured seamless infinite scroll */
+  .site .builder-marquee {
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(
+      to right,
+      transparent,
+      #000 8%,
+      #000 92%,
+      transparent
+    );
+    mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+  }
+
+  .site .builder-marquee__track {
+    display: flex;
+    width: max-content;
+    will-change: transform;
+    animation: builder-marquee var(--marquee-duration, 70s) linear infinite;
+    animation-play-state: paused;
+  }
+
+  .site .builder-marquee__track[data-ready="true"] {
+    animation-play-state: running;
+  }
+
+  .site .builder-marquee__group {
+    display: flex;
+    align-items: center;
+  }
+
+  .site .builder-marquee__item {
+    padding-inline: 1.75rem;
+  }
+
+  @media (min-width: 640px) {
+    .site .builder-marquee__item {
+      padding-inline: 2.5rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .site .builder-marquee__item {
+      padding-inline: 3rem;
+    }
+  }
+
+  @keyframes builder-marquee {
+    from {
+      transform: translate3d(0, 0, 0);
+    }
+
+    to {
+      transform: translate3d(calc(-1 * var(--marquee-distance, 0px)), 0, 0);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .site .builder-marquee {
+      overflow-x: auto;
+    }
+
+    .site .builder-marquee__track {
+      animation: none;
+    }
+  }
+
   /* Standalone uploads in content — match featured hero frame; image-card imgs unchanged below */
   .site .service-area-html-content :where(img):not(:where(.image-card *)) {
     display: block;

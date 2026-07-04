@@ -17,12 +17,12 @@ export async function readServicePagesStoreFromDisk(): Promise<ServicePagesStore
     const raw = await readFile(SERVICE_PAGES_LOCAL_FILE, "utf8");
     const parsed = JSON.parse(raw) as ServicePagesStore;
 
-    if (parsed.version !== 2 || !Array.isArray(parsed.pages)) {
+    if (parsed.version !== 3 || !Array.isArray(parsed.pages)) {
       return createDefaultServicePagesStore();
     }
 
     return {
-      version: 2,
+      version: 3,
       pages: parsed.pages.map((page) => normalizeServicePageRecord(page)),
     };
   } catch (error) {

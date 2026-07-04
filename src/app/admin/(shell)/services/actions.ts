@@ -12,7 +12,7 @@ import type { PublicServicePage } from "@/lib/site/servicesPublic";
 export async function syncServicePagesStoreAction(
   store: ServicePagesStore,
 ): Promise<{ ok: true }> {
-  if (store.version !== 2 || !Array.isArray(store.pages)) {
+  if (store.version !== 3 || !Array.isArray(store.pages)) {
     throw new Error("Invalid service pages store payload.");
   }
 

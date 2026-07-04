@@ -151,6 +151,9 @@ export default async function HomePage() {
         <HomeHeroContent />
       </HomeHeroSection>
 
+      {/* ── Builder logos marquee (right under the hero) ─────── */}
+      <BuilderPartnersSection />
+
       <BrandPillars />
 
       {/* ── Services ─────────────────────────────────────────── */}
@@ -158,8 +161,8 @@ export default async function HomePage() {
         <div className="site-container">
           <SectionIntro
             eyebrow="Our Services"
-            title="Remodeling, New Construction & Outdoor Living"
-            lede="From kitchen remodels and home additions to custom builds, decks, patios, and fences — Elite Builders delivers framing-first construction across Northern California."
+            title="Home Building, General Contracting & Framing Specialists"
+            lede="From custom home building and general contracting to remodeling, decks, and siding — Elite Builders delivers framing-first construction across the Bay Area, Central Valley, and Southern California. Framing is our signature specialty."
           />
 
           <div className="mt-8 grid gap-4 sm:mt-14 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
@@ -261,8 +264,6 @@ export default async function HomePage() {
           </p>
         </div>
       </section>
-
-      <BuilderPartnersSection />
 
       <TeamSection members={teamMembers} />
 

@@ -6,14 +6,40 @@ const supabaseHostname = getSupabaseStorageHostname();
 const nextConfig: NextConfig = {
   async redirects() {
     return [
-      { source: "/services/framing", destination: "/services/home-building", permanent: true },
-      { source: "/services/siding", destination: "/services/home-building", permanent: true },
-      { source: "/services/decks", destination: "/services/deck-construction", permanent: true },
+      // Framing is now a featured specialty under General Contractor.
+      { source: "/services/framing", destination: "/services/general-contractor", permanent: true },
       {
         source: "/services/general-contracting",
-        destination: "/services/home-building",
+        destination: "/services/general-contractor",
         permanent: true,
       },
+      // Siding → Siding Contractor
+      { source: "/services/siding", destination: "/services/siding-contractor", permanent: true },
+      // Decks → Deck Builder
+      { source: "/services/decks", destination: "/services/deck-builder", permanent: true },
+      { source: "/services/deck-construction", destination: "/services/deck-builder", permanent: true },
+      // Home building / additions / luxury / tiny homes → Home Builder
+      { source: "/services/home-building", destination: "/services/home-builder", permanent: true },
+      {
+        source: "/services/home-addition-construction",
+        destination: "/services/home-builder",
+        permanent: true,
+      },
+      {
+        source: "/services/luxury-home-building",
+        destination: "/services/home-builder",
+        permanent: true,
+      },
+      {
+        source: "/services/tiny-home-building",
+        destination: "/services/home-builder",
+        permanent: true,
+      },
+      // Remodeling → Remodeler
+      { source: "/services/remodeling", destination: "/services/remodeler", permanent: true },
+      // Retired outdoor structures → closest active category
+      { source: "/services/patio-construction", destination: "/services/deck-builder", permanent: true },
+      { source: "/services/fence-building", destination: "/services/deck-builder", permanent: true },
     ];
   },
   experimental: {

@@ -14,12 +14,12 @@ import {
 } from "@/lib/site/servicesPublic";
 
 function normalizeStore(raw: ServicePagesStore): ServicePagesStore {
-  if (raw.version !== 2 || !Array.isArray(raw.pages)) {
+  if (raw.version !== 3 || !Array.isArray(raw.pages)) {
     return createDefaultServicePagesStore();
   }
 
   return {
-    version: 2,
+    version: 3,
     pages: raw.pages.map((page) => normalizeServicePageRecord(page)),
   };
 }

@@ -94,6 +94,36 @@ export default function ServicePageTemplate({ detail }: { detail: ServiceDetail 
         </div>
       </section>
 
+      {/* ── Featured specialty (e.g. Framing) ────────────────── */}
+      {detail.featured && (
+        <section id="framing" className="scroll-mt-28 border-t border-solid border-gray-100 bg-brand-navy py-20 text-white">
+          <div className="site-container">
+            <div className="grid items-center gap-10 lg:grid-cols-2">
+              <div>
+                <p className="text-sm font-medium uppercase tracking-[0.18em] text-brand-sky">
+                  Our Specialty
+                </p>
+                <h2 className="mt-3 text-3xl font-bold sm:text-4xl">{detail.featured.heading}</h2>
+                <p className="mt-5 max-w-xl text-base leading-relaxed text-white/85">
+                  {detail.featured.body}
+                </p>
+              </div>
+              <ul className="grid gap-4 sm:grid-cols-2">
+                {detail.featured.items.map((item) => (
+                  <li
+                    key={item}
+                    className="flex items-start gap-3 rounded-xl border border-solid border-white/15 bg-white/5 p-5"
+                  >
+                    <CheckCircle2 size={20} aria-hidden className="mt-0.5 shrink-0 text-brand-sky" />
+                    <span className="text-sm font-semibold leading-relaxed text-white">{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* ── Scope of work ────────────────────────────────────── */}
       <section className="border-y border-solid border-gray-100 bg-gray-50/60 py-20">
         <div className="site-container">
@@ -150,6 +180,39 @@ export default function ServicePageTemplate({ detail }: { detail: ServiceDetail 
                   </details>
                 ))}
               </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ── Related services (internal links) ────────────────── */}
+      {detail.relatedServices.length > 0 && (
+        <section className="bg-white py-20">
+          <div className="site-container">
+            <div className="mx-auto max-w-3xl text-center">
+              <p className="text-sm font-medium uppercase tracking-[0.18em] text-site-accent">
+                Explore More
+              </p>
+              <h2 className="mt-3 text-3xl font-bold text-site-text-dark sm:text-4xl">
+                Related Services
+              </h2>
+            </div>
+
+            <div className="mx-auto mt-12 grid max-w-4xl gap-4 sm:grid-cols-3">
+              {detail.relatedServices.map((related) => (
+                <Link
+                  key={related.href}
+                  href={related.href}
+                  className="group flex items-center justify-between gap-3 rounded-xl border border-solid border-gray-200 bg-white p-5 transition-all hover:-translate-y-1 hover:border-brand-sky/60 hover:shadow-md"
+                >
+                  <span className="text-sm font-bold text-brand-navy">{related.label}</span>
+                  <ArrowRight
+                    size={16}
+                    aria-hidden
+                    className="shrink-0 text-brand-blue transition-transform group-hover:translate-x-1 group-hover:text-brand-red"
+                  />
+                </Link>
+              ))}
             </div>
           </div>
         </section>
