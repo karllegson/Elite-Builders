@@ -1,4 +1,5 @@
 import type { HomeImageKey } from "@/lib/site/images";
+import { getServiceSubPagesForCategory } from "@/lib/site/serviceSubPages";
 
 export const business = {
   name: "Elite Builders IX",
@@ -80,15 +81,6 @@ export const services: SiteService[] = [
       "Siding installation, siding replacement, and durable fiber cement siding built to withstand California weather.",
     icon: "building",
     image: "sidingInstallation",
-  },
-  {
-    title: "Construction Company",
-    slug: "construction-company",
-    href: "/services/construction-company",
-    shortDescription:
-      "Residential construction and new building construction backed by framing-first structural expertise.",
-    icon: "building",
-    image: "commercialRoofFramingAerial",
   },
 ];
 
@@ -306,68 +298,23 @@ export const utilityNavLinks = [
 ] as const;
 
 /** Desktop mega-menu — one group per main service category, sub-services as links. */
-export const serviceMenuGroups = [
-  {
-    title: "Home Builder",
-    href: "/services/home-builder",
-    icon: "home",
-    links: [
-      { label: "Custom Home Building", href: "/services/home-builder" },
-      { label: "New Home Construction", href: "/services/home-builder" },
-      { label: "Home Addition Construction", href: "/services/home-builder" },
-    ],
-  },
-  {
-    title: "General Contractor",
-    href: "/services/general-contractor",
-    icon: "hardhat",
-    links: [
-      { label: "General Contracting", href: "/services/general-contractor" },
-      { label: "Residential Framing", href: "/services/general-contractor#framing" },
-      { label: "Commercial Framing", href: "/services/general-contractor#framing" },
-      { label: "Rough Framing", href: "/services/general-contractor#framing" },
-      { label: "Structural Framing", href: "/services/general-contractor#framing" },
-    ],
-  },
-  {
-    title: "Remodeler",
-    href: "/services/remodeler",
-    icon: "paintbrush",
-    links: [
-      { label: "Whole Home Remodeling", href: "/services/remodeler" },
-      { label: "Kitchen Remodeling", href: "/services/remodeler" },
-      { label: "Bathroom Remodeling", href: "/services/remodeler" },
-    ],
-  },
-  {
-    title: "Deck Builder",
-    href: "/services/deck-builder",
-    icon: "fence",
-    links: [
-      { label: "Wood Deck Construction", href: "/services/deck-builder" },
-      { label: "Deck Replacement", href: "/services/deck-builder" },
-    ],
-  },
-  {
-    title: "Siding Contractor",
-    href: "/services/siding-contractor",
-    icon: "panels",
-    links: [
-      { label: "Siding Installation", href: "/services/siding-contractor" },
-      { label: "Siding Replacement", href: "/services/siding-contractor" },
-      { label: "Fiber Cement Siding", href: "/services/siding-contractor" },
-    ],
-  },
-  {
-    title: "Construction Company",
-    href: "/services/construction-company",
-    icon: "building",
-    links: [
-      { label: "Residential Construction", href: "/services/construction-company" },
-      { label: "New Building Construction", href: "/services/construction-company" },
-    ],
-  },
-] as const;
+const serviceMenuIcons: Record<(typeof services)[number]["slug"], string> = {
+  "home-builder": "home",
+  "general-contractor": "hardhat",
+  remodeler: "paintbrush",
+  "deck-builder": "fence",
+  "siding-contractor": "panels",
+};
+
+export const serviceMenuGroups = services.map((service) => ({
+  title: service.title,
+  href: service.href,
+  icon: serviceMenuIcons[service.slug],
+  links: getServiceSubPagesForCategory(service.slug).map((subPage) => ({
+    label: subPage.label,
+    href: subPage.href,
+  })),
+}));
 
 /** Flat service list for mobile nav — matches Elite Builders' official service lineup. */
 export const serviceNavLinks = services.map((service) => ({
@@ -377,7 +324,7 @@ export const serviceNavLinks = services.map((service) => ({
 
 export const whyUsNavLinks = [
   { label: "Why Choose Elite Builders", href: "/#why-us" },
-  { label: "Framing Specialists", href: "/services/general-contractor#framing" },
+  { label: "Framing Specialists", href: "/services/general-contractor/residential-framing" },
   { label: "Meet Our Team", href: "/#team" },
   { label: "Featured Projects", href: "/projects" },
   { label: "Customer Reviews", href: "/#reviews" },

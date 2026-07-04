@@ -29,7 +29,6 @@ const PAGE_ID_BY_SLUG: Record<string, string> = {
   remodeler: "services-remodeler",
   "deck-builder": "services-deck-builder",
   "siding-contractor": "services-siding-contractor",
-  "construction-company": "services-construction-company",
 };
 
 export function servicePageIdForSlug(slug: string): string {

@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { SITE_URL } from "@/lib/site/seo";
 import { serviceAreas, services } from "@/lib/site/config";
+import { getAllServiceSubPages } from "@/lib/site/serviceSubPages";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
@@ -18,6 +19,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: now,
       changeFrequency: "monthly" as const,
       priority: 0.8,
+    })),
+    ...getAllServiceSubPages().map((subPage) => ({
+      url: `${SITE_URL}${subPage.href}`,
+      lastModified: now,
+      changeFrequency: "monthly" as const,
+      priority: 0.75,
     })),
     ...serviceAreas.map((area) => ({
       url: `${SITE_URL}${area.href}`,

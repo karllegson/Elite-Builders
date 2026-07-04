@@ -29,9 +29,9 @@ export const CONTACT_FORM_SERVICE_LABELS: Record<string, string> = {
   remodeler: "Remodeler",
   "deck-builder": "Deck Builder",
   "siding-contractor": "Siding Contractor",
-  "construction-company": "Construction Company",
   other: "Other",
   // Legacy slugs kept so historical submissions still display a readable label.
+  "construction-company": "Home Builder",
   remodeling: "Remodeler",
   "home-addition-construction": "Home Builder",
   "home-building": "Home Builder",

@@ -78,6 +78,24 @@ const ROUTE_MATCHERS: RouteMatcher[] = [
     ],
   },
   {
+    test: (pathname) => /^\/services\/[^/]+\/[^/]+\/?$/.test(pathname),
+    items: (pathname) => {
+      const match = pathname.match(/^\/services\/([^/]+)\/([^/]+)\/?$/);
+      const category = match?.[1] ?? "";
+      const subslug = match?.[2] ?? "";
+
+      return [
+        {
+          label: "Edit Service Sub-Page",
+          href: `/admin/services/${category}/${subslug}`,
+        },
+        { label: "Edit Parent Category", href: `/admin/services/${category}` },
+        { label: "All Service Pages", href: "/admin/pages" },
+        { label: "Dashboard", href: "/admin" },
+      ];
+    },
+  },
+  {
     test: (pathname) => /^\/services\/[^/]+\/?$/.test(pathname),
     items: (pathname) => {
       const slug = pathname.match(/^\/services\/([^/]+)\/?$/)?.[1] ?? "";

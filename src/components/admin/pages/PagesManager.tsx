@@ -439,8 +439,9 @@ export function PagesManager({ initialView = "all" }: { initialView?: PageListVi
     <div className="admin-pages-manager">
       <p className="admin-categories-status-message" role="status">
         <strong>Service pages</strong> and <strong>Service Areas</strong> sync to the live site when
-        you save. Edit service pages from the <strong>Edit</strong> button on each row (or quick
-        edit title/status). Service area city pages nest under Service Areas — edit those in{" "}
+        you save. Service sub-pages nest under each category in the tree below — edit the parent
+        category for shared content, or open a sub-page row to view its URL and SEO details. Service
+        area city pages nest under Service Areas — edit those in{" "}
         <Link href="/admin/service-areas">Service Areas</Link>. Other static pages still require
         code changes.
       </p>

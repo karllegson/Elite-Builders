@@ -4,6 +4,50 @@
     {
       "slug": "home-builder",
       "name": "Home Builder",
+      "h1": "Home Builder — Bay Area, Central Valley & Southern California",
+      "metaTitle": "Home Builder Bay Area & Central Valley CA",
+      "metaDescription": "Elite Builders is a licensed California home builder — custom home building, new home construction, and home addition construction across the Bay Area, Central Valley, and Southern California. CSLB #970551.",
+      "heroImage": "customHomeFramingCrew",
+      "intro": [
+        "Elite Builders is a licensed California home builder delivering custom home building, new home construction, and home additions with framing-first structural precision.",
+        "From the first blueprint review to the final walkthrough, we build homes that are square, solid, and inspection-ready across the Bay Area, Central Valley, and Southern California."
+      ],
+      "scopeHeading": "Our Home Builder Services",
+      "scope": [
+        "Custom Home Building",
+        "New Home Construction",
+        "Home Addition Construction",
+        "Framing-first structural construction from foundation to finish",
+        "Permit coordination and inspection-ready craftsmanship"
+      ],
+      "residential": {
+        "heading": "Custom & New Homes",
+        "body": "Ground-up custom homes and new construction built with the craftsmanship your family deserves."
+      },
+      "commercial": {
+        "heading": "Builders & Developers",
+        "body": "Dependable new-home and addition capacity for production builders across California."
+      },
+      "faqs": [
+        {
+          "question": "What home building services do you offer?",
+          "answer": "Elite Builders provides custom home building, new home construction, and home addition construction — all built with framing-first structural precision across California."
+        }
+      ],
+      "relatedServices": [
+        {
+          "label": "General Contractor",
+          "href": "/services/general-contractor"
+        },
+        {
+          "label": "Construction Company",
+          "href": "/services/construction-company"
+        },
+        {
+          "label": "Remodeler",
+          "href": "/services/remodeler"
+        }
+      ],
       "id": "services-home-builder",
       "title": "Home Builder",
       "sortOrder": 0,
@@ -13,6 +57,61 @@
     {
       "slug": "general-contractor",
       "name": "General Contractor",
+      "h1": "General Contractor & Framing Specialists — Bay Area & Central Valley",
+      "metaTitle": "General Contractor & Framing Bay Area CA",
+      "metaDescription": "Licensed general contractor specializing in residential, commercial, rough, and structural framing across the Bay Area, Central Valley, and Southern California. Framing is our signature specialty. CSLB #970551.",
+      "heroImage": "framingContractorPlanning",
+      "intro": [
+        "Elite Builders is a licensed general contractor with a signature specialty: framing. Residential, commercial, rough, and structural framing is the core of everything we build.",
+        "As your general contractor, we manage the full scope — coordinating trades, permits, and inspections — while self-performing the structural framing that protects everything above the foundation."
+      ],
+      "scopeHeading": "General Contracting Services",
+      "scope": [
+        "General Contracting",
+        "Residential Framing",
+        "Commercial Framing",
+        "Rough Framing",
+        "Structural Framing",
+        "Trades, permit, and inspection coordination"
+      ],
+      "residential": {
+        "heading": "Homeowners",
+        "body": "A hands-on general contractor who self-performs the framing and manages your project end to end."
+      },
+      "commercial": {
+        "heading": "Builders & General Contractors",
+        "body": "A dependable framing subcontractor and GC partner for production communities and commercial builds."
+      },
+      "faqs": [
+        {
+          "question": "What kinds of framing do you specialize in?",
+          "answer": "We specialize in residential framing, commercial framing, rough framing, and structural framing — it's the core specialty behind our general contracting work across California."
+        }
+      ],
+      "relatedServices": [
+        {
+          "label": "Home Builder",
+          "href": "/services/home-builder"
+        },
+        {
+          "label": "Construction Company",
+          "href": "/services/construction-company"
+        },
+        {
+          "label": "Remodeler",
+          "href": "/services/remodeler"
+        }
+      ],
+      "featured": {
+        "heading": "Framing — Our Signature Specialty",
+        "body": "Framing isn't a side service at Elite Builders — it's our foundation. Our crews self-perform residential, commercial, rough, and structural framing square, plumb, and to spec on every job across the Bay Area and Central Valley.",
+        "items": [
+          "Residential Framing",
+          "Commercial Framing",
+          "Rough Framing",
+          "Structural Framing"
+        ]
+      },
       "id": "services-general-contractor",
       "title": "General Contractor",
       "sortOrder": 1,
@@ -22,6 +121,50 @@
     {
       "slug": "remodeler",
       "name": "Remodeler",
+      "h1": "Remodeler — Whole Home, Kitchen & Bathroom Remodeling",
+      "metaTitle": "Remodeler Bay Area & Central Valley CA",
+      "metaDescription": "Elite Builders is a licensed remodeler — whole home remodeling, kitchen remodeling, and bathroom remodeling across the Bay Area, Central Valley, and Southern California. CSLB #970551.",
+      "heroImage": "customKitchenRemodel",
+      "intro": [
+        "Elite Builders is a full-service remodeler transforming existing homes with structural know-how and finish-level craftsmanship.",
+        "From whole-home renovations to kitchen and bathroom remodels, we handle the structural modifications other remodelers subcontract out — all managed with clear communication."
+      ],
+      "scopeHeading": "Our Remodeling Services",
+      "scope": [
+        "Whole Home Remodeling",
+        "Kitchen Remodeling",
+        "Bathroom Remodeling",
+        "Structural modifications and wall reconfiguration",
+        "Permit coordination and code-compliant work"
+      ],
+      "residential": {
+        "heading": "Homeowners",
+        "body": "Remodels managed with clear communication from estimate to final walkthrough."
+      },
+      "commercial": {
+        "heading": "Builders & General Contractors",
+        "body": "Reliable remodel and structural-modification capacity across Northern California."
+      },
+      "faqs": [
+        {
+          "question": "What remodeling projects do you take on?",
+          "answer": "We handle whole home remodeling, kitchen remodeling, and bathroom remodeling — including the structural modifications that come with them."
+        }
+      ],
+      "relatedServices": [
+        {
+          "label": "Home Builder",
+          "href": "/services/home-builder"
+        },
+        {
+          "label": "Siding Contractor",
+          "href": "/services/siding-contractor"
+        },
+        {
+          "label": "Deck Builder",
+          "href": "/services/deck-builder"
+        }
+      ],
       "id": "services-remodeler",
       "title": "Remodeler",
       "sortOrder": 2,
@@ -31,6 +174,50 @@
     {
       "slug": "deck-builder",
       "name": "Deck Builder",
+      "h1": "Deck Builder — Wood Deck Construction & Deck Replacement",
+      "metaTitle": "Deck Builder Bay Area & Central Valley CA",
+      "metaDescription": "Elite Builders is a licensed deck builder — wood deck construction and deck replacement across the Bay Area, Central Valley, and Southern California. CSLB #970551.",
+      "heroImage": "deckPorch",
+      "intro": [
+        "Elite Builders builds and replaces decks with the same structural precision we bring to framing.",
+        "From new wood deck construction to full deck replacement, we build outdoor living spaces that are square, solid, and built to last through California seasons."
+      ],
+      "scopeHeading": "Our Deck Building Services",
+      "scope": [
+        "Wood Deck Construction",
+        "Deck Replacement",
+        "Structural posts, beams, and joist systems",
+        "Railings, stairs, and built-in features",
+        "Code-compliant structural hardware and strapping"
+      ],
+      "residential": {
+        "heading": "Residential Decks",
+        "body": "Custom wood decks and replacements designed and built to match your home."
+      },
+      "commercial": {
+        "heading": "Production & Multi-Family",
+        "body": "Deck packages for production homes and multi-family communities."
+      },
+      "faqs": [
+        {
+          "question": "Do you replace old decks?",
+          "answer": "Yes — we handle both new wood deck construction and full deck replacement, rebuilding to current code with proper structural hardware."
+        }
+      ],
+      "relatedServices": [
+        {
+          "label": "Siding Contractor",
+          "href": "/services/siding-contractor"
+        },
+        {
+          "label": "Remodeler",
+          "href": "/services/remodeler"
+        },
+        {
+          "label": "Home Builder",
+          "href": "/services/home-builder"
+        }
+      ],
       "id": "services-deck-builder",
       "title": "Deck Builder",
       "sortOrder": 3,
@@ -40,6 +227,50 @@
     {
       "slug": "siding-contractor",
       "name": "Siding Contractor",
+      "h1": "Siding Contractor — Installation, Replacement & Fiber Cement",
+      "metaTitle": "Siding Contractor Bay Area & Central Valley CA",
+      "metaDescription": "Elite Builders is a licensed siding contractor — siding installation, siding replacement, and fiber cement siding across the Bay Area, Central Valley, and Southern California. CSLB #970551.",
+      "heroImage": "sidingInstallation",
+      "intro": [
+        "Elite Builders is a licensed siding contractor protecting and beautifying homes across California.",
+        "From new siding installation to full siding replacement and durable fiber cement siding, we install exteriors that stand up to California weather."
+      ],
+      "scopeHeading": "Our Siding Services",
+      "scope": [
+        "Siding Installation",
+        "Siding Replacement",
+        "Fiber Cement Siding",
+        "Vapor barrier and trim installation",
+        "Weather-tight exterior detailing"
+      ],
+      "residential": {
+        "heading": "Homeowners",
+        "body": "Fresh siding and replacements that boost curb appeal and protect your home."
+      },
+      "commercial": {
+        "heading": "Builders & Multi-Family",
+        "body": "Siding packages for production communities and commercial exteriors."
+      },
+      "faqs": [
+        {
+          "question": "Do you install fiber cement siding?",
+          "answer": "Yes — fiber cement siding is one of our specialties, along with new siding installation and full siding replacement."
+        }
+      ],
+      "relatedServices": [
+        {
+          "label": "Deck Builder",
+          "href": "/services/deck-builder"
+        },
+        {
+          "label": "Remodeler",
+          "href": "/services/remodeler"
+        },
+        {
+          "label": "General Contractor",
+          "href": "/services/general-contractor"
+        }
+      ],
       "id": "services-siding-contractor",
       "title": "Siding Contractor",
       "sortOrder": 4,
@@ -49,6 +280,50 @@
     {
       "slug": "construction-company",
       "name": "Construction Company",
+      "h1": "Construction Company — Residential & New Building Construction",
+      "metaTitle": "Construction Company Bay Area & Central Valley CA",
+      "metaDescription": "Elite Builders is a licensed construction company — residential construction and new building construction across the Bay Area, Central Valley, and Southern California. CSLB #970551.",
+      "heroImage": "commercialRoofFramingAerial",
+      "intro": [
+        "Elite Builders is a full-service construction company delivering residential construction and new building construction across California.",
+        "Backed by framing-first expertise, we build structures that pass inspection the first time — from single-family homes to new commercial buildings."
+      ],
+      "scopeHeading": "Our Construction Services",
+      "scope": [
+        "Residential Construction",
+        "New Building Construction",
+        "Structural framing and hardware",
+        "Permit and inspection coordination",
+        "Coordination with architects, engineers, and GCs"
+      ],
+      "residential": {
+        "heading": "Residential Construction",
+        "body": "Ground-up residential builds framed and constructed with lasting structural integrity."
+      },
+      "commercial": {
+        "heading": "New Building Construction",
+        "body": "New commercial and multi-family building construction backed by structural framing expertise."
+      },
+      "faqs": [
+        {
+          "question": "What does your construction company build?",
+          "answer": "We handle residential construction and new building construction — from single-family homes to new commercial and multi-family buildings across California."
+        }
+      ],
+      "relatedServices": [
+        {
+          "label": "Home Builder",
+          "href": "/services/home-builder"
+        },
+        {
+          "label": "General Contractor",
+          "href": "/services/general-contractor"
+        },
+        {
+          "label": "Remodeler",
+          "href": "/services/remodeler"
+        }
+      ],
       "id": "services-construction-company",
       "title": "Construction Company",
       "sortOrder": 5,

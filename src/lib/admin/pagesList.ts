@@ -4,6 +4,7 @@ import type { ServicePageRecord } from "@/lib/admin/servicesData";
 import { createDefaultServicePagesStore } from "@/lib/admin/servicesData";
 import { serviceAreas as staticServiceAreas } from "@/lib/site/config";
 import { getServiceAreaPublicHref } from "@/lib/site/serviceAreaUrls";
+import { getServiceSubPagesForCategory } from "@/lib/site/serviceSubPages";
 
 export type PageStatus = "published" | "draft";
 
@@ -135,13 +136,25 @@ function buildServicePages(servicePages: ServicePageRecord[]): PageTreeItem[] {
       (left, right) =>
         left.sortOrder - right.sortOrder || left.title.localeCompare(right.title),
     )
-    .map((page) => ({
-      id: page.id,
-      title: page.title,
-      status: page.status,
-      href: `/services/${page.slug}`,
-      adminHref: `/admin/services/${page.slug}`,
-    }));
+    .map((page) => {
+      const subPages = getServiceSubPagesForCategory(page.slug).map((subPage) => ({
+        id: `${page.id}-${subPage.slug}`,
+        title: subPage.label,
+        status: page.status,
+        href: subPage.href,
+        adminHref: `/admin/services/${page.slug}/${subPage.slug}`,
+        suffix: "Sub-page",
+      }));
+
+      return {
+        id: page.id,
+        title: page.title,
+        status: page.status,
+        href: `/services/${page.slug}`,
+        adminHref: `/admin/services/${page.slug}`,
+        children: subPages.length > 0 ? subPages : undefined,
+      };
+    });
 }
 
 /** Live Next.js routes — service pages sync from the services store; service areas from their store. */

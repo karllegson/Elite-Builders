@@ -83,8 +83,8 @@ export const serviceDetails: Record<string, ServiceDetail> = {
     ],
     relatedServices: [
       { label: "General Contractor", href: "/services/general-contractor" },
-      { label: "Construction Company", href: "/services/construction-company" },
       { label: "Remodeler", href: "/services/remodeler" },
+      { label: "Deck Builder", href: "/services/deck-builder" },
     ],
   },
   "general-contractor": {
@@ -99,9 +99,8 @@ export const serviceDetails: Record<string, ServiceDetail> = {
       "Elite Builders is a licensed general contractor with a signature specialty: framing. Residential, commercial, rough, and structural framing is the core of everything we build.",
       "As your general contractor, we manage the full scope — coordinating trades, permits, and inspections — while self-performing the structural framing that protects everything above the foundation.",
     ],
-    scopeHeading: "General Contracting Services",
+    scopeHeading: "Framing & General Contracting Services",
     scope: [
-      "General Contracting",
       "Residential Framing",
       "Commercial Framing",
       "Rough Framing",
@@ -135,8 +134,8 @@ export const serviceDetails: Record<string, ServiceDetail> = {
     },
     relatedServices: [
       { label: "Home Builder", href: "/services/home-builder" },
-      { label: "Construction Company", href: "/services/construction-company" },
       { label: "Remodeler", href: "/services/remodeler" },
+      { label: "Deck Builder", href: "/services/deck-builder" },
     ],
   },
   remodeler: {
@@ -262,47 +261,6 @@ export const serviceDetails: Record<string, ServiceDetail> = {
       { label: "General Contractor", href: "/services/general-contractor" },
     ],
   },
-  "construction-company": {
-    slug: "construction-company",
-    name: "Construction Company",
-    h1: "Construction Company — Residential & New Building Construction",
-    metaTitle: "Construction Company Bay Area & Central Valley CA",
-    metaDescription:
-      "Elite Builders is a licensed construction company — residential construction and new building construction across the Bay Area, Central Valley, and Southern California. CSLB #970551.",
-    heroImage: "commercialRoofFramingAerial",
-    intro: [
-      "Elite Builders is a full-service construction company delivering residential construction and new building construction across California.",
-      "Backed by framing-first expertise, we build structures that pass inspection the first time — from single-family homes to new commercial buildings.",
-    ],
-    scopeHeading: "Our Construction Services",
-    scope: [
-      "Residential Construction",
-      "New Building Construction",
-      "Structural framing and hardware",
-      "Permit and inspection coordination",
-      "Coordination with architects, engineers, and GCs",
-    ],
-    residential: {
-      heading: "Residential Construction",
-      body: "Ground-up residential builds framed and constructed with lasting structural integrity.",
-    },
-    commercial: {
-      heading: "New Building Construction",
-      body: "New commercial and multi-family building construction backed by structural framing expertise.",
-    },
-    faqs: [
-      {
-        question: "What does your construction company build?",
-        answer:
-          "We handle residential construction and new building construction — from single-family homes to new commercial and multi-family buildings across California.",
-      },
-    ],
-    relatedServices: [
-      { label: "Home Builder", href: "/services/home-builder" },
-      { label: "General Contractor", href: "/services/general-contractor" },
-      { label: "Remodeler", href: "/services/remodeler" },
-    ],
-  },
 };
 
 export const serviceOrder = [
@@ -311,5 +269,4 @@ export const serviceOrder = [
   "remodeler",
   "deck-builder",
   "siding-contractor",
-  "construction-company",
 ] as const;

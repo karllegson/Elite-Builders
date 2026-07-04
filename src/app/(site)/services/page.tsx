@@ -6,6 +6,7 @@ import { business } from "@/lib/site/config";
 import { homeImages } from "@/lib/site/images";
 import { listPublishedPublicServicePages } from "@/lib/admin/services.server";
 import { getPublicServicePagesFallback } from "@/lib/site/servicesPublic";
+import { getServiceSubPagesForCategory } from "@/lib/site/serviceSubPages";
 import { buildPageMetadata } from "@/lib/site/seo";
 
 export const metadata: Metadata = buildPageMetadata({
@@ -43,38 +44,60 @@ export default async function ServicesPage() {
           <div className="grid gap-6 sm:grid-cols-2">
             {services.map((detail) => {
               const img = homeImages[detail.heroImage];
+              const subPages = getServiceSubPagesForCategory(detail.slug);
+
               return (
-                <Link
+                <article
                   key={detail.slug}
-                  href={detail.href}
-                  className="group overflow-hidden rounded-xl border border-solid border-gray-200 bg-white transition-all hover:-translate-y-1 hover:border-brand-sky/60 hover:shadow-lg"
+                  className="overflow-hidden rounded-xl border border-solid border-gray-200 bg-white transition-all hover:-translate-y-1 hover:border-brand-sky/60 hover:shadow-lg"
                 >
-                  <ContentImage src={img.src} alt={img.alt} className="h-52" />
-                  <div className="p-7">
-                    <h2 className="text-lg font-bold text-brand-navy">{detail.name}</h2>
-                    <p className="mt-2 text-sm leading-relaxed text-gray-500">
-                      {detail.shortDescription ?? detail.intro[0]}
-                    </p>
-                    {detail.scope.length > 0 && (
-                      <ul className="mt-4 space-y-1.5">
-                        {detail.scope.slice(0, 3).map((item) => (
-                          <li key={item} className="flex items-start gap-2 text-sm text-gray-600">
-                            <Check size={16} aria-hidden className="mt-0.5 shrink-0 text-brand-sky" />
-                            {item}
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                    <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-bold text-brand-blue group-hover:text-brand-red">
-                      Learn More
-                      <ArrowRight
-                        size={15}
-                        aria-hidden
-                        className="transition-transform group-hover:translate-x-1"
-                      />
-                    </span>
+                  <Link href={detail.href} className="group block">
+                    <ContentImage src={img.src} alt={img.alt} className="h-52" />
+                    <div className="p-7 pb-4">
+                      <h2 className="text-lg font-bold text-brand-navy group-hover:text-brand-blue">
+                        {detail.name}
+                      </h2>
+                      <p className="mt-2 text-sm leading-relaxed text-gray-500">
+                        {detail.shortDescription ?? detail.intro[0]}
+                      </p>
+                    </div>
+                  </Link>
+
+                  {subPages.length > 0 && (
+                    <ul className="space-y-1.5 px-7 pb-4">
+                      {subPages.map((subPage) => (
+                        <li key={subPage.href}>
+                          <Link
+                            href={subPage.href}
+                            className="group/sub flex items-center gap-2 text-sm text-gray-600 transition-colors hover:text-brand-blue"
+                          >
+                            <Check
+                              size={16}
+                              aria-hidden
+                              className="shrink-0 text-brand-sky"
+                            />
+                            <span>{subPage.label}</span>
+                            <ArrowRight
+                              size={14}
+                              aria-hidden
+                              className="opacity-0 transition-all group-hover/sub:translate-x-0.5 group-hover/sub:opacity-100"
+                            />
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+
+                  <div className="border-t border-solid border-gray-100 px-7 py-4">
+                    <Link
+                      href={detail.href}
+                      className="inline-flex items-center gap-1.5 text-sm font-bold text-brand-blue transition-colors hover:text-brand-red"
+                    >
+                      View {detail.name}
+                      <ArrowRight size={15} aria-hidden />
+                    </Link>
                   </div>
-                </Link>
+                </article>
               );
             })}
           </div>

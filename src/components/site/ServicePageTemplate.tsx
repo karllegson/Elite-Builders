@@ -5,7 +5,23 @@ import { business } from "@/lib/site/config";
 import { homeImages } from "@/lib/site/images";
 import type { ServiceDetail } from "@/lib/site/scope";
 
-export default function ServicePageTemplate({ detail }: { detail: ServiceDetail }) {
+type ServiceSubPageLink = {
+  label: string;
+  href: string;
+  slug?: string;
+};
+
+type ServicePageTemplateProps = {
+  detail: ServiceDetail;
+  subPages?: ServiceSubPageLink[];
+  activeSubPage?: string;
+};
+
+export default function ServicePageTemplate({
+  detail,
+  subPages = [],
+  activeSubPage,
+}: ServicePageTemplateProps) {
   const img = homeImages[detail.heroImage];
 
   const faqSchema = {
@@ -94,6 +110,55 @@ export default function ServicePageTemplate({ detail }: { detail: ServiceDetail 
         </div>
       </section>
 
+      {/* ── Sub-services for this category ───────────────────── */}
+      {subPages.length > 0 && (
+        <section className="border-t border-solid border-gray-100 bg-white py-20">
+          <div className="site-container">
+            <div className="mx-auto max-w-3xl text-center">
+              <p className="text-sm font-medium uppercase tracking-[0.18em] text-site-accent">
+                {detail.name} Services
+              </p>
+              <h2 className="mt-3 text-3xl font-bold text-site-text-dark sm:text-4xl">
+                Explore Our {detail.name} Sub-Services
+              </h2>
+            </div>
+
+            <div className="mx-auto mt-12 grid max-w-4xl gap-4 sm:grid-cols-2">
+              {subPages.map((subPage) => {
+                const isActive = activeSubPage === subPage.slug;
+                return (
+                  <Link
+                    key={subPage.href}
+                    href={subPage.href}
+                    aria-current={isActive ? "page" : undefined}
+                    className={`group flex items-center justify-between gap-3 rounded-xl border border-solid p-5 transition-all ${
+                      isActive
+                        ? "border-brand-blue bg-brand-blue/5 shadow-sm"
+                        : "border-gray-200 bg-white hover:-translate-y-1 hover:border-brand-sky/60 hover:shadow-md"
+                    }`}
+                  >
+                    <span
+                      className={`text-sm font-bold ${
+                        isActive ? "text-brand-blue" : "text-brand-navy"
+                      }`}
+                    >
+                      {subPage.label}
+                    </span>
+                    <ArrowRight
+                      size={16}
+                      aria-hidden
+                      className={`shrink-0 transition-transform group-hover:translate-x-1 ${
+                        isActive ? "text-brand-blue" : "text-brand-blue group-hover:text-brand-red"
+                      }`}
+                    />
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* ── Featured specialty (e.g. Framing) ────────────────── */}
       {detail.featured && (
         <section id="framing" className="scroll-mt-28 border-t border-solid border-gray-100 bg-brand-navy py-20 text-white">
@@ -109,15 +174,37 @@ export default function ServicePageTemplate({ detail }: { detail: ServiceDetail 
                 </p>
               </div>
               <ul className="grid gap-4 sm:grid-cols-2">
-                {detail.featured.items.map((item) => (
-                  <li
-                    key={item}
-                    className="flex items-start gap-3 rounded-xl border border-solid border-white/15 bg-white/5 p-5"
-                  >
-                    <CheckCircle2 size={20} aria-hidden className="mt-0.5 shrink-0 text-brand-sky" />
-                    <span className="text-sm font-semibold leading-relaxed text-white">{item}</span>
-                  </li>
-                ))}
+                {detail.featured.items.map((item) => {
+                  const subPage = subPages.find((page) => page.label === item);
+                  const content = (
+                    <>
+                      <CheckCircle2 size={20} aria-hidden className="mt-0.5 shrink-0 text-brand-sky" />
+                      <span className="text-sm font-semibold leading-relaxed text-white">{item}</span>
+                    </>
+                  );
+
+                  if (subPage) {
+                    return (
+                      <li key={item}>
+                        <Link
+                          href={subPage.href}
+                          className="flex items-start gap-3 rounded-xl border border-solid border-white/15 bg-white/5 p-5 transition-colors hover:border-brand-sky/50 hover:bg-white/10"
+                        >
+                          {content}
+                        </Link>
+                      </li>
+                    );
+                  }
+
+                  return (
+                    <li
+                      key={item}
+                      className="flex items-start gap-3 rounded-xl border border-solid border-white/15 bg-white/5 p-5"
+                    >
+                      {content}
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           </div>
@@ -137,15 +224,35 @@ export default function ServicePageTemplate({ detail }: { detail: ServiceDetail 
           </div>
 
           <ul className="mx-auto mt-12 grid max-w-4xl gap-4 sm:grid-cols-2">
-            {detail.scope.map((item) => (
-              <li
-                key={item}
-                className="flex items-start gap-3 rounded-xl border border-solid border-gray-200 bg-white p-5"
-              >
-                <CheckCircle2 size={20} aria-hidden className="mt-0.5 shrink-0 text-brand-sky" />
-                <span className="text-sm leading-relaxed text-gray-600">{item}</span>
-              </li>
-            ))}
+            {detail.scope.map((item) => {
+              const subPage = subPages.find((page) => page.label === item);
+
+              if (subPage) {
+                return (
+                  <li key={item}>
+                    <Link
+                      href={subPage.href}
+                      className="group flex items-start gap-3 rounded-xl border border-solid border-gray-200 bg-white p-5 transition-all hover:-translate-y-0.5 hover:border-brand-sky/60 hover:shadow-sm"
+                    >
+                      <CheckCircle2 size={20} aria-hidden className="mt-0.5 shrink-0 text-brand-sky" />
+                      <span className="text-sm leading-relaxed text-gray-600 group-hover:text-brand-navy">
+                        {item}
+                      </span>
+                    </Link>
+                  </li>
+                );
+              }
+
+              return (
+                <li
+                  key={item}
+                  className="flex items-start gap-3 rounded-xl border border-solid border-gray-200 bg-white p-5"
+                >
+                  <CheckCircle2 size={20} aria-hidden className="mt-0.5 shrink-0 text-brand-sky" />
+                  <span className="text-sm leading-relaxed text-gray-600">{item}</span>
+                </li>
+              );
+            })}
           </ul>
         </div>
       </section>
