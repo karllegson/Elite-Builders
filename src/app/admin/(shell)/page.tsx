@@ -21,6 +21,14 @@ export default function AdminDashboardPage() {
           </p>
           <span className="admin-dashboard-card-cta">Open Analytics →</span>
         </Link>
+        <Link href="/admin/seo" className="admin-card admin-dashboard-card-link">
+          <h3>SEO</h3>
+          <p>
+            Full SEO checklist, sitemap and robots.txt status, schema coverage, and technical file
+            inventory for launch QA.
+          </p>
+          <span className="admin-dashboard-card-cta">Open SEO →</span>
+        </Link>
         <Link href="/admin/forms/entries" className="admin-card admin-dashboard-card-link">
           <h3>Contact Submissions</h3>
           <p>

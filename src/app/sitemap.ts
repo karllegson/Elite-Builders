@@ -1,36 +1,6 @@
 import type { MetadataRoute } from "next";
-import { SITE_URL } from "@/lib/site/seo";
-import { serviceAreas, services } from "@/lib/site/config";
-import { getAllServiceSubPages } from "@/lib/site/serviceSubPages";
+import { buildSitemapEntries } from "@/lib/site/sitemapEntries";
 
-export default function sitemap(): MetadataRoute.Sitemap {
-  const now = new Date();
-  const staticRoutes = ["", "/about", "/contact", "/projects", "/services", "/service-areas", "/blog"];
-
-  return [
-    ...staticRoutes.map((path) => ({
-      url: `${SITE_URL}${path}`,
-      lastModified: now,
-      changeFrequency: path === "" ? ("weekly" as const) : ("monthly" as const),
-      priority: path === "" ? 1 : 0.8,
-    })),
-    ...services.map((service) => ({
-      url: `${SITE_URL}${service.href}`,
-      lastModified: now,
-      changeFrequency: "monthly" as const,
-      priority: 0.8,
-    })),
-    ...getAllServiceSubPages().map((subPage) => ({
-      url: `${SITE_URL}${subPage.href}`,
-      lastModified: now,
-      changeFrequency: "monthly" as const,
-      priority: 0.75,
-    })),
-    ...serviceAreas.map((area) => ({
-      url: `${SITE_URL}${area.href}`,
-      lastModified: now,
-      changeFrequency: "monthly" as const,
-      priority: 0.7,
-    })),
-  ];
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  return buildSitemapEntries();
 }
