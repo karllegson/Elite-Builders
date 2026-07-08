@@ -1,8 +1,10 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { useState, type FormEvent } from "react";
+import { useCallback, useState, type FormEvent } from "react";
+import TurnstileWidget from "@/components/site/TurnstileWidget";
 import type { ContactFormType } from "@/lib/contact/submissions.types";
+import { getTurnstileSiteKey } from "@/lib/contact/turnstileConfig";
 import { trackAnalyticsEvent } from "@/lib/site/analytics";
 import { business, services } from "@/lib/site/config";
 
@@ -24,8 +26,31 @@ export default function ContactForm({
   submitLabel,
 }: ContactFormProps) {
   const pathname = usePathname();
+  const turnstileSiteKey = getTurnstileSiteKey();
+  const turnstileRequired = Boolean(turnstileSiteKey);
+  const [formLoadedAt] = useState(() => Date.now());
   const [submitState, setSubmitState] = useState<SubmitState>("idle");
   const [errorMessage, setErrorMessage] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const [turnstileKey, setTurnstileKey] = useState(0);
+
+  const handleTurnstileToken = useCallback((token: string) => {
+    setTurnstileToken(token);
+  }, []);
+
+  const handleTurnstileExpire = useCallback(() => {
+    setTurnstileToken("");
+  }, []);
+
+  const handleTurnstileError = useCallback(() => {
+    setTurnstileToken("");
+    setErrorMessage("Security check failed. Please try again.");
+  }, []);
+
+  const resetTurnstile = useCallback(() => {
+    setTurnstileToken("");
+    setTurnstileKey((current) => current + 1);
+  }, []);
 
   const heading =
     title ??
@@ -41,8 +66,14 @@ export default function ContactForm({
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setSubmitState("submitting");
     setErrorMessage("");
+
+    if (turnstileRequired && !turnstileToken) {
+      setErrorMessage("Please complete the security check.");
+      return;
+    }
+
+    setSubmitState("submitting");
 
     const form = event.currentTarget;
     const formData = new FormData(form);
@@ -60,6 +91,8 @@ export default function ContactForm({
           pagePath: pathname || "/",
           formType,
           website: formData.get("website"),
+          formLoadedAt,
+          turnstileToken: turnstileToken || undefined,
         }),
       });
 
@@ -77,6 +110,7 @@ export default function ContactForm({
       form.reset();
       setSubmitState("success");
     } catch (error) {
+      resetTurnstile();
       setSubmitState("error");
       setErrorMessage(
         error instanceof Error ? error.message : "Unable to send your message right now.",
@@ -253,6 +287,17 @@ export default function ContactForm({
         >
           Response within one business day.
         </p>
+
+        {turnstileSiteKey ? (
+          <TurnstileWidget
+            key={turnstileKey}
+            siteKey={turnstileSiteKey}
+            onToken={handleTurnstileToken}
+            onExpire={handleTurnstileExpire}
+            onError={handleTurnstileError}
+            theme={variant === "card" ? "light" : "dark"}
+          />
+        ) : null}
 
         <button
           type="submit"
