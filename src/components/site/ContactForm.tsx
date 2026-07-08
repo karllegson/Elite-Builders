@@ -33,8 +33,8 @@ export default function ContactForm({
   const lede =
     description ??
     (formType === "contact"
-      ? "Tell us about your project and we will respond within one business day."
-      : "No pressure. No obligation. We respond within one business day.");
+      ? "Tell us about your project."
+      : "No pressure. No obligation.");
   const buttonLabel =
     submitLabel ??
     (formType === "contact" ? "Send Message" : "Request My Free Estimate");
@@ -245,6 +245,14 @@ export default function ContactForm({
             {errorMessage}
           </p>
         ) : null}
+
+        <p
+          className={`text-center text-sm ${
+            variant === "card" ? "text-gray-600" : "text-white/80"
+          }`}
+        >
+          Response within one business day.
+        </p>
 
         <button
           type="submit"
