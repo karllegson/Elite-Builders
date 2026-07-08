@@ -19,7 +19,7 @@ export default function ContactPage() {
           <p className="text-sm font-medium uppercase tracking-[0.18em] text-brand-sky">
             Contact Us
           </p>
-          <h1 className="mt-3 max-w-3xl text-3xl font-bold leading-tight sm:text-4xl lg:text-5xl">
+          <h1 className="mt-3 max-w-3xl text-3xl font-bold leading-tight text-white sm:text-4xl lg:text-5xl">
             Request a Free Estimate or Ask a Question
           </h1>
           <p className="mt-5 max-w-2xl text-base leading-relaxed text-white/85">
