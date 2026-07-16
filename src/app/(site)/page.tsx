@@ -206,6 +206,8 @@ export default async function HomePage() {
         </div>
       </section>
 
+      <TeamSection members={teamMembers} />
+
       {/* ── Dual audience — homeowners + builders ────────────── */}
       <section className="border-t border-solid border-gray-100 bg-gray-50/60 py-12 sm:py-24">
         <div className="site-container">
@@ -264,8 +266,6 @@ export default async function HomePage() {
           </p>
         </div>
       </section>
-
-      <TeamSection members={teamMembers} />
 
       <WhyChooseUsSection items={whyChooseUs} lede={framingFirstTagline} />
 

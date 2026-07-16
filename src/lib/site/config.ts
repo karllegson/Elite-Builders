@@ -272,21 +272,82 @@ export type TeamMember = {
   role: string;
   initials: string;
   imageSrc?: string;
+  /** CSS object-position for circular crops (e.g. "50% 20%"). */
+  imageObjectPosition?: string;
+  /** Display-only zoom on the website crop — does not change the source file. */
+  imageScale?: number;
   isPlaceholder?: boolean;
   profile?: TeamMemberProfile;
 };
 
-/** Homepage team cards — add members here when names and headshots are ready. */
+/**
+ * Homepage team cards.
+ * Headshots live in /public/images/team/. Replace placeholder names/roles when ready.
+ */
 export const teamMembers: TeamMember[] = [
   {
     id: "fernando-gradilla",
     name: "Fernando Gradilla",
     role: "Owner",
     initials: "FG",
+    imageSrc: "/images/team/fernando-gradilla.webp",
+    // Low Y keeps the edited headroom visible (center-crop was cutting it off).
+    imageObjectPosition: "51% 15%",
+    imageScale: 1.08,
     profile: {
       experience: "Construction & framing background",
       bio: "Fernando built his career in construction long before Elite Builders — learning the trade on job sites across Northern California. During a difficult time in his life, he met the Lord, and his Christian faith became the foundation for how he leads today. He founded Elite Builders on no cutting corners, real integrity, and promises kept — treating every residential and commercial project with the honesty and care he'd want on his own home.",
     },
+  },
+  {
+    id: "team-member-01",
+    name: "Name Coming Soon",
+    role: "Team Member",
+    initials: "?",
+    imageSrc: "/images/team/team-member-01.webp",
+    imageObjectPosition: "42% 18%",
+    imageScale: 1.44,
+    isPlaceholder: true,
+  },
+  {
+    id: "team-member-02",
+    name: "Name Coming Soon",
+    role: "Team Member",
+    initials: "?",
+    imageSrc: "/images/team/team-member-02.webp",
+    imageObjectPosition: "45% 0%",
+    imageScale: 1.33,
+    isPlaceholder: true,
+  },
+  {
+    id: "team-member-03",
+    name: "Name Coming Soon",
+    role: "Team Member",
+    initials: "?",
+    imageSrc: "/images/team/team-member-03.webp",
+    imageObjectPosition: "50% 48%",
+    imageScale: 1,
+    isPlaceholder: true,
+  },
+  {
+    id: "team-member-04",
+    name: "Name Coming Soon",
+    role: "Team Member",
+    initials: "?",
+    imageSrc: "/images/team/team-member-04.webp",
+    imageObjectPosition: "50% 26%",
+    imageScale: 1,
+    isPlaceholder: true,
+  },
+  {
+    id: "team-member-05",
+    name: "Name Coming Soon",
+    role: "Team Member",
+    initials: "?",
+    imageSrc: "/images/team/team-member-05.webp",
+    imageObjectPosition: "2% 38%",
+    imageScale: 1,
+    isPlaceholder: true,
   },
 ];
 

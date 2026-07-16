@@ -56,7 +56,10 @@ export default function HomeHeroSection({ children }: HomeHeroSectionProps) {
   }, [markVideoReady]);
 
   return (
-    <section className="relative min-h-[58dvh] overflow-hidden bg-brand-navy sm:min-h-[75dvh]">
+    <section
+      id="home-hero"
+      className="relative min-h-[58dvh] overflow-hidden bg-brand-navy sm:min-h-[75dvh]"
+    >
       {showVideo ? (
         <video
           ref={videoRef}

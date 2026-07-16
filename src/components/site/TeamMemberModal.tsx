@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import Image from "next/image";
 import { X } from "lucide-react";
+import { TeamHeadshotImage } from "@/components/site/TeamHeadshotImage";
 import type { TeamMember } from "@/lib/site/config";
 
 type TeamMemberModalProps = {
@@ -13,12 +13,10 @@ type TeamMemberModalProps = {
 function ModalPhoto({ member }: { member: TeamMember }) {
   if (member.imageSrc) {
     return (
-      <Image
-        src={member.imageSrc}
-        alt={member.name}
-        width={200}
-        height={200}
-        className="size-32 shrink-0 rounded-full object-cover ring-4 ring-white shadow-md sm:size-36"
+      <TeamHeadshotImage
+        member={member}
+        frameClassName="size-32 shrink-0 ring-4 ring-white shadow-md sm:size-36"
+        sizes="(max-width: 640px) 128px, 144px"
       />
     );
   }
