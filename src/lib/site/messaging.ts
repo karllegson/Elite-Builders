@@ -8,7 +8,7 @@ export const integrityStatement =
   "Integrity means doing the right thing even when you didn't have to — because it's the right thing to do.";
 
 export const differentiationIntro =
-  "How we work when the inspector isn't on site — and when they are.";
+  "Three principles on every job — from estimate to inspection.";
 
 export const brandPillarsHeading = "The Standard Behind Every Frame";
 
@@ -20,15 +20,15 @@ export const heroIntro =
 export const brandPillars = [
   {
     title: "No Cutting Corners",
-    body: "Every connection framed to code and spec. Shortcuts behind the walls become expensive problems — we don't pass them down the line.",
+    body: "Framed to code and spec — no shortcuts behind the walls.",
   },
   {
     title: "Integrity",
-    body: "When we find an issue, we address it — not bury it. Doing the right thing isn't optional just because no one would know.",
+    body: "Problems addressed openly, even when no one's watching.",
   },
   {
-    title: "Promises",
-    body: "Clear scope, honest timelines, and updates you don't have to chase. If we commit to it, that's what you get.",
+    title: "Our Word",
+    body: "Clear scope, honest timelines, updates without the chase.",
   },
 ] as const;
 

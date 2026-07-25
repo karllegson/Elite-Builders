@@ -10,6 +10,7 @@ type ContactSubmissionRow = {
   id: string;
   name: string;
   phone: string;
+  email: string;
   city: string;
   service: string;
   message: string;
@@ -28,13 +29,27 @@ function normalizePagePath(path: string | undefined): string {
   return trimmed.startsWith("/") ? trimmed.slice(0, 300) : `/${trimmed}`.slice(0, 300);
 }
 
+function normalizeEmail(value: string | undefined): string {
+  const email = normalizeText(value, 254).toLowerCase();
+  if (!email) {
+    return "";
+  }
+
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? email : "";
+}
+
 export function sanitizeContactSubmissionInput(
   input: Partial<ContactSubmissionInput>,
 ): ContactSubmissionInput | null {
   const name = normalizeText(input.name, 120);
   const phone = normalizeText(input.phone, 40);
+  const rawEmail = normalizeText(input.email, 254);
 
   if (name.length < 2 || phone.length < 7) {
+    return null;
+  }
+
+  if (rawEmail && !normalizeEmail(rawEmail)) {
     return null;
   }
 
@@ -43,6 +58,7 @@ export function sanitizeContactSubmissionInput(
   return {
     name,
     phone,
+    email: normalizeEmail(rawEmail),
     city: normalizeText(input.city, 120),
     service: normalizeText(input.service, 80),
     message: normalizeText(input.message, 4000),
@@ -56,6 +72,7 @@ function mapRow(row: ContactSubmissionRow): ContactSubmission {
     id: row.id,
     name: row.name,
     phone: row.phone,
+    email: row.email ?? "",
     city: row.city,
     service: row.service,
     message: row.message,
@@ -80,6 +97,7 @@ export async function createContactSubmission(
       .insert({
         name: input.name,
         phone: input.phone,
+        email: input.email ?? "",
         city: input.city ?? "",
         service: input.service ?? "",
         message: input.message ?? "",

@@ -10,9 +10,9 @@ import { getServiceSubPagesForCategory } from "@/lib/site/serviceSubPages";
 import { buildPageMetadata } from "@/lib/site/seo";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Construction Services — Home Builder, General Contractor & Framing",
+  title: "Construction Services — Framing Contractor, Home Builder & More",
   description:
-    "Home building, general contracting, framing, remodeling, deck building, siding, and construction across the Bay Area, Central Valley, and Southern California. Framing is our signature specialty. CSLB #970551.",
+    "Framing contractor, home building, deck building, and siding across the Bay Area, Central Valley, and Southern California. Custom, production, and addition framing is our core specialty. CSLB #970551.",
   path: "/services",
 });
 
@@ -28,12 +28,12 @@ export default async function ServicesPage() {
             Our Services
           </p>
           <h1 className="mt-3 max-w-3xl text-3xl font-bold leading-tight text-white sm:text-4xl lg:text-5xl">
-            Home Builder, General Contractor & Framing Specialists
+            Framing Contractor & Construction Specialists
           </h1>
           <p className="mt-5 max-w-2xl text-base leading-relaxed text-white/85">
-            Elite Builders offers home building, general contracting, remodeling, deck building,
-            siding, and construction — all built with framing-first precision across the Bay Area,
-            Central Valley, and Southern California. Framing is our signature specialty.
+            Elite Builders is a framing-first contractor — custom, production, and addition framing
+            plus home building, deck construction, and siding across the Bay Area, Central Valley, and
+            Southern California.
           </p>
           <p className="mt-4 text-sm font-semibold text-brand-sky">{business.license}</p>
         </div>

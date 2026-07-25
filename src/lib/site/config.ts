@@ -38,31 +38,22 @@ export type SiteService = {
 
 export const services: SiteService[] = [
   {
-    title: "Home Builder",
-    slug: "home-builder",
-    href: "/services/home-builder",
+    title: "Framing Contractor",
+    slug: "framing-contractor",
+    href: "/services/framing-contractor",
     shortDescription:
-      "Custom home building, new home construction, and home additions — framing-first builds across California.",
-    icon: "hammer",
-    image: "customHomeFramingCrew",
-  },
-  {
-    title: "General Contractor",
-    slug: "general-contractor",
-    href: "/services/general-contractor",
-    shortDescription:
-      "Full-service general contracting with framing as our signature specialty — residential, commercial, rough, and structural framing.",
+      "Custom, production, and addition framing — residential, commercial, rough, and structural work across California.",
     icon: "clipboard",
     image: "framingContractorPlanning",
   },
   {
-    title: "Remodeler",
-    slug: "remodeler",
-    href: "/services/remodeler",
+    title: "Home Builder",
+    slug: "home-builder",
+    href: "/services/home-builder",
     shortDescription:
-      "Whole home, kitchen, and bathroom remodeling — including the structural modifications other remodelers subcontract out.",
-    icon: "layers",
-    image: "customKitchenRemodel",
+      "Custom home building, production home framing, and home additions — framing-first builds across California.",
+    icon: "hammer",
+    image: "customHomeFramingCrew",
   },
   {
     title: "Deck Builder",
@@ -78,7 +69,7 @@ export const services: SiteService[] = [
     slug: "siding-contractor",
     href: "/services/siding-contractor",
     shortDescription:
-      "Siding installation, siding replacement, and durable fiber cement siding built to withstand California weather.",
+      "Siding installation and siding replacement — exterior protection built to withstand California weather.",
     icon: "building",
     image: "sidingInstallation",
   },
@@ -300,69 +291,64 @@ export const teamMembers: TeamMember[] = [
     },
   },
   {
-    id: "team-member-01",
-    name: "Name Coming Soon",
+    id: "juan-carlos-marin",
+    name: "Juan Carlos Marin",
     role: "Team Member",
-    initials: "?",
+    initials: "JC",
     imageSrc: "/images/team/team-member-01.webp",
-    imageObjectPosition: "42% 18%",
+    imageObjectPosition: "50% 18%",
     imageScale: 1.44,
-    isPlaceholder: true,
   },
   {
-    id: "team-member-02",
-    name: "Name Coming Soon",
+    id: "ramon-baltazar",
+    name: "Ramon Baltazar",
     role: "Team Member",
-    initials: "?",
+    initials: "RB",
     imageSrc: "/images/team/team-member-02.webp",
-    imageObjectPosition: "45% 0%",
-    imageScale: 1.33,
-    isPlaceholder: true,
+    imageObjectPosition: "47% 28%",
+    imageScale: 1.24,
   },
   {
-    id: "team-member-03",
-    name: "Name Coming Soon",
+    id: "maria-zavalza",
+    name: "Maria Zavalza",
     role: "Team Member",
-    initials: "?",
+    initials: "MZ",
     imageSrc: "/images/team/team-member-03.webp",
     imageObjectPosition: "50% 48%",
     imageScale: 1,
-    isPlaceholder: true,
   },
   {
-    id: "team-member-04",
-    name: "Name Coming Soon",
+    id: "edith-pelayo",
+    name: "Edith Pelayo",
     role: "Team Member",
-    initials: "?",
+    initials: "EP",
     imageSrc: "/images/team/team-member-04.webp",
     imageObjectPosition: "50% 26%",
     imageScale: 1,
-    isPlaceholder: true,
   },
   {
-    id: "team-member-05",
-    name: "Name Coming Soon",
+    id: "francisco-gradilla",
+    name: "Francisco Gradilla",
     role: "Team Member",
-    initials: "?",
+    initials: "FC",
     imageSrc: "/images/team/team-member-05.webp",
     imageObjectPosition: "2% 38%",
     imageScale: 1,
-    isPlaceholder: true,
   },
 ];
 
 /** Top utility bar — hides on scroll (Arlington-style). */
 export const utilityNavLinks = [
   { label: "Service Areas", href: "/service-areas" },
+  { label: "Blog", href: "/blog" },
   { label: "Reviews", href: "/#reviews" },
   { label: "Projects", href: "/projects" },
 ] as const;
 
 /** Desktop mega-menu — one group per main service category, sub-services as links. */
 const serviceMenuIcons: Record<(typeof services)[number]["slug"], string> = {
+  "framing-contractor": "hardhat",
   "home-builder": "home",
-  "general-contractor": "hardhat",
-  remodeler: "paintbrush",
   "deck-builder": "fence",
   "siding-contractor": "panels",
 };
@@ -385,7 +371,7 @@ export const serviceNavLinks = services.map((service) => ({
 
 export const whyUsNavLinks = [
   { label: "Why Choose Elite Builders", href: "/#why-us" },
-  { label: "Framing Specialists", href: "/services/general-contractor/residential-framing" },
+  { label: "Framing Specialists", href: "/services/framing-contractor/custom-framing" },
   { label: "Meet Our Team", href: "/#team" },
   { label: "Featured Projects", href: "/projects" },
   { label: "Customer Reviews", href: "/#reviews" },

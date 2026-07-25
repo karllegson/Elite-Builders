@@ -20,7 +20,7 @@ export const roughCarpentryScope: string[] = [
 
 export type RelatedService = { label: string; href: string };
 
-/** Highlighted specialty block — used to feature Framing under General Contractor. */
+/** Highlighted specialty block — used on framing contractor pages. */
 export type FeaturedBlock = { heading: string; body: string; items: string[] };
 
 export type ServiceDetail = {
@@ -41,7 +41,7 @@ export type ServiceDetail = {
   faqs: { question: string; answer: string }[];
   /** Internal links to related service categories for SEO + navigation. */
   relatedServices: RelatedService[];
-  /** Optional featured specialty callout (e.g. Framing under General Contractor). */
+  /** Optional featured specialty callout (e.g. framing-first block on sub-pages). */
   featured?: FeaturedBlock;
 };
 
@@ -82,101 +82,68 @@ export const serviceDetails: Record<string, ServiceDetail> = {
       },
     ],
     relatedServices: [
-      { label: "General Contractor", href: "/services/general-contractor" },
-      { label: "Remodeler", href: "/services/remodeler" },
+      { label: "Framing Contractor", href: "/services/framing-contractor" },
       { label: "Deck Builder", href: "/services/deck-builder" },
+      { label: "Siding Contractor", href: "/services/siding-contractor" },
     ],
   },
-  "general-contractor": {
-    slug: "general-contractor",
-    name: "General Contractor",
-    h1: "General Contractor & Framing Specialists — Bay Area & Central Valley",
-    metaTitle: "General Contractor & Framing Bay Area CA",
+  "framing-contractor": {
+    slug: "framing-contractor",
+    name: "Framing Contractor",
+    h1: "Framing Contractor — Bay Area, Central Valley & Southern California",
+    metaTitle: "Framing Contractor Bay Area & Central Valley CA",
     metaDescription:
-      "Licensed general contractor specializing in residential, commercial, rough, and structural framing across the Bay Area, Central Valley, and Southern California. Framing is our signature specialty. CSLB #970551.",
+      "Licensed framing contractor — custom framing, production home framing, home addition framing, residential, commercial, rough, and structural framing across California. CSLB #970551.",
     heroImage: "framingContractorPlanning",
     intro: [
-      "Elite Builders is a licensed general contractor with a signature specialty: framing. Residential, commercial, rough, and structural framing is the core of everything we build.",
-      "As your general contractor, we manage the full scope — coordinating trades, permits, and inspections — while self-performing the structural framing that protects everything above the foundation.",
+      "Elite Builders is a licensed framing contractor. Custom framing, production home framing, and home addition framing are what we do every day — square, plumb, and inspection-ready.",
+      "We self-perform structural framing for new builds, additions, and remodels. Need kitchen or room re-framing? We handle the structural work — walls, headers, and layout — not finish remodeling.",
     ],
-    scopeHeading: "Framing & General Contracting Services",
+    scopeHeading: "Our Framing Services",
     scope: [
+      "Custom Framing",
+      "Home Addition Framing",
+      "Production Home Framing",
       "Residential Framing",
       "Commercial Framing",
       "Rough Framing",
       "Structural Framing",
-      "Trades, permit, and inspection coordination",
+      "Remodel Framing",
     ],
     residential: {
       heading: "Homeowners",
-      body: "A hands-on general contractor who self-performs the framing and manages your project end to end.",
+      body: "Addition framing, custom homes, and structural work for remodels — clear estimates and crews who treat your project like their own.",
     },
     commercial: {
-      heading: "Builders & General Contractors",
-      body: "A dependable framing subcontractor and GC partner for production communities and commercial builds.",
+      heading: "Builders & Developers",
+      body: "Production home framing and dependable rough framing capacity for builders across California.",
     },
     faqs: [
       {
+        question: "Do you do full kitchen or bathroom remodeling?",
+        answer:
+          "We focus on framing — the structural work. That includes kitchen and room re-framing, wall removal, headers, and layout changes. Finish remodeling (cabinets, tile, fixtures) is outside our scope.",
+      },
+      {
         question: "What kinds of framing do you specialize in?",
         answer:
-          "We specialize in residential framing, commercial framing, rough framing, and structural framing — it's the core specialty behind our general contracting work across California.",
+          "Custom framing, production home framing, home addition framing, residential and commercial framing, rough framing, structural framing, and remodel framing across the Bay Area and Central Valley.",
       },
     ],
     featured: {
-      heading: "Framing — Our Signature Specialty",
-      body: "Framing isn't a side service at Elite Builders — it's our foundation. Our crews self-perform residential, commercial, rough, and structural framing square, plumb, and to spec on every job across the Bay Area and Central Valley.",
+      heading: "Framing-First Specialists",
+      body: "Framing isn't a side service at Elite Builders — it's what we build our reputation on. Our crews self-perform structural framing square, plumb, and to spec on every job.",
       items: [
-        "Residential Framing",
-        "Commercial Framing",
-        "Rough Framing",
-        "Structural Framing",
+        "Custom Framing",
+        "Production Home Framing",
+        "Home Addition Framing",
+        "Residential & Commercial Framing",
       ],
     },
     relatedServices: [
       { label: "Home Builder", href: "/services/home-builder" },
-      { label: "Remodeler", href: "/services/remodeler" },
       { label: "Deck Builder", href: "/services/deck-builder" },
-    ],
-  },
-  remodeler: {
-    slug: "remodeler",
-    name: "Remodeler",
-    h1: "Remodeler — Whole Home, Kitchen & Bathroom Remodeling",
-    metaTitle: "Remodeler Bay Area & Central Valley CA",
-    metaDescription:
-      "Elite Builders is a licensed remodeler — whole home remodeling, kitchen remodeling, and bathroom remodeling across the Bay Area, Central Valley, and Southern California. CSLB #970551.",
-    heroImage: "customKitchenRemodel",
-    intro: [
-      "Elite Builders is a full-service remodeler transforming existing homes with structural know-how and finish-level craftsmanship.",
-      "From whole-home renovations to kitchen and bathroom remodels, we handle the structural modifications other remodelers subcontract out — all managed with clear communication.",
-    ],
-    scopeHeading: "Our Remodeling Services",
-    scope: [
-      "Whole Home Remodeling",
-      "Kitchen Remodeling",
-      "Bathroom Remodeling",
-      "Structural modifications and wall reconfiguration",
-      "Permit coordination and code-compliant work",
-    ],
-    residential: {
-      heading: "Homeowners",
-      body: "Remodels managed with clear communication from estimate to final walkthrough.",
-    },
-    commercial: {
-      heading: "Builders & General Contractors",
-      body: "Reliable remodel and structural-modification capacity across Northern California.",
-    },
-    faqs: [
-      {
-        question: "What remodeling projects do you take on?",
-        answer:
-          "We handle whole home remodeling, kitchen remodeling, and bathroom remodeling — including the structural modifications that come with them.",
-      },
-    ],
-    relatedServices: [
-      { label: "Home Builder", href: "/services/home-builder" },
       { label: "Siding Contractor", href: "/services/siding-contractor" },
-      { label: "Deck Builder", href: "/services/deck-builder" },
     ],
   },
   "deck-builder": {
@@ -216,27 +183,26 @@ export const serviceDetails: Record<string, ServiceDetail> = {
     ],
     relatedServices: [
       { label: "Siding Contractor", href: "/services/siding-contractor" },
-      { label: "Remodeler", href: "/services/remodeler" },
+      { label: "Framing Contractor", href: "/services/framing-contractor" },
       { label: "Home Builder", href: "/services/home-builder" },
     ],
   },
   "siding-contractor": {
     slug: "siding-contractor",
     name: "Siding Contractor",
-    h1: "Siding Contractor — Installation, Replacement & Fiber Cement",
+    h1: "Siding Contractor — Installation & Replacement",
     metaTitle: "Siding Contractor Bay Area & Central Valley CA",
     metaDescription:
-      "Elite Builders is a licensed siding contractor — siding installation, siding replacement, and fiber cement siding across the Bay Area, Central Valley, and Southern California. CSLB #970551.",
+      "Elite Builders is a licensed siding contractor — siding installation and siding replacement across the Bay Area, Central Valley, and Southern California. CSLB #970551.",
     heroImage: "sidingInstallation",
     intro: [
       "Elite Builders is a licensed siding contractor protecting and beautifying homes across California.",
-      "From new siding installation to full siding replacement and durable fiber cement siding, we install exteriors that stand up to California weather.",
+      "From new siding installation to full siding replacement, we install exteriors that stand up to California weather.",
     ],
     scopeHeading: "Our Siding Services",
     scope: [
       "Siding Installation",
       "Siding Replacement",
-      "Fiber Cement Siding",
       "Vapor barrier and trim installation",
       "Weather-tight exterior detailing",
     ],
@@ -250,23 +216,22 @@ export const serviceDetails: Record<string, ServiceDetail> = {
     },
     faqs: [
       {
-        question: "Do you install fiber cement siding?",
+        question: "Do you install and replace siding?",
         answer:
-          "Yes — fiber cement siding is one of our specialties, along with new siding installation and full siding replacement.",
+          "Yes — we handle new siding installation and full siding replacement with proper vapor barrier and trim detailing.",
       },
     ],
     relatedServices: [
       { label: "Deck Builder", href: "/services/deck-builder" },
-      { label: "Remodeler", href: "/services/remodeler" },
-      { label: "General Contractor", href: "/services/general-contractor" },
+      { label: "Framing Contractor", href: "/services/framing-contractor" },
+      { label: "Home Builder", href: "/services/home-builder" },
     ],
   },
 };
 
 export const serviceOrder = [
+  "framing-contractor",
   "home-builder",
-  "general-contractor",
-  "remodeler",
   "deck-builder",
   "siding-contractor",
 ] as const;

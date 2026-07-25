@@ -122,6 +122,10 @@ body {
     text-wrap: balance;
   }
 
+  .site :is(h1, h2, h3, h4).text-white {
+    color: #fff;
+  }
+
   .site strong {
     font-weight: 600;
   }
@@ -1577,4 +1581,176 @@ body {
 .site .service-area-html-content .quick-summary:not(:has(.site-quick-summary)) em,
 .site .service-area-html-content .quick-summary:not(:has(.site-quick-summary)) i {
   font-style: normal;
+}
+
+/* Contact page — split hero (text left, group photo right, edge fade) */
+.site .contact-page-hero {
+  overflow: hidden;
+  background: rgb(249 250 251);
+}
+
+.site .contact-page-hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.site .contact-page-hero-copy {
+  position: relative;
+  z-index: 2;
+  padding: 3rem var(--site-container-margin, 1.25rem) 2.5rem;
+  text-align: center;
+}
+
+.site .contact-page-hero-title {
+  color: var(--color-brand-navy);
+}
+
+.site .contact-page-hero-media {
+  position: relative;
+  min-height: 18rem;
+  overflow: hidden;
+}
+
+.site .contact-page-hero-photo {
+  object-fit: cover;
+  max-width: none;
+  width: 100%;
+  height: 100%;
+}
+
+.site .contact-page-hero-fade {
+  pointer-events: none;
+  position: absolute;
+}
+
+@media (max-width: 1023px) {
+  .site .contact-page-hero-fade {
+    inset: 0;
+    background: linear-gradient(
+      180deg,
+      rgb(249 250 251) 0%,
+      rgb(249 250 251 / 0.78) 8%,
+      rgb(249 250 251 / 0.18) 18%,
+      transparent 28%
+    );
+  }
+}
+
+@media (min-width: 1024px) {
+  .site .contact-page-hero-grid {
+    grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+    min-height: 28rem;
+  }
+
+  .site .contact-page-hero-copy {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 4.5rem 2rem;
+  }
+
+  .site .contact-page-hero-media {
+    min-height: 100%;
+  }
+
+  .site .contact-page-hero-fade {
+    inset: 0 auto 0 0;
+    width: min(6.5rem, 11%);
+    background: linear-gradient(
+      90deg,
+      rgb(249 250 251) 0%,
+      rgb(249 250 251 / 0.88) 38%,
+      rgb(249 250 251 / 0.15) 72%,
+      transparent 100%
+    );
+  }
+}
+
+/* Homepage — What We Stand For split hero (group photo left, text right) */
+.site .brand-pillars-hero {
+  overflow: hidden;
+  background: #f5f8fd;
+}
+
+.site .brand-pillars-hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.site .brand-pillars-hero-copy {
+  position: relative;
+  z-index: 2;
+  padding: 2.5rem var(--site-container-margin, 1.25rem);
+  text-align: center;
+}
+
+.site .brand-pillars-hero-media {
+  position: relative;
+  min-height: 18rem;
+  overflow: hidden;
+}
+
+.site .brand-pillars-hero-photo {
+  object-fit: cover;
+  max-width: none;
+  width: 100%;
+  height: 100%;
+}
+
+.site .brand-pillars-hero-fade {
+  pointer-events: none;
+  position: absolute;
+}
+
+.site .brand-pillars-card {
+  text-align: left;
+}
+
+@media (max-width: 1023px) {
+  .site .brand-pillars-hero-fade {
+    inset: 0;
+    background: linear-gradient(
+      180deg,
+      transparent 0%,
+      rgb(245 248 253 / 0.18) 72%,
+      rgb(245 248 253 / 0.78) 88%,
+      #f5f8fd 100%
+    );
+  }
+}
+
+@media (min-width: 1024px) {
+  .site .brand-pillars-hero-grid {
+    grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
+    align-items: center;
+  }
+
+  .site .brand-pillars-hero-copy {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 2.75rem 2rem 2.75rem 1.75rem;
+  }
+
+  .site .brand-pillars-hero-media {
+    aspect-ratio: 3600 / 2435;
+    width: 100%;
+    min-height: unset;
+    height: auto;
+    align-self: center;
+  }
+
+  .site .brand-pillars-hero-fade {
+    inset: 0 0 0 auto;
+    width: min(6.5rem, 11%);
+    background: linear-gradient(
+      270deg,
+      #f5f8fd 0%,
+      rgb(245 248 253 / 0.88) 38%,
+      rgb(245 248 253 / 0.15) 72%,
+      transparent 100%
+    );
+  }
 }
