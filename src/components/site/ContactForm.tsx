@@ -1,10 +1,8 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { useCallback, useState, type FormEvent } from "react";
-import TurnstileWidget from "@/components/site/TurnstileWidget";
+import { useState, type FormEvent } from "react";
 import type { ContactFormType } from "@/lib/contact/submissions.types";
-import { getTurnstileSiteKey } from "@/lib/contact/turnstileConfig";
 import { trackAnalyticsEvent } from "@/lib/site/analytics";
 import { business, services } from "@/lib/site/config";
 
@@ -26,31 +24,8 @@ export default function ContactForm({
   submitLabel,
 }: ContactFormProps) {
   const pathname = usePathname();
-  const turnstileSiteKey = getTurnstileSiteKey();
-  const turnstileRequired = Boolean(turnstileSiteKey);
-  const [formLoadedAt] = useState(() => Date.now());
   const [submitState, setSubmitState] = useState<SubmitState>("idle");
   const [errorMessage, setErrorMessage] = useState("");
-  const [turnstileToken, setTurnstileToken] = useState("");
-  const [turnstileKey, setTurnstileKey] = useState(0);
-
-  const handleTurnstileToken = useCallback((token: string) => {
-    setTurnstileToken(token);
-  }, []);
-
-  const handleTurnstileExpire = useCallback(() => {
-    setTurnstileToken("");
-  }, []);
-
-  const handleTurnstileError = useCallback(() => {
-    setTurnstileToken("");
-    setErrorMessage("Security check failed. Please try again.");
-  }, []);
-
-  const resetTurnstile = useCallback(() => {
-    setTurnstileToken("");
-    setTurnstileKey((current) => current + 1);
-  }, []);
 
   const heading =
     title ??
@@ -59,21 +34,17 @@ export default function ContactForm({
     description ??
     (formType === "contact"
       ? "Tell us about your project."
-      : "No pressure. No obligation.");
+      : "No pressure. No obligation. We respond within one business day.");
+  const preSubmitNote =
+    formType === "contact" ? "Response within one business day." : null;
   const buttonLabel =
     submitLabel ??
     (formType === "contact" ? "Send Message" : "Request My Free Estimate");
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setErrorMessage("");
-
-    if (turnstileRequired && !turnstileToken) {
-      setErrorMessage("Please complete the security check.");
-      return;
-    }
-
     setSubmitState("submitting");
+    setErrorMessage("");
 
     const form = event.currentTarget;
     const formData = new FormData(form);
@@ -92,8 +63,6 @@ export default function ContactForm({
           pagePath: pathname || "/",
           formType,
           website: formData.get("website"),
-          formLoadedAt,
-          turnstileToken: turnstileToken || undefined,
         }),
       });
 
@@ -111,7 +80,6 @@ export default function ContactForm({
       form.reset();
       setSubmitState("success");
     } catch (error) {
-      resetTurnstile();
       setSubmitState("error");
       setErrorMessage(
         error instanceof Error ? error.message : "Unable to send your message right now.",
@@ -218,24 +186,23 @@ export default function ContactForm({
           </label>
         </div>
 
-        {formType === "contact" ? (
-          <label className="grid gap-1.5">
-            <span
-              className={`text-xs font-semibold uppercase tracking-wide ${
-                variant === "card" ? "text-gray-600" : "text-white/80"
-              }`}
-            >
-              Email
-            </span>
-            <input
-              type="email"
-              name="email"
-              autoComplete="email"
-              placeholder="you@example.com"
-              className="rounded-md border border-solid border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 placeholder:text-gray-400"
-            />
-          </label>
-        ) : null}
+        <label className="grid gap-1.5">
+          <span
+            className={`text-xs font-semibold uppercase tracking-wide ${
+              variant === "card" ? "text-gray-600" : "text-white/80"
+            }`}
+          >
+            Email *
+          </span>
+          <input
+            type="email"
+            name="email"
+            required
+            autoComplete="email"
+            placeholder="you@example.com"
+            className="rounded-md border border-solid border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 placeholder:text-gray-400"
+          />
+        </label>
 
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="grid gap-1.5">
@@ -300,23 +267,14 @@ export default function ContactForm({
           </p>
         ) : null}
 
-        <p
-          className={`text-center text-sm ${
-            variant === "card" ? "text-gray-600" : "text-white/80"
-          }`}
-        >
-          Response within one business day.
-        </p>
-
-        {turnstileSiteKey ? (
-          <TurnstileWidget
-            key={turnstileKey}
-            siteKey={turnstileSiteKey}
-            onToken={handleTurnstileToken}
-            onExpire={handleTurnstileExpire}
-            onError={handleTurnstileError}
-            theme={variant === "card" ? "light" : "dark"}
-          />
+        {preSubmitNote ? (
+          <p
+            className={`text-center text-sm ${
+              variant === "card" ? "text-gray-600" : "text-white/80"
+            }`}
+          >
+            {preSubmitNote}
+          </p>
         ) : null}
 
         <button

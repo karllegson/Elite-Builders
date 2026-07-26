@@ -49,7 +49,8 @@ export function sanitizeContactSubmissionInput(
     return null;
   }
 
-  if (rawEmail && !normalizeEmail(rawEmail)) {
+  const email = normalizeEmail(rawEmail);
+  if (!email) {
     return null;
   }
 
@@ -58,7 +59,7 @@ export function sanitizeContactSubmissionInput(
   return {
     name,
     phone,
-    email: normalizeEmail(rawEmail),
+    email,
     city: normalizeText(input.city, 120),
     service: normalizeText(input.service, 80),
     message: normalizeText(input.message, 4000),
@@ -97,7 +98,7 @@ export async function createContactSubmission(
       .insert({
         name: input.name,
         phone: input.phone,
-        email: input.email ?? "",
+        email: input.email,
         city: input.city ?? "",
         service: input.service ?? "",
         message: input.message ?? "",
