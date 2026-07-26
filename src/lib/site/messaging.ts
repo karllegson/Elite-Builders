@@ -14,8 +14,10 @@ export const brandPillarsHeading = "The Standard Behind Every Frame";
 
 export const framingFirstTagline = "Framing-first specialists — structure is our core, not a side service.";
 
+export const heroSubheading = "Built on Quality. Driven by Precision.";
+
 export const heroIntro =
-  "Trusted since 2012 across the Bay Area, Central Valley, and Southern California — elite-level structural work, dependable crews, and straight answers from estimate to inspection.";
+  "Delivering structural framing, rough framing, and siding for commercial and residential projects across the Bay Area, Central Valley, and throughout California.";
 
 export const brandPillars = [
   {
@@ -33,18 +35,10 @@ export const brandPillars = [
 ] as const;
 
 export const heroBullets = [
-  {
-    lead: "Who We Are:",
-    text: "Structure first — no gimmicks or hidden fees.",
-  },
-  {
-    lead: "How We're Different:",
-    text: "Honest estimates, clear communication, crews you trust.",
-  },
-  {
-    lead: "What To Expect:",
-    text: "Straight answers and work we'd stand behind.",
-  },
+  "Licensed & Insured",
+  "Commercial & Residential",
+  "Honest Estimates",
+  "Reliable Crews",
 ] as const;
 
 export const homepageFaqs = [

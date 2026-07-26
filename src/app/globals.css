@@ -1681,8 +1681,14 @@ body {
 .site .brand-pillars-hero-copy {
   position: relative;
   z-index: 2;
-  padding: 2.5rem var(--site-container-margin, 1.25rem);
+  padding: 1.5rem var(--site-container-margin, 1.25rem) 2rem;
   text-align: center;
+}
+
+@media (min-width: 640px) {
+  .site .brand-pillars-hero-copy {
+    padding: 2.5rem var(--site-container-margin, 1.25rem);
+  }
 }
 
 .site .brand-pillars-hero-media {
@@ -1705,6 +1711,19 @@ body {
 
 .site .brand-pillars-card {
   text-align: left;
+}
+
+.site .brand-pillars-card-grid {
+  background-image:
+    linear-gradient(rgb(0 32 91 / 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(0 32 91 / 0.05) 1px, transparent 1px);
+  background-size: 8px 8px;
+}
+
+@media (min-width: 640px) {
+  .site .brand-pillars-card-grid {
+    background-size: 24px 24px;
+  }
 }
 
 @media (max-width: 1023px) {

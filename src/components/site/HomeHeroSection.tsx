@@ -45,7 +45,7 @@ export default function HomeHeroSection({ children }: HomeHeroSectionProps) {
   return (
     <section
       id="home-hero"
-      className="relative min-h-[58dvh] overflow-hidden bg-brand-navy bg-cover bg-center sm:min-h-[75dvh]"
+      className="relative min-h-[46dvh] overflow-hidden bg-brand-navy bg-cover bg-center sm:min-h-[75dvh]"
       style={{ backgroundImage: `url("${HERO_INLINE_PLACEHOLDER}")` }}
     >
       {showVideo ? (
@@ -79,10 +79,10 @@ export default function HomeHeroSection({ children }: HomeHeroSectionProps) {
 
       <div
         aria-hidden
-        className="absolute inset-0 bg-gradient-to-r from-brand-navy/60 via-brand-navy/25 to-transparent"
+        className="absolute inset-0 bg-gradient-to-r from-brand-navy/35 via-brand-navy/12 to-transparent"
       />
 
-      <div className="site-container relative z-10 flex min-h-[58dvh] items-center py-8 sm:min-h-[75dvh] sm:py-14">
+      <div className="site-container relative z-10 flex min-h-[46dvh] items-center py-5 sm:min-h-[75dvh] sm:py-14">
         {children}
       </div>
     </section>

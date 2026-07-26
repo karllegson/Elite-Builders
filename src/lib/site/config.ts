@@ -6,8 +6,8 @@ export const business = {
   legalName: "Elite Builders IX",
   displayName: "Elite Builders IX",
   slogan: "Build your dream",
-  heroLocationLine: "Bay Area · Central Valley · Southern California",
-  heroHeadline: "Framing California's Future.",
+  heroLocationLine: "Serving California Since 2012",
+  heroHeadline: "Framing Contractor Serving the Bay Area & Central Valley",
   companyStory:
     "Family-owned framing-first specialists since 2012 — known for integrity, straight answers, and experienced crews who treat every structure like their own across the Bay Area, Central Valley, and Southern California.",
   phone: "(209) 484-2743",
@@ -305,7 +305,7 @@ export const teamMembers: TeamMember[] = [
     role: "Team Member",
     initials: "RB",
     imageSrc: "/images/team/team-member-02.webp",
-    imageObjectPosition: "47% 28%",
+    imageObjectPosition: "47% 22%",
     imageScale: 1.24,
   },
   {
