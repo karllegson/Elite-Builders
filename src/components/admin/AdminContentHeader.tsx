@@ -23,6 +23,7 @@ const pageActions: Record<string, PageAction[]> = {
     { href: "/admin/service-areas/new", label: "Add New Service Area" },
   ],
   "/admin/faqs": [{ href: "/admin/faqs/new", label: "Add New FAQ" }],
+  "/admin/showcase": [{ href: "/admin/showcase/new", label: "Add Project" }],
   "/admin/reviews": [{ href: "/admin/reviews/new", label: "Add New Review" }],
   "/admin/forms": [
     {

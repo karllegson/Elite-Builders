@@ -1,0 +1,802 @@
+/*
+ * Lobby TV showcase — designed for a landscape display running fullscreen.
+ * All sizing is viewport-relative so it scales from a 32" panel to a 4K wall.
+ */
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+  background: #f5f8fd;
+}
+
+.showcase-root {
+  --sc-navy: #00205b;
+  --sc-blue: #15569e;
+  --sc-sky: #4aa3dd;
+  --sc-red: #e31b23;
+  --sc-bg: #f5f8fd;
+  --sc-line: rgb(0 32 91 / 0.1);
+  --sc-text: #00205b;
+  --sc-text-body: #2f3a4d;
+  --sc-text-dim: #59647a;
+  --sc-surface: rgb(255 255 255 / 0.92);
+
+  height: 100%;
+  font-family: var(--font-fira), system-ui, -apple-system, sans-serif;
+  color: var(--sc-text);
+  -webkit-font-smoothing: antialiased;
+}
+
+.showcase-screen {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: var(--sc-bg);
+}
+
+.showcase-backdrop {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 55% at 88% 6%, rgb(74 163 221 / 0.12), transparent 70%),
+    radial-gradient(ellipse 55% 50% at 6% 96%, rgb(21 86 158 / 0.09), transparent 70%),
+    var(--sc-bg);
+}
+
+/*
+ * Blueprint grid — drafting paper texture, blurred so the hairlines read as a
+ * soft wash instead of cutting through the copy that sits on top of them.
+ * Inset past the edges so the blur has room and doesn't fade the border.
+ */
+.showcase-backdrop::before {
+  content: "";
+  position: absolute;
+  inset: -8px;
+  background-image:
+    linear-gradient(rgb(0 32 91 / 0.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(0 32 91 / 0.055) 1px, transparent 1px),
+    linear-gradient(rgb(0 32 91 / 0.032) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(0 32 91 / 0.032) 1px, transparent 1px);
+  background-size:
+    120px 120px,
+    120px 120px,
+    24px 24px,
+    24px 24px;
+  filter: blur(1.75px);
+  mask-image: radial-gradient(ellipse 95% 90% at 50% 45%, #000 55%, transparent 100%);
+}
+
+/* Calms the grid directly behind the slide copy so text always has clean paper */
+.showcase-backdrop::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse 55% 60% at 28% 55%,
+    rgb(245 248 253 / 0.92) 0%,
+    rgb(245 248 253 / 0.55) 45%,
+    transparent 75%
+  );
+}
+
+.showcase-shell {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  height: 100%;
+  padding: clamp(1.25rem, 2.2vh, 2.25rem) clamp(1.75rem, 3vw, 4rem);
+  box-sizing: border-box;
+}
+
+/* ── Header ──────────────────────────────────────────── */
+
+.showcase-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  padding-bottom: clamp(0.9rem, 1.8vh, 1.5rem);
+  border-bottom: 1px solid var(--sc-line);
+}
+
+.showcase-brand {
+  display: flex;
+  align-items: center;
+  gap: clamp(0.75rem, 1.2vw, 1.15rem);
+}
+
+.showcase-brand-logo {
+  width: clamp(2.75rem, 4vw, 4.25rem);
+  height: auto;
+  object-fit: contain;
+}
+
+.showcase-brand-copy {
+  line-height: 1.15;
+}
+
+.showcase-brand-name {
+  margin: 0;
+  font-family: var(--font-poppins), system-ui, sans-serif;
+  font-size: clamp(1.1rem, 1.65vw, 1.75rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.showcase-brand-tag {
+  margin: 0.15rem 0 0;
+  font-size: clamp(0.72rem, 0.92vw, 0.95rem);
+  font-style: italic;
+  font-weight: 500;
+  color: var(--sc-sky);
+}
+
+.showcase-clock {
+  padding: clamp(0.55rem, 1vh, 0.85rem) clamp(0.85rem, 1.25vw, 1.25rem);
+  border-radius: 0.65rem;
+  text-align: right;
+  line-height: 1.15;
+  background: var(--sc-navy);
+  color: #fff;
+}
+
+.showcase-clock-time {
+  margin: 0;
+  font-family: var(--font-poppins), system-ui, sans-serif;
+  font-size: clamp(1.25rem, 1.95vw, 2rem);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+  color: #fff;
+}
+
+.showcase-clock-date {
+  margin: 0.2rem 0 0;
+  font-size: clamp(0.72rem, 0.95vw, 1rem);
+  color: rgb(255 255 255 / 0.72);
+}
+
+/* ── Stage / slide transitions ───────────────────────── */
+
+.showcase-stage {
+  min-height: 0;
+  padding: clamp(1.1rem, 2.6vh, 2.5rem) 0;
+  opacity: 0;
+  transform: translateY(12px);
+  transition:
+    opacity 0.5s ease,
+    transform 0.5s ease;
+}
+
+.showcase-stage--visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.showcase-slide {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.showcase-slide-intro {
+  margin-bottom: clamp(1rem, 2.2vh, 1.85rem);
+}
+
+.showcase-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin: 0;
+  font-size: clamp(0.72rem, 0.88vw, 0.92rem);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--sc-blue);
+}
+
+.showcase-kicker::before {
+  content: "";
+  width: 1.75rem;
+  height: 3px;
+  border-radius: 999px;
+  background: var(--sc-red);
+}
+
+.showcase-slide-title {
+  margin: clamp(0.45rem, 0.9vh, 0.7rem) 0 0;
+  font-family: var(--font-poppins), system-ui, sans-serif;
+  font-size: clamp(2.15rem, 3.85vw, 4rem);
+  font-weight: 700;
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+  color: var(--sc-navy);
+}
+
+.showcase-title-accent {
+  color: var(--sc-sky);
+}
+
+.showcase-slide-lede {
+  margin: clamp(0.5rem, 1vh, 0.8rem) 0 0;
+  max-width: 42ch;
+  font-size: clamp(0.98rem, 1.15vw, 1.18rem);
+  line-height: 1.5;
+  color: var(--sc-text-body);
+}
+
+.showcase-section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin: 0 0 clamp(0.75rem, 1.4vh, 1rem);
+  font-family: var(--font-poppins), system-ui, sans-serif;
+  font-size: clamp(1rem, 1.22vw, 1.28rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--sc-navy);
+}
+
+.showcase-section-title::after {
+  content: "";
+  flex: 1;
+  height: 2px;
+  background: linear-gradient(90deg, var(--sc-sky), transparent);
+}
+
+/* ── Calendar slide ──────────────────────────────────── */
+
+.showcase-calendar-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+  gap: clamp(1.25rem, 2.5vw, 2.75rem);
+  flex: 1;
+  min-height: 0;
+}
+
+.showcase-calendar {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+  border: 1px solid rgb(0 32 91 / 0.14);
+  border-radius: 0.85rem;
+  background: #fff;
+  box-shadow: 0 18px 40px rgb(0 32 91 / 0.08);
+}
+
+.showcase-calendar-head {
+  margin: 0;
+  padding: clamp(0.85rem, 1.5vh, 1.2rem) clamp(1rem, 1.5vw, 1.35rem);
+  background: linear-gradient(135deg, var(--sc-navy) 0%, #123a7a 100%);
+  color: #fff;
+}
+
+.showcase-calendar-month {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 0;
+  font-family: var(--font-poppins), system-ui, sans-serif;
+}
+
+.showcase-calendar-month-name {
+  font-size: clamp(1.15rem, 1.55vw, 1.55rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.showcase-calendar-month-year {
+  font-size: clamp(0.95rem, 1.15vw, 1.15rem);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: rgb(255 255 255 / 0.72);
+}
+
+.showcase-calendar-grid {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  padding: clamp(0.65rem, 1.2vh, 0.95rem);
+}
+
+.showcase-calendar-weekdays,
+.showcase-calendar-days {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+.showcase-calendar-weekdays {
+  border-bottom: 1px solid var(--sc-line);
+}
+
+.showcase-calendar-weekdays span {
+  padding: clamp(0.35rem, 0.7vh, 0.5rem) 0;
+  font-size: clamp(0.68rem, 0.82vw, 0.85rem);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--sc-blue);
+}
+
+.showcase-calendar-weekdays span:first-child,
+.showcase-calendar-weekdays span:last-child {
+  color: var(--sc-sky);
+}
+
+.showcase-calendar-days {
+  flex: 1;
+  min-height: 0;
+  grid-auto-rows: minmax(0, 1fr);
+  border-left: 1px solid var(--sc-line);
+}
+
+.showcase-day {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px solid var(--sc-line);
+  border-bottom: 1px solid var(--sc-line);
+  font-size: clamp(0.78rem, 1vw, 1.05rem);
+  font-variant-numeric: tabular-nums;
+  color: var(--sc-text-body);
+}
+
+.showcase-day--empty {
+  background: rgb(0 32 91 / 0.015);
+}
+
+.showcase-day--today .showcase-day-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: clamp(1.55rem, 2.2vw, 2rem);
+  height: clamp(1.55rem, 2.2vw, 2rem);
+  border-radius: 999px;
+  background: var(--sc-navy);
+  font-weight: 600;
+  color: #fff;
+}
+
+.showcase-day--due {
+  background: rgb(227 27 35 / 0.07);
+  font-weight: 700;
+  color: var(--sc-red);
+}
+
+.showcase-day--due.showcase-day--today .showcase-day-number {
+  background: var(--sc-red);
+  box-shadow: 0 0 0 3px rgb(227 27 35 / 0.2);
+}
+
+.showcase-day-marker {
+  position: absolute;
+  bottom: clamp(0.25rem, 0.55vh, 0.4rem);
+  width: 0.28rem;
+  height: 0.28rem;
+  border-radius: 999px;
+  background: var(--sc-red);
+}
+
+.showcase-deadlines {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.showcase-deadline-list {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  min-height: 0;
+  overflow: hidden;
+  border: 1px solid rgb(0 32 91 / 0.14);
+  border-radius: 0.85rem;
+  background: #fff;
+  box-shadow: 0 18px 40px rgb(0 32 91 / 0.08);
+}
+
+.showcase-deadline {
+  display: grid;
+  grid-template-columns: clamp(4.25rem, 5.5vw, 5rem) minmax(0, 1fr) auto;
+  align-items: center;
+  gap: clamp(0.85rem, 1.4vw, 1.35rem);
+  padding: clamp(0.8rem, 1.45vh, 1.15rem) clamp(1rem, 1.45vw, 1.4rem);
+  border-bottom: 1px solid var(--sc-line);
+  border-left: 4px solid transparent;
+}
+
+.showcase-deadline:last-child {
+  border-bottom: none;
+}
+
+.showcase-deadline--soon {
+  border-left-color: var(--sc-red);
+  background: linear-gradient(90deg, rgb(227 27 35 / 0.05), transparent 42%);
+}
+
+.showcase-deadline--mid {
+  border-left-color: var(--sc-sky);
+}
+
+.showcase-deadline--later {
+  border-left-color: var(--sc-blue);
+}
+
+.showcase-deadline-when {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1;
+}
+
+.showcase-deadline-day {
+  font-family: var(--font-poppins), system-ui, sans-serif;
+  font-size: clamp(1.45rem, 2.1vw, 2.15rem);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
+  color: var(--sc-navy);
+}
+
+.showcase-deadline--soon .showcase-deadline-day {
+  color: var(--sc-red);
+}
+
+.showcase-deadline-month {
+  margin-top: 0.2rem;
+  font-size: clamp(0.68rem, 0.82vw, 0.82rem);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--sc-blue);
+}
+
+.showcase-deadline-copy {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 0.15rem;
+}
+
+.showcase-deadline-copy strong {
+  font-family: var(--font-poppins), system-ui, sans-serif;
+  font-size: clamp(0.98rem, 1.25vw, 1.32rem);
+  font-weight: 700;
+  line-height: 1.22;
+  letter-spacing: -0.01em;
+  color: var(--sc-navy);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.showcase-deadline-copy span {
+  font-size: clamp(0.78rem, 0.95vw, 0.98rem);
+  font-weight: 500;
+  color: var(--sc-sky);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.showcase-deadline-countdown {
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  font-size: clamp(0.68rem, 0.86vw, 0.88rem);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.showcase-deadline-countdown--soon {
+  background: rgb(227 27 35 / 0.1);
+  color: var(--sc-red);
+}
+
+.showcase-deadline-countdown--mid {
+  background: rgb(74 163 221 / 0.14);
+  color: #1a6fa8;
+}
+
+.showcase-deadline-countdown--later {
+  background: rgb(21 86 158 / 0.1);
+  color: var(--sc-blue);
+}
+
+.showcase-deadline-countdown--tbd {
+  background: rgb(0 32 91 / 0.06);
+  color: var(--sc-text-dim);
+}
+
+/* ── Project slide ───────────────────────────────────── */
+
+.showcase-project-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  gap: clamp(1.5rem, 3vw, 3.25rem);
+  flex: 1;
+  min-height: 0;
+  align-items: stretch;
+}
+
+.showcase-project-main {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+}
+
+.showcase-project-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: clamp(0.55rem, 0.95vw, 0.85rem);
+  margin-bottom: clamp(0.65rem, 1.2vh, 1rem);
+}
+
+.showcase-project-type {
+  padding: 0.32rem 0.75rem;
+  border-radius: 999px;
+  background: var(--sc-navy);
+  font-size: clamp(0.72rem, 0.88vw, 0.9rem);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #fff;
+}
+
+.showcase-status {
+  padding: 0.32rem 0.75rem;
+  border-radius: 999px;
+  font-size: clamp(0.72rem, 0.88vw, 0.9rem);
+  font-weight: 700;
+}
+
+.showcase-status::before {
+  content: none;
+}
+
+.showcase-status--current {
+  background: rgb(227 27 35 / 0.1);
+  color: var(--sc-red);
+}
+
+.showcase-status--completed {
+  background: rgb(21 86 158 / 0.1);
+  color: var(--sc-blue);
+}
+
+.showcase-project-title {
+  max-width: 14ch;
+  color: var(--sc-navy);
+}
+
+.showcase-project-subline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.45rem 0.75rem;
+  margin: clamp(0.55rem, 1.1vh, 0.9rem) 0 0;
+}
+
+.showcase-project-builder {
+  font-family: var(--font-poppins), system-ui, sans-serif;
+  font-size: clamp(1.05rem, 1.45vw, 1.55rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--sc-sky);
+}
+
+.showcase-project-location {
+  font-size: clamp(0.92rem, 1.12vw, 1.12rem);
+  font-weight: 500;
+  color: var(--sc-text-dim);
+}
+
+.showcase-project-location::before {
+  content: "·";
+  margin-right: 0.75rem;
+  color: rgb(0 32 91 / 0.25);
+}
+
+.showcase-project-details {
+  margin: clamp(0.85rem, 1.7vh, 1.35rem) 0 0;
+  max-width: 50ch;
+  padding-left: 1rem;
+  border-left: 3px solid var(--sc-sky);
+  font-size: clamp(0.95rem, 1.18vw, 1.22rem);
+  line-height: 1.6;
+  color: var(--sc-text-body);
+}
+
+/* ── Project photo ───────────────────────────────────── */
+
+.showcase-project-photo {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid rgb(0 32 91 / 0.14);
+  border-radius: 0.85rem;
+  background: #fff;
+  box-shadow: 0 18px 40px rgb(0 32 91 / 0.1);
+}
+
+.showcase-project-photo-frame {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--sc-bg);
+}
+
+.showcase-project-photo-img {
+  object-fit: cover;
+}
+
+/* Empty state reads as an unshot frame on blueprint paper, not a broken image */
+.showcase-photo-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(0.5rem, 1.2vh, 0.9rem);
+  height: 100%;
+  background-color: var(--sc-bg);
+  background-image:
+    linear-gradient(rgb(0 32 91 / 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(0 32 91 / 0.06) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: rgb(0 32 91 / 0.4);
+}
+
+.showcase-photo-placeholder-icon {
+  width: clamp(2rem, 3.4vw, 3.5rem);
+  height: clamp(2rem, 3.4vw, 3.5rem);
+  stroke-width: 1.25;
+}
+
+.showcase-photo-placeholder-text {
+  margin: 0;
+  font-size: clamp(0.82rem, 1vw, 1rem);
+  font-weight: 500;
+  color: rgb(0 32 91 / 0.45);
+}
+
+.showcase-project-photo-caption {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 1rem;
+  padding: clamp(0.85rem, 1.45vh, 1.15rem) clamp(1rem, 1.4vw, 1.4rem);
+  background: linear-gradient(135deg, var(--sc-navy) 0%, #123a7a 100%);
+  color: #fff;
+}
+
+.showcase-photo-caption-copy {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 0.15rem;
+}
+
+.showcase-photo-caption-label {
+  font-size: clamp(0.68rem, 0.82vw, 0.82rem);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgb(255 255 255 / 0.68);
+}
+
+.showcase-photo-caption-date {
+  font-family: var(--font-poppins), system-ui, sans-serif;
+  font-size: clamp(0.95rem, 1.22vw, 1.25rem);
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  color: #fff;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.showcase-project-photo-caption .showcase-deadline-countdown--soon {
+  background: rgb(255 255 255 / 0.14);
+  color: #ffc4c7;
+}
+
+.showcase-project-photo-caption .showcase-deadline-countdown--mid {
+  background: rgb(255 255 255 / 0.14);
+  color: #b8e4ff;
+}
+
+.showcase-project-photo-caption .showcase-deadline-countdown--later,
+.showcase-project-photo-caption .showcase-deadline-countdown--tbd {
+  background: rgb(255 255 255 / 0.14);
+  color: #fff;
+}
+
+/* ── Footer ──────────────────────────────────────────── */
+
+.showcase-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding-top: clamp(0.8rem, 1.6vh, 1.35rem);
+  border-top: 1px solid var(--sc-line);
+}
+
+.showcase-footer-meta {
+  margin: 0;
+  flex: 1;
+  font-size: clamp(0.7rem, 0.9vw, 0.95rem);
+  color: var(--sc-text-dim);
+}
+
+.showcase-footer-meta--end {
+  text-align: right;
+  font-family: var(--font-poppins), system-ui, sans-serif;
+  font-size: clamp(0.82rem, 1vw, 1.05rem);
+  font-weight: 700;
+  color: var(--sc-red);
+}
+
+.showcase-progress {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.showcase-progress-dot {
+  width: 0.35rem;
+  height: 0.35rem;
+  border-radius: 999px;
+  background: rgb(0 32 91 / 0.2);
+  transition:
+    width 0.35s ease,
+    background-color 0.35s ease;
+}
+
+.showcase-progress-dot--active {
+  width: 1.1rem;
+  background: var(--sc-red);
+}
+
+/* ── Empty state ─────────────────────────────────────── */
+
+.showcase-slide--empty {
+  align-items: center;
+  justify-content: center;
+}
+
+.showcase-empty {
+  font-size: clamp(1rem, 1.5vw, 1.4rem);
+  color: var(--sc-text-dim);
+}
+
+/* Portrait / narrow fallback so the page never breaks off-TV */
+@media (max-aspect-ratio: 1/1), (max-width: 900px) {
+  .showcase-calendar-layout,
+  .showcase-project-grid {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+    overflow-y: auto;
+  }
+
+  .showcase-project-photo {
+    min-height: 40vh;
+  }
+}

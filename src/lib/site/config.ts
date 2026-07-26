@@ -293,7 +293,7 @@ export const teamMembers: TeamMember[] = [
   {
     id: "juan-carlos-marin",
     name: "Juan Carlos Marin",
-    role: "Team Member",
+    role: "Estimator",
     initials: "JC",
     imageSrc: "/images/team/team-member-01.webp",
     imageObjectPosition: "50% 18%",
@@ -320,7 +320,7 @@ export const teamMembers: TeamMember[] = [
   {
     id: "edith-pelayo",
     name: "Edith Pelayo",
-    role: "Team Member",
+    role: "Administrative Assistant",
     initials: "EP",
     imageSrc: "/images/team/team-member-04.webp",
     imageObjectPosition: "50% 26%",
