@@ -1,0 +1,85 @@
+{
+  "version": 1,
+  "settings": {
+    "slideDurationSeconds": 12,
+    "calendarSlideDurationSeconds": 16
+  },
+  "projects": [
+    {
+      "id": "minarets-road",
+      "name": "6060 Minarets Rd",
+      "location": "Northern California",
+      "builder": "Durkin Inc",
+      "type": "Custom Homes",
+      "status": "current",
+      "dueDate": "2026-08-08",
+      "blurb": "Custom-home framing package built to architectural and structural specifications.",
+      "details": "Custom-home framing package built to architectural and structural specifications.",
+      "displayOrder": 0,
+      "published": true,
+      "createdAt": "2026-07-25T00:00:00.000Z",
+      "updatedAt": "2026-07-25T00:00:00.000Z",
+      "featuredImage": {
+        "src": "/images/home/modesto-two-story-home-framing-exterior.webp",
+        "alt": "Two-story residential home framing contractor project in Northern California",
+        "title": "Two-story home framing"
+      }
+    },
+    {
+      "id": "heritage-park",
+      "name": "Heritage Park",
+      "location": "Northern California",
+      "builder": "Precision General",
+      "type": "Multi-Family",
+      "status": "current",
+      "dueDate": "2026-08-29",
+      "blurb": "Ongoing structural framing for a multi-family residential community.",
+      "details": "Ongoing structural framing for a multi-family residential community.",
+      "displayOrder": 1,
+      "published": true,
+      "createdAt": "2026-07-25T00:00:00.000Z",
+      "updatedAt": "2026-07-25T00:00:00.000Z",
+      "featuredImage": {
+        "src": "/images/home/rough-framing-aerial.png",
+        "alt": "Aerial view of residential rough framing and roof trusses on a Northern California job site",
+        "title": "Rough framing aerial"
+      }
+    },
+    {
+      "id": "tjh-multiple-custom",
+      "name": "Thomas James Homes (Multiple Custom Homes)",
+      "location": "Northern California",
+      "builder": "Thomas James Homes",
+      "type": "Custom Homes",
+      "status": "current",
+      "dueDate": "2026-09-19",
+      "blurb": "Concurrent custom-home framing across multiple active build sites.",
+      "details": "Concurrent custom-home framing across multiple active build sites.",
+      "displayOrder": 2,
+      "published": true,
+      "createdAt": "2026-07-25T00:00:00.000Z",
+      "updatedAt": "2026-07-25T00:00:00.000Z",
+      "featuredImage": {
+        "src": "/images/home/modesto-custom-home-framing-crew.png",
+        "alt": "Elite Builders framing crew building a custom home in Northern California",
+        "title": "Custom home framing crew"
+      }
+    },
+    {
+      "id": "san-bruno-city-ventures",
+      "name": "San Bruno",
+      "location": "San Bruno, CA",
+      "builder": "City Ventures",
+      "type": "Multi-Family",
+      "status": "current",
+      "dueDate": "2026-10-10",
+      "blurb": "Framing for a Peninsula residential development with City Ventures.",
+      "details": "Framing for a Peninsula residential development with City Ventures.",
+      "displayOrder": 3,
+      "published": true,
+      "createdAt": "2026-07-25T00:00:00.000Z",
+      "updatedAt": "2026-07-25T00:00:00.000Z",
+      "featuredImage": null
+    }
+  ]
+}

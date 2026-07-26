@@ -84,7 +84,7 @@ const featuredProjects: Project[] = [
 const audiences = [
   {
     title: "For Homeowners",
-    body: "Custom homes, additions, remodels, decks, and siding — framed and finished with honest estimates and clear communication from start to finish.",
+    body: "Custom homes, additions, remodel framing, decks, and siding — structural work with honest estimates and clear communication from start to finish.",
   },
   {
     title: "For Builders & General Contractors",
@@ -114,7 +114,7 @@ const localBusinessSchema = {
   foundingDate: String(business.foundedYear),
   areaServed: serviceAreas.map((area) => ({ "@type": "City", name: `${area.city}, CA` })),
   description:
-    "Framing-first contractor serving the Bay Area, Central Valley, and Southern California — rough framing, remodeling, siding, and deck construction for residential and commercial projects.",
+    "Framing-first contractor serving the Bay Area, Central Valley, and Southern California — custom, production, and addition framing plus siding and deck construction for residential and commercial projects.",
 };
 
 const faqSchema = {
@@ -147,6 +147,18 @@ export default async function HomePage() {
       />
 
       {/* ── Hero with commercial video ───────────────────────── */}
+      <link
+        rel="preload"
+        href="/videos/elite-builders-hero-poster.jpg"
+        as="image"
+        fetchPriority="high"
+      />
+      <link
+        rel="preload"
+        href="/videos/elite-builders-hero.mp4?v=5"
+        as="video"
+        type="video/mp4"
+      />
       <HomeHeroSection>
         <HomeHeroContent />
       </HomeHeroSection>
@@ -156,16 +168,19 @@ export default async function HomePage() {
 
       <BrandPillars />
 
+      <TeamSection members={teamMembers} />
+
       {/* ── Services ─────────────────────────────────────────── */}
       <section className="bg-white py-12 sm:py-24">
         <div className="site-container">
           <SectionIntro
             eyebrow="Our Services"
-            title="Home Building, General Contracting & Framing Specialists"
-            lede="From custom home building and general contracting to remodeling, decks, and siding — Elite Builders delivers framing-first construction across the Bay Area, Central Valley, and Southern California. Framing is our signature specialty."
+            title="Framing Contractor & Construction Specialists"
+            lede="Custom, production, and addition framing are our core — plus home building, decks, and siding across the Bay Area, Central Valley, and Southern California. Need kitchen or room re-framing? We handle the structural work."
           />
 
-          <div className="mt-8 grid gap-4 sm:mt-14 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
+          <div className="mt-8 sm:mt-14">
+            <div className="grid gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
             {services.map((service) => {
               const img = homeImages[service.image];
               return (
@@ -202,6 +217,7 @@ export default async function HomePage() {
                 Ask Us Anything
               </Link>
             </div>
+          </div>
           </div>
         </div>
       </section>
@@ -264,8 +280,6 @@ export default async function HomePage() {
           </p>
         </div>
       </section>
-
-      <TeamSection members={teamMembers} />
 
       <WhyChooseUsSection items={whyChooseUs} lede={framingFirstTagline} />
 

@@ -57,6 +57,16 @@ export const adminNavItems: AdminNavItem[] = [
   },
   { label: "Bookings", href: "/admin/bookings", icon: "calendar-check", phase: 3 },
   {
+    label: "Showcase",
+    href: "/admin/showcase",
+    icon: "monitor",
+    phase: 1,
+    children: [
+      { label: "All Projects", href: "/admin/showcase" },
+      { label: "Add Project", href: "/admin/showcase/new" },
+    ],
+  },
+  {
     label: "Service Areas",
     href: "/admin/service-areas",
     icon: "map-pin",
@@ -124,6 +134,8 @@ export const adminPageTitles: Record<string, string> = {
   "/admin/forms/[id]/edit": "Edit Form",
   "/admin/forms/[id]/settings": "Form Settings",
   "/admin/bookings": "Bookings",
+  "/admin/showcase": "Lobby Showcase",
+  "/admin/showcase/new": "Add Showcase Project",
   "/admin/service-areas": "Service Areas",
   "/admin/service-areas/new": "Add New Service Area",
   "/admin/service-areas/sorting": "Sorting",

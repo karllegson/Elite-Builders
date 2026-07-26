@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   ArrowRight,
+  BookOpen,
   Building2,
   ChevronDown,
   ChevronRight,
@@ -37,6 +38,7 @@ type OpenMenu = "services" | "why-us" | "about" | null;
 
 const utilityIcons = {
   "Service Areas": MapPin,
+  Blog: BookOpen,
   Reviews: MessageSquare,
   Projects: FolderOpen,
 } as const;

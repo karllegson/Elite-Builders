@@ -85,6 +85,7 @@ export default function ContactForm({
         body: JSON.stringify({
           name: formData.get("name"),
           phone: formData.get("phone"),
+          email: formData.get("email"),
           city: formData.get("city"),
           service: formData.get("service"),
           message: formData.get("message"),
@@ -216,6 +217,25 @@ export default function ContactForm({
             />
           </label>
         </div>
+
+        {formType === "contact" ? (
+          <label className="grid gap-1.5">
+            <span
+              className={`text-xs font-semibold uppercase tracking-wide ${
+                variant === "card" ? "text-gray-600" : "text-white/80"
+              }`}
+            >
+              Email
+            </span>
+            <input
+              type="email"
+              name="email"
+              autoComplete="email"
+              placeholder="you@example.com"
+              className="rounded-md border border-solid border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 placeholder:text-gray-400"
+            />
+          </label>
+        ) : null}
 
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="grid gap-1.5">

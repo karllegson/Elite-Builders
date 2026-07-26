@@ -8,21 +8,20 @@ export type ServiceSubPageDefinition = {
 
 /** Sub-service pages nested under each main GBP category. */
 export const serviceSubPagesByCategory: Record<string, ServiceSubPageDefinition[]> = {
-  "home-builder": [
-    { slug: "custom-home-building", label: "Custom Home Building" },
-    { slug: "new-home-construction", label: "New Home Construction" },
-    { slug: "home-addition-construction", label: "Home Addition Construction" },
-  ],
-  "general-contractor": [
+  "framing-contractor": [
+    { slug: "custom-framing", label: "Custom Framing" },
+    { slug: "home-addition-framing", label: "Home Addition Framing" },
+    { slug: "production-home-framing", label: "Production Home Framing" },
     { slug: "residential-framing", label: "Residential Framing" },
     { slug: "commercial-framing", label: "Commercial Framing" },
     { slug: "rough-framing", label: "Rough Framing" },
     { slug: "structural-framing", label: "Structural Framing" },
+    { slug: "remodel-framing", label: "Remodel Framing" },
   ],
-  remodeler: [
-    { slug: "whole-home-remodeling", label: "Whole Home Remodeling" },
-    { slug: "kitchen-remodeling", label: "Kitchen Remodeling" },
-    { slug: "bathroom-remodeling", label: "Bathroom Remodeling" },
+  "home-builder": [
+    { slug: "custom-home-building", label: "Custom Home Building" },
+    { slug: "new-home-construction", label: "New Home Construction" },
+    { slug: "home-addition-construction", label: "Home Addition Construction" },
   ],
   "deck-builder": [
     { slug: "wood-deck-construction", label: "Wood Deck Construction" },
@@ -31,7 +30,6 @@ export const serviceSubPagesByCategory: Record<string, ServiceSubPageDefinition[
   "siding-contractor": [
     { slug: "siding-installation", label: "Siding Installation" },
     { slug: "siding-replacement", label: "Siding Replacement" },
-    { slug: "fiber-cement-siding", label: "Fiber Cement Siding" },
   ],
 };
 
@@ -88,7 +86,7 @@ export function buildServiceSubPageDetail(
     (page) => page.slug !== subSlug,
   );
 
-  const isFramingSubPage = categorySlug === "general-contractor";
+  const isFramingSubPage = categorySlug === "framing-contractor";
 
   return {
     ...parent,

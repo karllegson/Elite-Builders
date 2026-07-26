@@ -1,33 +1,21 @@
 import type { Metadata } from "next";
 import { Phone } from "lucide-react";
 import ContactForm from "@/components/site/ContactForm";
+import ContactPageHero from "@/components/site/ContactPageHero";
 import { business } from "@/lib/site/config";
 import { buildPageMetadata } from "@/lib/site/seo";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Contact Us",
   description:
-    "Contact Elite Builders for a free framing, remodeling, siding, or deck estimate. Serving the Bay Area, Central Valley, and Southern California. CSLB #970551.",
+    "Contact Elite Builders for a free framing, siding, or deck estimate. Serving the Bay Area, Central Valley, and Southern California. CSLB #970551.",
   path: "/contact",
 });
 
 export default function ContactPage() {
   return (
     <>
-      <section className="bg-brand-navy py-16 text-white sm:py-20">
-        <div className="site-container">
-          <p className="text-sm font-medium uppercase tracking-[0.18em] text-brand-sky">
-            Contact Us
-          </p>
-          <h1 className="mt-3 max-w-3xl text-3xl font-bold leading-tight text-white sm:text-4xl lg:text-5xl">
-            Request a Free Estimate or Ask a Question
-          </h1>
-          <p className="mt-5 max-w-2xl text-base leading-relaxed text-white/85">
-            Tell us about your framing, remodeling, siding, or deck project. We respond within one
-            business day. {business.license}.
-          </p>
-        </div>
-      </section>
+      <ContactPageHero />
 
       <section className="bg-white py-12 sm:py-20">
         <div className="site-container grid gap-10 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:items-start">

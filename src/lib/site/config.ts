@@ -6,8 +6,8 @@ export const business = {
   legalName: "Elite Builders IX",
   displayName: "Elite Builders IX",
   slogan: "Build your dream",
-  heroLocationLine: "Bay Area · Central Valley · Southern California",
-  heroHeadline: "Framing California's Future.",
+  heroLocationLine: "Serving California Since 2012",
+  heroHeadline: "Framing Contractor Serving the Bay Area & Central Valley",
   companyStory:
     "Family-owned framing-first specialists since 2012 — known for integrity, straight answers, and experienced crews who treat every structure like their own across the Bay Area, Central Valley, and Southern California.",
   phone: "(209) 484-2743",
@@ -38,31 +38,22 @@ export type SiteService = {
 
 export const services: SiteService[] = [
   {
-    title: "Home Builder",
-    slug: "home-builder",
-    href: "/services/home-builder",
+    title: "Framing Contractor",
+    slug: "framing-contractor",
+    href: "/services/framing-contractor",
     shortDescription:
-      "Custom home building, new home construction, and home additions — framing-first builds across California.",
-    icon: "hammer",
-    image: "customHomeFramingCrew",
-  },
-  {
-    title: "General Contractor",
-    slug: "general-contractor",
-    href: "/services/general-contractor",
-    shortDescription:
-      "Full-service general contracting with framing as our signature specialty — residential, commercial, rough, and structural framing.",
+      "Custom, production, and addition framing — residential, commercial, rough, and structural work across California.",
     icon: "clipboard",
     image: "framingContractorPlanning",
   },
   {
-    title: "Remodeler",
-    slug: "remodeler",
-    href: "/services/remodeler",
+    title: "Home Builder",
+    slug: "home-builder",
+    href: "/services/home-builder",
     shortDescription:
-      "Whole home, kitchen, and bathroom remodeling — including the structural modifications other remodelers subcontract out.",
-    icon: "layers",
-    image: "customKitchenRemodel",
+      "Custom home building, production home framing, and home additions — framing-first builds across California.",
+    icon: "hammer",
+    image: "customHomeFramingCrew",
   },
   {
     title: "Deck Builder",
@@ -78,7 +69,7 @@ export const services: SiteService[] = [
     slug: "siding-contractor",
     href: "/services/siding-contractor",
     shortDescription:
-      "Siding installation, siding replacement, and durable fiber cement siding built to withstand California weather.",
+      "Siding installation and siding replacement — exterior protection built to withstand California weather.",
     icon: "building",
     image: "sidingInstallation",
   },
@@ -272,36 +263,92 @@ export type TeamMember = {
   role: string;
   initials: string;
   imageSrc?: string;
+  /** CSS object-position for circular crops (e.g. "50% 20%"). */
+  imageObjectPosition?: string;
+  /** Display-only zoom on the website crop — does not change the source file. */
+  imageScale?: number;
   isPlaceholder?: boolean;
   profile?: TeamMemberProfile;
 };
 
-/** Homepage team cards — add members here when names and headshots are ready. */
+/**
+ * Homepage team cards.
+ * Headshots live in /public/images/team/. Replace placeholder names/roles when ready.
+ */
 export const teamMembers: TeamMember[] = [
   {
     id: "fernando-gradilla",
     name: "Fernando Gradilla",
     role: "Owner",
     initials: "FG",
+    imageSrc: "/images/team/fernando-gradilla.webp",
+    // Low Y keeps the edited headroom visible (center-crop was cutting it off).
+    imageObjectPosition: "51% 15%",
+    imageScale: 1.08,
     profile: {
       experience: "Construction & framing background",
       bio: "Fernando built his career in construction long before Elite Builders — learning the trade on job sites across Northern California. During a difficult time in his life, he met the Lord, and his Christian faith became the foundation for how he leads today. He founded Elite Builders on no cutting corners, real integrity, and promises kept — treating every residential and commercial project with the honesty and care he'd want on his own home.",
     },
+  },
+  {
+    id: "juan-carlos-marin",
+    name: "Juan Carlos Marin",
+    role: "Estimator",
+    initials: "JC",
+    imageSrc: "/images/team/team-member-01.webp",
+    imageObjectPosition: "50% 18%",
+    imageScale: 1.44,
+  },
+  {
+    id: "ramon-baltazar",
+    name: "Ramon Baltazar",
+    role: "Team Member",
+    initials: "RB",
+    imageSrc: "/images/team/team-member-02.webp",
+    imageObjectPosition: "47% 22%",
+    imageScale: 1.24,
+  },
+  {
+    id: "maria-zavalza",
+    name: "Maria Zavalza",
+    role: "Team Member",
+    initials: "MZ",
+    imageSrc: "/images/team/team-member-03.webp",
+    imageObjectPosition: "50% 48%",
+    imageScale: 1,
+  },
+  {
+    id: "edith-pelayo",
+    name: "Edith Pelayo",
+    role: "Administrative Assistant",
+    initials: "EP",
+    imageSrc: "/images/team/team-member-04.webp",
+    imageObjectPosition: "50% 26%",
+    imageScale: 1,
+  },
+  {
+    id: "francisco-gradilla",
+    name: "Francisco Gradilla",
+    role: "Team Member",
+    initials: "FC",
+    imageSrc: "/images/team/team-member-05.webp",
+    imageObjectPosition: "2% 38%",
+    imageScale: 1,
   },
 ];
 
 /** Top utility bar — hides on scroll (Arlington-style). */
 export const utilityNavLinks = [
   { label: "Service Areas", href: "/service-areas" },
+  { label: "Blog", href: "/blog" },
   { label: "Reviews", href: "/#reviews" },
   { label: "Projects", href: "/projects" },
 ] as const;
 
 /** Desktop mega-menu — one group per main service category, sub-services as links. */
 const serviceMenuIcons: Record<(typeof services)[number]["slug"], string> = {
+  "framing-contractor": "hardhat",
   "home-builder": "home",
-  "general-contractor": "hardhat",
-  remodeler: "paintbrush",
   "deck-builder": "fence",
   "siding-contractor": "panels",
 };
@@ -324,7 +371,7 @@ export const serviceNavLinks = services.map((service) => ({
 
 export const whyUsNavLinks = [
   { label: "Why Choose Elite Builders", href: "/#why-us" },
-  { label: "Framing Specialists", href: "/services/general-contractor/residential-framing" },
+  { label: "Framing Specialists", href: "/services/framing-contractor/custom-framing" },
   { label: "Meet Our Team", href: "/#team" },
   { label: "Featured Projects", href: "/projects" },
   { label: "Customer Reviews", href: "/#reviews" },

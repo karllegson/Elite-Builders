@@ -276,6 +276,14 @@ export function ContactSubmissionsList() {
                     <a href={`tel:${selected.phone.replace(/[^\d+]/g, "")}`}>{selected.phone}</a>
                   </dd>
                 </div>
+                {selected.email ? (
+                  <div>
+                    <dt>Email</dt>
+                    <dd>
+                      <a href={`mailto:${selected.email}`}>{selected.email}</a>
+                    </dd>
+                  </div>
+                ) : null}
                 <div>
                   <dt>City</dt>
                   <dd>{selected.city || "—"}</dd>

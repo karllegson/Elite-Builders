@@ -64,17 +64,29 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
-      // Framing is now a featured specialty under General Contractor.
-      { source: "/services/framing", destination: "/services/general-contractor/residential-framing", permanent: true },
+      // Framing contractor — primary category
+      { source: "/services/framing", destination: "/services/framing-contractor/residential-framing", permanent: true },
       {
         source: "/services/general-contracting",
-        destination: "/services/general-contractor/residential-framing",
+        destination: "/services/framing-contractor/residential-framing",
+        permanent: true,
+      },
+      { source: "/services/general-contractor", destination: "/services/framing-contractor", permanent: true },
+      {
+        source: "/services/general-contractor/:path*",
+        destination: "/services/framing-contractor/:path*",
+        permanent: true,
+      },
+      { source: "/services/remodeler", destination: "/services/framing-contractor/remodel-framing", permanent: true },
+      {
+        source: "/services/remodeler/:path*",
+        destination: "/services/framing-contractor/remodel-framing",
         permanent: true,
       },
       // Legacy flat sub-service URLs → nested category/sub-service paths
       {
         source: "/services/home-addition-construction",
-        destination: "/services/home-builder/home-addition-construction",
+        destination: "/services/framing-contractor/home-addition-framing",
         permanent: true,
       },
       {
@@ -88,38 +100,53 @@ const nextConfig: NextConfig = {
         permanent: true,
       },
       {
+        source: "/services/custom-framing",
+        destination: "/services/framing-contractor/custom-framing",
+        permanent: true,
+      },
+      {
+        source: "/services/home-addition-framing",
+        destination: "/services/framing-contractor/home-addition-framing",
+        permanent: true,
+      },
+      {
+        source: "/services/production-home-framing",
+        destination: "/services/framing-contractor/production-home-framing",
+        permanent: true,
+      },
+      {
         source: "/services/residential-framing",
-        destination: "/services/general-contractor/residential-framing",
+        destination: "/services/framing-contractor/residential-framing",
         permanent: true,
       },
       {
         source: "/services/commercial-framing",
-        destination: "/services/general-contractor/commercial-framing",
+        destination: "/services/framing-contractor/commercial-framing",
         permanent: true,
       },
       {
         source: "/services/rough-framing",
-        destination: "/services/general-contractor/rough-framing",
+        destination: "/services/framing-contractor/rough-framing",
         permanent: true,
       },
       {
         source: "/services/structural-framing",
-        destination: "/services/general-contractor/structural-framing",
+        destination: "/services/framing-contractor/structural-framing",
         permanent: true,
       },
       {
         source: "/services/whole-home-remodeling",
-        destination: "/services/remodeler/whole-home-remodeling",
+        destination: "/services/framing-contractor/remodel-framing",
         permanent: true,
       },
       {
         source: "/services/kitchen-remodeling",
-        destination: "/services/remodeler/kitchen-remodeling",
+        destination: "/services/framing-contractor/remodel-framing",
         permanent: true,
       },
       {
         source: "/services/bathroom-remodeling",
-        destination: "/services/remodeler/bathroom-remodeling",
+        destination: "/services/framing-contractor/remodel-framing",
         permanent: true,
       },
       {
@@ -144,7 +171,7 @@ const nextConfig: NextConfig = {
       },
       {
         source: "/services/fiber-cement-siding",
-        destination: "/services/siding-contractor/fiber-cement-siding",
+        destination: "/services/siding-contractor/siding-installation",
         permanent: true,
       },
       {
@@ -184,8 +211,8 @@ const nextConfig: NextConfig = {
         destination: "/services/home-builder",
         permanent: true,
       },
-      // Remodeling → Remodeler
-      { source: "/services/remodeling", destination: "/services/remodeler", permanent: true },
+      // Remodeling → remodel framing (structural work, not finish remodel)
+      { source: "/services/remodeling", destination: "/services/framing-contractor/remodel-framing", permanent: true },
       // Retired outdoor structures → closest active category
       { source: "/services/patio-construction", destination: "/services/deck-builder", permanent: true },
       { source: "/services/fence-building", destination: "/services/deck-builder", permanent: true },

@@ -10,6 +10,9 @@ export const MISSING_SERVICE_AREAS_TABLE_MESSAGE =
 export const MISSING_FAQS_TABLE_MESSAGE =
   "FAQs table is missing in Supabase. Run migration supabase/migrations/008_faqs_store.sql.";
 
+export const MISSING_SHOWCASE_TABLE_MESSAGE =
+  "Showcase table is missing in Supabase. Run migration supabase/migrations/010_showcase_store.sql.";
+
 /**
  * Local JSON under ./data is allowed only in local development when Supabase
  * is not configured. Never used on Vercel, Lambda, or NODE_ENV=production.

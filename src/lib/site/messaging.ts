@@ -8,43 +8,37 @@ export const integrityStatement =
   "Integrity means doing the right thing even when you didn't have to — because it's the right thing to do.";
 
 export const differentiationIntro =
-  "How we work when the inspector isn't on site — and when they are.";
+  "Three principles on every job — from estimate to inspection.";
 
 export const brandPillarsHeading = "The Standard Behind Every Frame";
 
 export const framingFirstTagline = "Framing-first specialists — structure is our core, not a side service.";
 
+export const heroSubheading = "Built on Quality. Driven by Precision.";
+
 export const heroIntro =
-  "Trusted since 2012 across the Bay Area, Central Valley, and Southern California — elite-level structural work, dependable crews, and straight answers from estimate to inspection.";
+  "Delivering structural framing, rough framing, and siding for commercial and residential projects across the Bay Area, Central Valley, and throughout California.";
 
 export const brandPillars = [
   {
     title: "No Cutting Corners",
-    body: "Every connection framed to code and spec. Shortcuts behind the walls become expensive problems — we don't pass them down the line.",
+    body: "Framed to code and spec — no shortcuts behind the walls.",
   },
   {
     title: "Integrity",
-    body: "When we find an issue, we address it — not bury it. Doing the right thing isn't optional just because no one would know.",
+    body: "Problems addressed openly, even when no one's watching.",
   },
   {
-    title: "Promises",
-    body: "Clear scope, honest timelines, and updates you don't have to chase. If we commit to it, that's what you get.",
+    title: "Our Word",
+    body: "Clear scope, honest timelines, updates without the chase.",
   },
 ] as const;
 
 export const heroBullets = [
-  {
-    lead: "Who We Are:",
-    text: "Structure first — no gimmicks or hidden fees.",
-  },
-  {
-    lead: "How We're Different:",
-    text: "Honest estimates, clear communication, crews you trust.",
-  },
-  {
-    lead: "What To Expect:",
-    text: "Straight answers and work we'd stand behind.",
-  },
+  "Licensed & Insured",
+  "Commercial & Residential",
+  "Honest Estimates",
+  "Reliable Crews",
 ] as const;
 
 export const homepageFaqs = [
