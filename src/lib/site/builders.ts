@@ -9,6 +9,10 @@ export type Builder = {
   logoClassName?: string;
   /** Optional image max-height class override. */
   logoImageClassName?: string;
+  /** Skip Next.js image optimization (best for thin-line logos). */
+  logoUnoptimized?: boolean;
+  /** Render logo exactly as provided — no marquee grayscale/multiply. */
+  logoPreserveOriginal?: boolean;
   logoWidth?: number;
   logoHeight?: number;
 };
@@ -30,13 +34,23 @@ export const builders: Builder[] = [
     logoHeight: 120,
   },
   {
-    name: "Chadha Construction",
-    category: "General Contractor",
-    logo: "/images/builders/chadha-construction.png",
-    logoClassName: "h-16",
-    logoImageClassName: "max-h-[3.25rem]",
-    logoWidth: 140,
-    logoHeight: 140,
+    name: "Riviera Development Company",
+    category: "Development Company",
+    logo: "/images/builders/riviera-development-company.png",
+    logoClassName: "h-14",
+    logoImageClassName: "max-h-11",
+    logoWidth: 220,
+    logoHeight: 82,
+  },
+  {
+    name: "Branagh Development",
+    category: "Development Company",
+    logo: "/images/builders/branagh-development.png",
+    logoClassName: "h-[2.75rem] sm:h-12",
+    logoPreserveOriginal: true,
+    logoUnoptimized: true,
+    logoWidth: 584,
+    logoHeight: 172,
   },
   {
     name: "Durkin Inc",
