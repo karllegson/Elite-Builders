@@ -325,7 +325,7 @@ export const teamMembers: TeamMember[] = [
   {
     id: "edith-pelayo",
     name: "Edith Pelayo",
-    role: "Administrative Assistant",
+    role: "HR & Payroll Coordinator",
     initials: "EP",
     imageSrc: "/images/team/team-member-04.webp",
     imageObjectPosition: "50% 26%",
