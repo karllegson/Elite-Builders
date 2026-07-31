@@ -1,9 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Phone } from "lucide-react";
+import EstimateCtaLink from "@/components/site/EstimateCtaLink";
 import { business } from "@/lib/site/config";
 
 const HOME_HERO_ID = "home-hero";
@@ -64,13 +64,13 @@ export default function MobileStickyCta() {
         <Phone size={16} aria-hidden />
         Call Now
       </a>
-      <Link
+      <EstimateCtaLink
         href="/#estimate"
         tabIndex={visible ? 0 : -1}
         className="flex items-center justify-center bg-brand-red py-3.5 text-sm font-bold text-white"
       >
         Free Estimate
-      </Link>
+      </EstimateCtaLink>
     </div>
   );
 }

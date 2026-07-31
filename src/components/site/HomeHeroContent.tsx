@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { CheckCircle2 } from "lucide-react";
 import { useEffect, useState } from "react";
+import EstimateCtaLink from "@/components/site/EstimateCtaLink";
 import { business } from "@/lib/site/config";
 import { heroBullets, heroIntro, heroSubheading } from "@/lib/site/messaging";
 import { readRuntimeSiteConfig } from "@/lib/site/runtimeSiteConfig";
@@ -51,12 +52,12 @@ export default function HomeHeroContent() {
       </ul>
 
       <div className="mt-4 flex flex-wrap items-center gap-2.5 sm:mt-7 sm:gap-3">
-        <Link
+        <EstimateCtaLink
           href={primaryCtaHref}
           className="rounded-full bg-brand-red px-5 py-2 text-xs font-bold text-white transition-colors hover:bg-brand-red-dark sm:px-7 sm:py-3 sm:text-base"
         >
           {primaryCtaText}
-        </Link>
+        </EstimateCtaLink>
         <Link
           href={secondaryCtaHref}
           className="rounded-full border border-solid border-white/40 px-4 py-2 text-xs font-bold backdrop-blur-sm transition-colors hover:bg-white/10 sm:px-6 sm:py-3 sm:text-base"

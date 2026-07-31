@@ -9,7 +9,6 @@ import {
   Building2,
   ChevronDown,
   ChevronRight,
-  ClipboardCheck,
   Fence,
   FolderOpen,
   HardHat,
@@ -24,6 +23,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import SiteLogo from "@/components/site/SiteLogo";
+import EstimateCtaLink from "@/components/site/EstimateCtaLink";
 import {
   aboutNavLinks,
   business,
@@ -66,8 +66,8 @@ export default function SiteHeader({ hasAdminBar = false }: SiteHeaderProps) {
   const [runtimePhone, setRuntimePhone] = useState<string>(business.phone);
   const [runtimePhoneHref, setRuntimePhoneHref] = useState<string>(business.phoneHref);
   const [runtimeBusinessName, setRuntimeBusinessName] = useState<string>(business.displayName);
-  const [runtimePrimaryCtaText, setRuntimePrimaryCtaText] = useState("Get A Free Quote");
-  const [runtimePrimaryCtaHref, setRuntimePrimaryCtaHref] = useState("/#estimate");
+  const [runtimeNavCtaText, setRuntimeNavCtaText] = useState("Contact Us");
+  const [runtimeNavCtaHref, setRuntimeNavCtaHref] = useState("/contact");
 
   useEffect(() => {
     const applyRuntime = () => {
@@ -75,8 +75,8 @@ export default function SiteHeader({ hasAdminBar = false }: SiteHeaderProps) {
       setRuntimePhone(runtime.phoneMain || business.phone);
       setRuntimePhoneHref(phoneToHref(runtime.phoneMain || business.phone));
       setRuntimeBusinessName(runtime.businessName || business.displayName);
-      setRuntimePrimaryCtaText(runtime.homepagePrimaryCtaText || "Get A Free Quote");
-      setRuntimePrimaryCtaHref(runtime.homepagePrimaryCtaLink || "/#estimate");
+      setRuntimeNavCtaText(runtime.mainMenuCtaText || "Contact Us");
+      setRuntimeNavCtaHref(runtime.mainMenuCtaLink || "/contact");
     };
 
     applyRuntime();
@@ -327,13 +327,13 @@ export default function SiteHeader({ hasAdminBar = false }: SiteHeaderProps) {
               </div>
             </nav>
 
-            <Link
-              href={runtimePrimaryCtaHref}
-              className="hidden items-center gap-2 rounded-lg bg-site-nav-cta px-5 py-2.5 text-[15px] font-medium text-white transition-colors hover:bg-brand-navy-light sm:inline-flex"
+            <EstimateCtaLink
+              href={runtimeNavCtaHref}
+              className="group hidden shrink-0 items-center gap-2 whitespace-nowrap rounded-lg border-2 border-brand-red bg-white px-4 py-2 text-[15px] font-bold text-brand-red transition-colors duration-200 hover:bg-brand-red hover:text-white sm:inline-flex"
             >
-              <ClipboardCheck size={17} strokeWidth={2} aria-hidden />
-              {runtimePrimaryCtaText || `Get A Free Quote - ${runtimeBusinessName}`}
-            </Link>
+              <Phone size={15} strokeWidth={2.5} className="shrink-0" aria-hidden />
+              {runtimeNavCtaText || `Get A Free Quote - ${runtimeBusinessName}`}
+            </EstimateCtaLink>
             <button
               type="button"
               className="p-2 text-site-text-dark lg:hidden"
@@ -471,14 +471,14 @@ export default function SiteHeader({ hasAdminBar = false }: SiteHeaderProps) {
             ))}
 
             <li>
-              <Link
-                href={runtimePrimaryCtaHref}
-                className="my-3 flex items-center justify-center gap-2 rounded-lg bg-site-nav-cta px-5 py-3 font-medium text-white"
+              <EstimateCtaLink
+                href={runtimeNavCtaHref}
+                className="group my-3 flex w-full shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-lg border-2 border-brand-red bg-white px-4 py-3 text-[15px] font-bold text-brand-red transition-colors duration-200 hover:bg-brand-red hover:text-white"
                 onClick={closeMenus}
               >
-                <ClipboardCheck size={16} aria-hidden />
-                {runtimePrimaryCtaText || `Get A Free Quote - ${runtimeBusinessName}`}
-              </Link>
+                <Phone size={15} strokeWidth={2.5} className="shrink-0" aria-hidden />
+                {runtimeNavCtaText || `Get A Free Quote - ${runtimeBusinessName}`}
+              </EstimateCtaLink>
             </li>
           </ul>
         </nav>
