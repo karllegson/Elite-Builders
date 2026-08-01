@@ -19,21 +19,38 @@ function LogoGroup({
       className="builder-marquee__group flex shrink-0 items-center"
       aria-hidden={ariaHidden || undefined}
     >
-      {builders.map((builder) => (
-        <li
-          key={builder.name}
-          className="builder-marquee__item flex h-9 shrink-0 items-center justify-center sm:h-11"
-        >
-          <Image
-            src={builder.logo}
-            alt={builder.name}
-            width={builder.logoWidth ?? 180}
-            height={builder.logoHeight ?? 56}
-            onLoad={onImageLoad}
-            className="h-full w-auto max-w-none object-contain opacity-60 grayscale transition duration-300 [mix-blend-mode:multiply] hover:opacity-100 hover:grayscale-0"
-          />
-        </li>
-      ))}
+      {builders.map((builder) => {
+        const marqueeTreatment = builder.logoPreserveOriginal
+          ? "opacity-60 hover:opacity-100"
+          : "opacity-60 grayscale [mix-blend-mode:multiply] hover:opacity-100 hover:grayscale-0";
+
+        const logoClassName = [
+          "h-full w-auto max-w-none object-contain transition duration-300",
+          marqueeTreatment,
+          builder.logoImageClassName,
+        ]
+          .filter(Boolean)
+          .join(" ");
+
+        return (
+          <li
+            key={builder.name}
+            className={`builder-marquee__item flex shrink-0 items-center justify-center ${
+              builder.logoClassName ?? "h-9 sm:h-11"
+            }`}
+          >
+            <Image
+              src={builder.logo}
+              alt={builder.name}
+              width={builder.logoWidth ?? 180}
+              height={builder.logoHeight ?? 56}
+              unoptimized={builder.logoUnoptimized}
+              onLoad={onImageLoad}
+              className={logoClassName}
+            />
+          </li>
+        );
+      })}
     </ul>
   );
 }

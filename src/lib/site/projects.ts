@@ -30,7 +30,7 @@ export const completedProjects: Project[] = [
     id: "moffet-road-apartments",
     name: "2125 Moffet Road",
     location: "Northern California",
-    builder: "Chadha Construction",
+    builder: "Riviera Development Company",
     type: "Apartments",
     status: "completed",
     image: "commercialRoofFramingAerial",

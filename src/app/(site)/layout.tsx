@@ -5,6 +5,7 @@ import SiteHeader from "@/components/site/SiteHeader";
 import SiteFooter from "@/components/site/SiteFooter";
 import SiteAnalytics from "@/components/site/SiteAnalytics";
 import MobileStickyCta from "@/components/site/MobileStickyCta";
+import EstimateHashScroll from "@/components/site/EstimateHashScroll";
 import { SiteAdminBar } from "@/components/site/SiteAdminBar";
 import { getSiteAdminSession } from "@/lib/admin/getSiteAdminSession";
 import { siteDefaultMetadata } from "@/lib/site/seo";
@@ -53,6 +54,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
       <Suspense fallback={null}>
         <SiteAnalytics />
       </Suspense>
+      <EstimateHashScroll />
 
       {/* Sticky mobile call-to-action bar — hidden until past hero / top of page */}
       <MobileStickyCta />

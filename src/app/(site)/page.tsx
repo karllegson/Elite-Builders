@@ -25,7 +25,7 @@ import { homeImages, homepageGalleryImageKeys } from "@/lib/site/images";
 import { completedProjects, currentProjects, type Project } from "@/lib/site/projects";
 import { homepageMetadata, logoSchemaImage, organizationSchema } from "@/lib/site/seo";
 
-const EstimateForm = dynamic(() => import("@/components/site/EstimateForm"));
+const ContactForm = dynamic(() => import("@/components/site/ContactForm"));
 const BuilderPartnersSection = dynamic(
   () => import("@/components/site/BuilderPartnersSection"),
 );
@@ -439,7 +439,13 @@ export default async function HomePage() {
             lede="Tell us about your project and we'll respond within one business day — no pressure, no obligation."
           />
           <div className="mx-auto mt-6 grid max-w-5xl items-start gap-6 sm:mt-12 sm:gap-10 lg:grid-cols-2">
-            <EstimateForm variant="card" />
+            <ContactForm
+              formType="contact"
+              variant="card"
+              title="Get Your Free Estimate"
+              description="No pressure. No obligation. We respond within one business day."
+              submitLabel="Request My Free Estimate"
+            />
             <ContentImage
               src={homeImages.luxuryHomeInterior.src}
               alt={homeImages.luxuryHomeInterior.alt}

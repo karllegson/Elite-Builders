@@ -13,6 +13,8 @@ export type RuntimeSiteConfig = {
   heroHeadline: string;
   homepagePrimaryCtaText: string;
   homepagePrimaryCtaLink: string;
+  mainMenuCtaText: string;
+  mainMenuCtaLink: string;
   ctaButtonText: string;
   ctaButtonPage: string;
 };
@@ -29,6 +31,8 @@ function toRuntime(values: Record<string, string>): RuntimeSiteConfig {
     heroHeadline: merged.heroHeadline || defaults.heroHeadline,
     homepagePrimaryCtaText: merged.homepagePrimaryCtaText || defaults.homepagePrimaryCtaText,
     homepagePrimaryCtaLink: merged.homepagePrimaryCtaLink || defaults.homepagePrimaryCtaLink,
+    mainMenuCtaText: merged.mainMenuCtaText || defaults.mainMenuCtaText,
+    mainMenuCtaLink: merged.mainMenuCtaLink || defaults.mainMenuCtaLink,
     ctaButtonText: merged.ctaButtonText || defaults.ctaButtonText,
     ctaButtonPage: merged.ctaButtonPage || defaults.ctaButtonPage,
   };
