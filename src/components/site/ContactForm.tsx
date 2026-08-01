@@ -33,10 +33,8 @@ export default function ContactForm({
   const lede =
     description ??
     (formType === "contact"
-      ? "Tell us about your project."
+      ? "Tell us about your project and we will respond within one business day."
       : "No pressure. No obligation. We respond within one business day.");
-  const preSubmitNote =
-    formType === "contact" ? "Response within one business day." : null;
   const buttonLabel =
     submitLabel ??
     (formType === "contact" ? "Send Message" : "Request My Free Estimate");
@@ -264,16 +262,6 @@ export default function ContactForm({
         {submitState === "error" ? (
           <p className="rounded-md border border-solid border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
             {errorMessage}
-          </p>
-        ) : null}
-
-        {preSubmitNote ? (
-          <p
-            className={`text-center text-sm ${
-              variant === "card" ? "text-gray-600" : "text-white/80"
-            }`}
-          >
-            {preSubmitNote}
           </p>
         ) : null}
 
