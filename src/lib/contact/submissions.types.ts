@@ -3,7 +3,7 @@ export type ContactFormType = "estimate" | "contact";
 export type ContactSubmissionInput = {
   name: string;
   phone: string;
-  email?: string;
+  email: string;
   city?: string;
   service?: string;
   message?: string;
