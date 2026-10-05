@@ -36,33 +36,33 @@ export function PasswordProtectedPost({
   }
 
   return (
-    <section className="bg-gray-50">
-      <div className="site-container flex max-w-xl flex-col gap-4 py-24">
-        <h1 className="text-3xl font-extrabold text-brand-navy">{title}</h1>
-        <p className="text-gray-600">This post is password protected.</p>
-        <form className="flex flex-col gap-3" onSubmit={(event) => void handleSubmit(event)}>
-          <label className="flex flex-col gap-1 text-sm font-semibold text-site-text-dark">
-            Password
-            <input
-              type="password"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              className="rounded-md border border-gray-300 px-3 py-2 font-normal"
-              autoComplete="current-password"
-            />
-          </label>
-          {error ? (
-            <p className="text-sm text-brand-red" role="alert">
-              {error}
-            </p>
-          ) : null}
-          <button
-            type="submit"
-            className="w-fit rounded-md bg-brand-red px-5 py-2.5 font-bold text-white hover:bg-brand-red-dark"
-          >
-            View Post
-          </button>
-        </form>
+    <section className="section bg-site-surface">
+      <div className="site-container">
+        <div className="mx-auto max-w-lg rounded-3xl border border-solid border-site-line bg-white p-8 sm:p-10">
+          <p className="eyebrow">Protected</p>
+          <h1 className="mt-4 font-display text-2xl font-bold sm:text-3xl">{title}</h1>
+          <p className="mt-3 text-site-text">This post is password protected.</p>
+          <form className="mt-7 grid gap-4" onSubmit={(event) => void handleSubmit(event)}>
+            <label className="grid gap-2">
+              <span className="field-label">Password</span>
+              <input
+                type="password"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                className="field"
+                autoComplete="current-password"
+              />
+            </label>
+            {error ? (
+              <p className="text-sm text-brand-red" role="alert">
+                {error}
+              </p>
+            ) : null}
+            <button type="submit" className="btn btn-primary w-full">
+              View Post
+            </button>
+          </form>
+        </div>
       </div>
     </section>
   );

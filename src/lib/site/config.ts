@@ -42,7 +42,7 @@ export const services: SiteService[] = [
     slug: "framing-contractor",
     href: "/services/framing-contractor",
     shortDescription:
-      "Custom, production, and addition framing — residential, commercial, rough, and structural work across California.",
+      "Residential, new construction, and custom home framing — plus rough and structural framing across California.",
     icon: "clipboard",
     image: "framingContractorPlanning",
   },
@@ -51,27 +51,9 @@ export const services: SiteService[] = [
     slug: "home-builder",
     href: "/services/home-builder",
     shortDescription:
-      "Custom home building, production home framing, and home additions — framing-first builds across California.",
+      "Custom and luxury home building, new home construction, and home additions — framing-first builds across California.",
     icon: "hammer",
     image: "customHomeFramingCrew",
-  },
-  {
-    title: "Deck Builder",
-    slug: "deck-builder",
-    href: "/services/deck-builder",
-    shortDescription:
-      "Wood deck construction and deck replacement built with the same structural precision we bring to framing.",
-    icon: "fence",
-    image: "deckPorch",
-  },
-  {
-    title: "Siding Contractor",
-    slug: "siding-contractor",
-    href: "/services/siding-contractor",
-    shortDescription:
-      "Siding installation and siding replacement — exterior protection built to withstand California weather.",
-    icon: "building",
-    image: "sidingInstallation",
   },
 ];
 
@@ -130,7 +112,7 @@ export const serviceAreas: ServiceArea[] = [
     city: "Riverbank",
     slug: "riverbank",
     href: "/service-areas/riverbank",
-    blurb: "Residential framing and deck construction for Riverbank families.",
+    blurb: "Residential and custom home framing for Riverbank families.",
     region: "Central Valley",
   },
   {
@@ -172,7 +154,7 @@ export const serviceAreas: ServiceArea[] = [
     city: "Dublin",
     slug: "dublin",
     href: "/service-areas/dublin",
-    blurb: "Framing, siding, and deck services for Dublin homeowners.",
+    blurb: "Framing and home building services for Dublin homeowners.",
     region: "Bay Area",
   },
   {
@@ -207,7 +189,7 @@ export const serviceAreas: ServiceArea[] = [
     city: "Pasadena",
     slug: "pasadena",
     href: "/service-areas/pasadena",
-    blurb: "Rough framing, remodeling, and siding for Pasadena and the greater Southern California region.",
+    blurb: "Rough framing and structural framing for Pasadena and the greater Southern California region.",
     region: "Southern California",
   },
   {
@@ -345,8 +327,6 @@ export const utilityNavLinks = [
 const serviceMenuIcons: Record<(typeof services)[number]["slug"], string> = {
   "framing-contractor": "hardhat",
   "home-builder": "home",
-  "deck-builder": "fence",
-  "siding-contractor": "panels",
 };
 
 export const serviceMenuGroups = services.map((service) => ({

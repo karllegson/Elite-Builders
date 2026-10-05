@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { CheckCircle2 } from "lucide-react";
+import { ArrowRight, Check } from "lucide-react";
 import { useEffect, useState } from "react";
 import EstimateCtaLink from "@/components/site/EstimateCtaLink";
 import { business } from "@/lib/site/config";
@@ -32,39 +32,44 @@ export default function HomeHeroContent() {
   }, []);
 
   return (
-    <div className="max-w-xl text-white [text-shadow:0_2px_16px_rgba(0,0,0,0.45)]">
-      <p className="text-[0.6875rem] font-semibold uppercase tracking-[0.14em] text-brand-sky sm:text-sm sm:tracking-[0.18em]">
+    <div className="max-w-3xl text-white">
+      <p className="inline-flex items-center gap-2.5 rounded-full border border-solid border-white/20 bg-white/10 py-1.5 pl-2 pr-4 text-xs font-medium tracking-wide text-white/90 backdrop-blur-md sm:text-sm">
+        <span className="relative flex size-2.5 items-center justify-center" aria-hidden>
+          <span className="absolute inline-flex size-full animate-ping rounded-full bg-brand-red/70 motion-reduce:hidden" />
+          <span className="relative inline-flex size-2 rounded-full bg-brand-red" />
+        </span>
         {heroLocationLine}
       </p>
-      <h1 className="mt-1.5 text-xl font-bold leading-tight text-white sm:mt-2 sm:text-3xl lg:text-4xl">
+      <h1 className="mt-6 font-display text-[2.375rem] font-bold leading-[1.02] tracking-[-0.03em] text-white sm:text-6xl lg:text-7xl">
         {heroHeadline}
       </h1>
-      <p className="mt-2 text-sm font-semibold text-white sm:mt-3 sm:text-lg">{heroSubheading}</p>
-      <p className="mt-2 text-xs leading-relaxed text-white/90 sm:mt-3 sm:text-base">{heroIntro}</p>
+      <p className="mt-6 font-display text-lg font-semibold text-brand-sky sm:text-xl">
+        {heroSubheading}
+      </p>
+      <p className="mt-3 max-w-2xl text-base leading-relaxed text-white/80 sm:text-lg">
+        {heroIntro}
+      </p>
 
-      <ul className="mt-3 grid grid-cols-1 gap-1.5 sm:mt-5 sm:grid-cols-2 sm:gap-2">
-        {heroBullets.map((item) => (
-          <li key={item} className="flex items-center gap-2 sm:gap-2.5">
-            <CheckCircle2 size={16} aria-hidden className="shrink-0 text-brand-sky sm:size-[18px]" />
-            <p className="text-xs leading-snug text-white/90 sm:text-[0.9375rem]">{item}</p>
-          </li>
-        ))}
-      </ul>
-
-      <div className="mt-4 flex flex-wrap items-center gap-2.5 sm:mt-7 sm:gap-3">
-        <EstimateCtaLink
-          href={primaryCtaHref}
-          className="rounded-full bg-brand-red px-5 py-2 text-xs font-bold text-white transition-colors hover:bg-brand-red-dark sm:px-7 sm:py-3 sm:text-base"
-        >
+      <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+        <EstimateCtaLink href={primaryCtaHref} className="btn btn-primary btn-lg">
           {primaryCtaText}
+          <ArrowRight size={18} aria-hidden className="btn-arrow" />
         </EstimateCtaLink>
-        <Link
-          href={secondaryCtaHref}
-          className="rounded-full border border-solid border-white/40 px-4 py-2 text-xs font-bold backdrop-blur-sm transition-colors hover:bg-white/10 sm:px-6 sm:py-3 sm:text-base"
-        >
+        <Link href={secondaryCtaHref} className="btn btn-glass btn-lg">
           {secondaryCtaText}
         </Link>
       </div>
+
+      <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-2.5">
+        {heroBullets.map((item) => (
+          <li key={item} className="flex items-center gap-2 text-sm text-white/85 sm:text-[0.9375rem]">
+            <span className="flex size-5 items-center justify-center rounded-full bg-white/15">
+              <Check size={12} strokeWidth={3} aria-hidden className="text-white" />
+            </span>
+            {item}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

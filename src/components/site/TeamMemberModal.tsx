@@ -65,7 +65,7 @@ export default function TeamMemberModal({ member, onClose }: TeamMemberModalProp
       <button
         type="button"
         aria-label="Close profile"
-        className="absolute inset-0 bg-brand-navy/50 backdrop-blur-[2px]"
+        className="absolute inset-0 bg-brand-ink/60 backdrop-blur-sm"
         onClick={onClose}
       />
 
@@ -73,7 +73,7 @@ export default function TeamMemberModal({ member, onClose }: TeamMemberModalProp
         role="dialog"
         aria-modal="true"
         aria-labelledby="team-member-modal-title"
-        className="relative z-10 max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white p-6 shadow-2xl sm:p-8"
+        className="relative z-10 max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-3xl bg-white p-6 shadow-2xl sm:p-10"
       >
         <button
           ref={closeButtonRef}
@@ -93,7 +93,7 @@ export default function TeamMemberModal({ member, onClose }: TeamMemberModalProp
           <div className="min-w-0 flex-1 pt-1">
             <h2
               id="team-member-modal-title"
-              className="pr-8 text-2xl font-bold text-brand-navy sm:text-3xl"
+              className="pr-8 font-display text-2xl font-bold sm:text-3xl"
             >
               {member.name}
             </h2>
@@ -121,7 +121,7 @@ export default function TeamMemberModal({ member, onClose }: TeamMemberModalProp
         <p className="mt-6 text-sm leading-relaxed text-site-text sm:text-base">{profile.bio}</p>
 
         {profile.testimonial ? (
-          <blockquote className="mt-6 rounded-xl bg-[#f5f8fd] px-5 py-5 sm:px-6">
+          <blockquote className="mt-6 rounded-2xl bg-site-surface px-5 py-5 sm:px-6">
             <p className="text-sm font-bold text-brand-navy sm:text-base">
               What Homeowners Say About {firstName}
             </p>

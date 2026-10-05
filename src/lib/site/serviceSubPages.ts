@@ -9,27 +9,17 @@ export type ServiceSubPageDefinition = {
 /** Sub-service pages nested under each main GBP category. */
 export const serviceSubPagesByCategory: Record<string, ServiceSubPageDefinition[]> = {
   "framing-contractor": [
-    { slug: "custom-framing", label: "Custom Framing" },
-    { slug: "home-addition-framing", label: "Home Addition Framing" },
-    { slug: "production-home-framing", label: "Production Home Framing" },
     { slug: "residential-framing", label: "Residential Framing" },
-    { slug: "commercial-framing", label: "Commercial Framing" },
+    { slug: "new-construction-framing", label: "New Construction Framing" },
+    { slug: "custom-framing", label: "Custom Home Framing" },
     { slug: "rough-framing", label: "Rough Framing" },
     { slug: "structural-framing", label: "Structural Framing" },
-    { slug: "remodel-framing", label: "Remodel Framing" },
   ],
   "home-builder": [
-    { slug: "custom-home-building", label: "Custom Home Building" },
-    { slug: "new-home-construction", label: "New Home Construction" },
     { slug: "home-addition-construction", label: "Home Addition Construction" },
-  ],
-  "deck-builder": [
-    { slug: "wood-deck-construction", label: "Wood Deck Construction" },
-    { slug: "deck-replacement", label: "Deck Replacement" },
-  ],
-  "siding-contractor": [
-    { slug: "siding-installation", label: "Siding Installation" },
-    { slug: "siding-replacement", label: "Siding Replacement" },
+    { slug: "luxury-home-building", label: "Luxury Home Building" },
+    { slug: "new-home-construction", label: "New Home Construction" },
+    { slug: "custom-home-building", label: "Custom Home Building" },
   ],
 };
 

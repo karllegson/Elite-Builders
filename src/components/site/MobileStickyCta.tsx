@@ -51,15 +51,15 @@ export default function MobileStickyCta() {
 
   return (
     <div
-      className={`fixed inset-x-0 bottom-0 z-50 grid grid-cols-2 transition-transform duration-300 ease-out sm:hidden ${
-        visible ? "translate-y-0" : "pointer-events-none translate-y-full"
+      className={`fixed inset-x-3 bottom-3 z-50 grid grid-cols-2 gap-2 rounded-full border border-solid border-white/10 bg-brand-ink/90 p-1.5 shadow-[0_18px_40px_-12px_rgba(7,21,48,0.6)] backdrop-blur-md transition-all duration-300 ease-out sm:hidden ${
+        visible ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-[150%] opacity-0"
       }`}
       aria-hidden={!visible}
     >
       <a
         href={business.phoneHref}
         tabIndex={visible ? 0 : -1}
-        className="flex items-center justify-center gap-2 bg-brand-navy py-3.5 text-sm font-bold text-white"
+        className="flex items-center justify-center gap-2 rounded-full py-3 font-display text-sm font-semibold text-white"
       >
         <Phone size={16} aria-hidden />
         Call Now
@@ -67,7 +67,7 @@ export default function MobileStickyCta() {
       <EstimateCtaLink
         href="/#estimate"
         tabIndex={visible ? 0 : -1}
-        className="flex items-center justify-center bg-brand-red py-3.5 text-sm font-bold text-white"
+        className="flex items-center justify-center rounded-full bg-brand-red py-3 font-display text-sm font-semibold text-white"
       >
         Free Estimate
       </EstimateCtaLink>

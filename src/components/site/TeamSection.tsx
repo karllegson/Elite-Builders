@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Image from "next/image";
 import { ArrowUpRight, User } from "lucide-react";
 import TeamHeadshotDevTools from "@/components/site/TeamHeadshotDevTools";
-import { TeamHeadshotImage } from "@/components/site/TeamHeadshotImage";
 import TeamMemberModal from "@/components/site/TeamMemberModal";
+import SectionIntro from "@/components/site/SectionIntro";
 import type { TeamMember } from "@/lib/site/config";
 import {
   cropToMemberOverrides,
@@ -19,35 +20,100 @@ type TeamSectionProps = {
   members: TeamMember[];
 };
 
-function TeamAvatar({ member }: { member: TeamMember }) {
-  if (member.imageSrc) {
-    return (
-      <TeamHeadshotImage
-        member={member}
-        frameClassName="size-20 ring-2 ring-white sm:size-36 sm:ring-4"
-        sizes="(max-width: 640px) 80px, 144px"
-      />
-    );
-  }
-
-  if (member.isPlaceholder) {
-    return (
-      <div
-        className="flex size-20 items-center justify-center rounded-full bg-brand-navy/10 text-brand-navy/35 ring-2 ring-white sm:size-36 sm:ring-4"
-        aria-hidden
-      >
-        <User className="size-7 sm:size-12" strokeWidth={1.5} />
-      </div>
-    );
-  }
+/** Full-bleed portrait card — the headshots are waist-up portraits on a matching wall. */
+function TeamPortraitCard({
+  member,
+  index,
+  onOpen,
+  selected,
+}: {
+  member: TeamMember;
+  index: number;
+  onOpen?: () => void;
+  selected?: boolean;
+}) {
+  const firstName = member.name.split(" ")[0];
 
   return (
-    <div
-      className="flex size-20 items-center justify-center rounded-full bg-brand-navy text-lg font-semibold text-white ring-2 ring-white sm:size-36 sm:text-3xl sm:ring-4"
-      aria-hidden
+    <article
+      className={`group relative isolate aspect-[3/4] overflow-hidden rounded-2xl bg-brand-ink shadow-[0_16px_32px_-20px_rgba(7,21,48,0.5)] transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_24px_44px_-20px_rgba(7,21,48,0.6)] ${
+        selected ? "ring-4 ring-amber-400" : ""
+      }`}
     >
-      {member.initials}
-    </div>
+      {member.imageSrc ? (
+        <Image
+          src={member.imageSrc}
+          alt={member.name}
+          fill
+          quality={85}
+          sizes="(max-width: 640px) 50vw, (max-width: 1280px) 33vw, 220px"
+          className="-z-20 object-cover transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.06] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+          style={{ objectPosition: "50% 12%" }}
+        />
+      ) : (
+        <div
+          className="bg-blueprint absolute inset-0 -z-20 flex items-center justify-center font-display text-4xl font-bold text-white/25"
+          aria-hidden
+        >
+          {member.isPlaceholder ? <User className="size-10" strokeWidth={1.25} /> : member.initials}
+        </div>
+      )}
+
+      {/* Legibility gradient + subtle brand tint on hover */}
+      <div
+        className="absolute inset-x-0 bottom-0 -z-10 h-3/5 bg-gradient-to-t from-brand-ink via-brand-ink/60 to-transparent"
+        aria-hidden
+      />
+      <div
+        className="absolute inset-0 -z-10 bg-brand-navy/0 transition-colors duration-500 group-hover:bg-brand-navy/15"
+        aria-hidden
+      />
+
+      <span
+        className="absolute left-3 top-3 font-display text-[0.625rem] font-semibold tracking-[0.18em] text-white/80"
+        aria-hidden
+      >
+        {String(index + 1).padStart(2, "0")}
+      </span>
+
+      {onOpen ? (
+        <span
+          className="absolute right-3 top-3 flex size-7 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-md transition-all duration-300 group-hover:bg-brand-red"
+          aria-hidden
+        >
+          <ArrowUpRight className="size-3.5 transition-transform duration-300 group-hover:rotate-45" />
+        </span>
+      ) : null}
+
+      <div className="absolute inset-x-0 bottom-0 p-3.5 sm:p-4">
+        <span
+          className="block h-0.5 w-6 bg-brand-red transition-all duration-500 group-hover:w-10"
+          aria-hidden
+        />
+        <h3 className="mt-2 font-display text-sm font-bold leading-tight text-white sm:text-base">
+          {onOpen ? (
+            <button
+              type="button"
+              onClick={onOpen}
+              className="text-left after:absolute after:inset-0 after:rounded-2xl focus:outline-none focus-visible:after:ring-4 focus-visible:after:ring-brand-sky"
+              aria-label={`${member.name}, ${member.role} — read profile`}
+            >
+              {member.name}
+            </button>
+          ) : (
+            member.name
+          )}
+        </h3>
+        <p className="mt-1 text-[0.5625rem] font-semibold uppercase leading-snug tracking-[0.14em] text-white/70 sm:text-[0.625rem]">
+          {member.role}
+        </p>
+        {onOpen ? (
+          <p className="mt-2 hidden text-xs font-medium text-white/0 transition-colors duration-300 group-hover:text-white/90 sm:block">
+            Meet {firstName} →
+          </p>
+        ) : null}
+      </div>
+    </article>
   );
 }
 
@@ -101,97 +167,35 @@ export default function TeamSection({ members }: TeamSectionProps) {
     setCropToolsOpen(false);
   };
 
-  const firstName = (name: string) => name.split(" ")[0];
-
   return (
     <>
-      <section id="team" className="scroll-mt-28 border-y border-solid border-brand-navy/10 bg-[#f5f8fd] py-14 sm:py-24">
+      <section id="team" className="section scroll-mt-28 bg-site-surface">
         <div className="site-container">
-          <div className="mx-auto max-w-2xl text-center">
-            <p className="text-xs font-medium uppercase tracking-[0.18em] text-brand-blue">
-              The Crew
-            </p>
-            <h2 className="mt-2 font-display text-xl font-bold tracking-tight text-brand-navy sm:text-3xl">
-              Meet the people on your job
-            </h2>
-            <p className="mt-3 text-sm leading-relaxed text-site-text sm:text-base">
-              Experienced, skilled, and committed to doing it right.
-            </p>
-          </div>
+          <SectionIntro
+            eyebrow="The Crew"
+            title="Meet the people on your job"
+            lede="Experienced, skilled, and committed to doing it right."
+          />
 
-          <ul className="mt-10 grid grid-cols-2 gap-x-6 gap-y-10 sm:mt-14 sm:grid-cols-3 sm:gap-x-10 sm:gap-y-12">
-            {displayMembers.map((member) => {
+          <ul className="mx-auto mt-12 grid max-w-6xl grid-cols-2 gap-3 sm:mt-14 sm:grid-cols-3 sm:gap-4 xl:grid-cols-6">
+            {displayMembers.map((member, index) => {
               const canOpenProfile = Boolean(member.profile) && !member.isPlaceholder;
+              const inCropMode = cropToolsOpen && Boolean(member.imageSrc);
 
               return (
-                <li
-                  key={member.id}
-                  className={`group ${
-                    cropToolsOpen && selectedCropId === member.id
-                      ? "rounded-sm ring-2 ring-amber-400 ring-offset-2 ring-offset-[#f5f8fd]"
-                      : ""
-                  }`}
-                >
-                  <article className="flex h-full flex-col items-center text-center">
-                    {cropToolsOpen && member.imageSrc ? (
-                      <button
-                        type="button"
-                        className="cursor-pointer rounded-full shadow-[0_12px_28px_-16px_rgba(0,32,91,0.45)] focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
-                        onClick={() => setSelectedCropId(member.id)}
-                        aria-label={`Adjust crop for ${member.name}`}
-                      >
-                        <span className="block transition-transform duration-300 group-hover:scale-[1.02]">
-                          <TeamAvatar member={member} />
-                        </span>
-                      </button>
-                    ) : canOpenProfile ? (
-                      <button
-                        type="button"
-                        className="cursor-pointer rounded-full shadow-[0_12px_28px_-16px_rgba(0,32,91,0.45)] focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue"
-                        onClick={() => setActiveMember(member)}
-                        aria-label={`About ${member.name}`}
-                      >
-                        <span className="block transition-transform duration-300 group-hover:scale-[1.02]">
-                          <TeamAvatar member={member} />
-                        </span>
-                      </button>
-                    ) : (
-                      <div className="rounded-full shadow-[0_12px_28px_-16px_rgba(0,32,91,0.45)]">
-                        <span className="block">
-                          <TeamAvatar member={member} />
-                        </span>
-                      </div>
-                    )}
-
-                    <span className="mt-4 block h-0.5 w-6 bg-brand-red sm:mt-5" aria-hidden />
-
-                    <h3
-                      className={`mt-3 font-display text-sm font-bold leading-snug tracking-tight sm:text-base ${
-                        member.isPlaceholder ? "text-site-text-muted" : "text-brand-navy"
-                      }`}
-                    >
-                      {member.name}
-                    </h3>
-
-                    <p className="mt-1 text-[11px] font-medium uppercase tracking-[0.14em] text-brand-blue sm:text-xs">
-                      {member.role}
-                    </p>
-
-                    {canOpenProfile ? (
-                      <button
-                        type="button"
-                        onClick={() => setActiveMember(member)}
-                        className="mt-3 inline-flex items-center gap-0.5 text-[11px] font-semibold text-site-text transition-colors hover:text-brand-navy sm:mt-4 sm:text-xs"
-                      >
-                        About {firstName(member.name)}
-                        <ArrowUpRight className="size-3.5 opacity-60" aria-hidden />
-                      </button>
-                    ) : (
-                      <p className="mt-3 text-[11px] text-site-text-muted sm:mt-4 sm:text-xs">
-                        Profile soon
-                      </p>
-                    )}
-                  </article>
+                <li key={member.id}>
+                  <TeamPortraitCard
+                    member={member}
+                    index={index}
+                    selected={cropToolsOpen && selectedCropId === member.id}
+                    onOpen={
+                      inCropMode
+                        ? () => setSelectedCropId(member.id)
+                        : canOpenProfile
+                          ? () => setActiveMember(member)
+                          : undefined
+                    }
+                  />
                 </li>
               );
             })}

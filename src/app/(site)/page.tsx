@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import {
-  ArrowRight,
-  MapPin,
-} from "lucide-react";
+import { ArrowRight, Check, Mail, MapPin, Phone } from "lucide-react";
 import ContentImage from "@/components/site/ContentImage";
+import EstimateCtaLink from "@/components/site/EstimateCtaLink";
+import ProjectCard from "@/components/site/ProjectCard";
 import HomeHeroContent from "@/components/site/HomeHeroContent";
 import HomeHeroSection from "@/components/site/HomeHeroSection";
 import BrandPillars from "@/components/site/BrandPillars";
@@ -84,7 +83,7 @@ const featuredProjects: Project[] = [
 const audiences = [
   {
     title: "For Homeowners",
-    body: "Custom homes, additions, remodel framing, decks, and siding — structural work with honest estimates and clear communication from start to finish.",
+    body: "Custom homes, luxury homes, additions, and residential framing — structural work with honest estimates and clear communication from start to finish.",
   },
   {
     title: "For Builders & General Contractors",
@@ -93,6 +92,13 @@ const audiences = [
 ];
 
 const faqs = [...homepageFaqs];
+
+/** Mosaic spans for the 11-photo gallery — fills a 4-column grid with no gaps. */
+const galleryTileClass: Record<number, string> = {
+  0: "col-span-2 row-span-2",
+  5: "row-span-2",
+  8: "col-span-2",
+};
 
 const localBusinessSchema = {
   "@context": "https://schema.org",
@@ -114,7 +120,7 @@ const localBusinessSchema = {
   foundingDate: String(business.foundedYear),
   areaServed: serviceAreas.map((area) => ({ "@type": "City", name: `${area.city}, CA` })),
   description:
-    "Framing-first contractor serving the Bay Area, Central Valley, and Southern California — custom, production, and addition framing plus siding and deck construction for residential and commercial projects.",
+    "Framing-first contractor serving the Bay Area, Central Valley, and Southern California — residential, new construction, custom home, rough, and structural framing plus custom and luxury home building.",
 };
 
 const faqSchema = {
@@ -131,6 +137,10 @@ export default async function HomePage() {
   const publishedServices = await listPublishedPublicServicePages();
   const services =
     publishedServices.length > 0 ? publishedServices : getPublicServicePagesFallback();
+  // Two services: large side-by-side tiles with the "not sure" card as a full-width strip.
+  // Four services: two large + three standard tiles. Otherwise a plain three-column grid.
+  const pairLayout = services.length === 2;
+  const useFeatureLayout = services.length === 4;
   return (
     <>
       <script
@@ -159,7 +169,25 @@ export default async function HomePage() {
         as="video"
         type="video/mp4"
       />
-      <HomeHeroSection>
+      <HomeHeroSection
+        footer={
+          <dl className="grid grid-cols-2 overflow-hidden rounded-2xl border border-solid border-white/15 bg-white/10 backdrop-blur-md lg:grid-cols-4">
+            {trustStats.map(({ value, label }, index) => (
+              <div
+                key={label}
+                className={`flex flex-col-reverse px-5 py-4 sm:px-7 sm:py-5 ${index % 2 === 1 ? "border-l border-solid border-white/10" : ""} ${
+                  index > 1 ? "border-t border-solid border-white/10 lg:border-t-0" : ""
+                } ${index === 2 ? "lg:border-l" : ""}`}
+              >
+                <dt className="mt-1 text-xs text-white/70 sm:text-sm">{label}</dt>
+                <dd className="font-display text-2xl font-bold tracking-tight text-white sm:text-3xl">
+                  {value}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        }
+      >
         <HomeHeroContent />
       </HomeHeroSection>
 
@@ -171,59 +199,91 @@ export default async function HomePage() {
       <TeamSection members={teamMembers} />
 
       {/* ── Services ─────────────────────────────────────────── */}
-      <section className="bg-white py-12 sm:py-24">
+      <section className="section bg-white">
         <div className="site-container">
           <SectionIntro
             eyebrow="Our Services"
             title="Framing Contractor & Construction Specialists"
-            lede="Custom, production, and addition framing are our core — plus home building, decks, and siding across the Bay Area, Central Valley, and Southern California. Need kitchen or room re-framing? We handle the structural work."
+            lede="Residential, new construction, and custom home framing are our core — plus custom and luxury home building across the Bay Area, Central Valley, and Southern California. Need kitchen or room re-framing? We handle the structural work."
+            align="left"
+            action={
+              <Link href="/services" className="btn btn-outline">
+                All Services
+                <ArrowRight size={16} aria-hidden className="btn-arrow" />
+              </Link>
+            }
           />
 
-          <div className="mt-8 sm:mt-14">
-            <div className="grid gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
-            {services.map((service) => {
+          <div className="mt-12 grid gap-5 sm:mt-16 sm:grid-cols-2 lg:grid-cols-6 lg:gap-6">
+            {services.map((service, index) => {
               const img = homeImages[service.image];
+              const wide = pairLayout || (useFeatureLayout && index < 2);
               return (
                 <Link
                   key={service.slug}
                   href={service.href}
-                  className="group overflow-hidden rounded-xl border border-solid border-gray-200 bg-white transition-all hover:-translate-y-1 hover:border-brand-sky/60 hover:shadow-lg"
+                  className={`group relative isolate flex min-h-[22rem] flex-col justify-end overflow-hidden rounded-3xl bg-brand-ink ${
+                    wide ? `lg:col-span-3 ${pairLayout ? "sm:min-h-[28rem] lg:min-h-[32rem]" : "lg:min-h-[26rem]"}` : "lg:col-span-2"
+                  }`}
                 >
-                  <ContentImage src={img.src} alt={img.alt} className="h-36 sm:h-48" />
-                  <div className="p-4 sm:p-7">
-                    <h3 className="text-base font-bold text-brand-navy sm:text-lg">{service.name}</h3>
-                    <p className="mt-1.5 text-xs leading-relaxed text-gray-500 sm:mt-2 sm:text-sm">
-                      {service.shortDescription}
-                    </p>
-                    <span className="mt-3 inline-flex items-center gap-1.5 text-xs font-bold text-brand-blue group-hover:text-brand-red sm:mt-4 sm:text-sm">
-                      Learn More
-                      <ArrowRight size={15} aria-hidden className="transition-transform group-hover:translate-x-1" />
+                  <ContentImage
+                    src={img.src}
+                    alt={img.alt}
+                    className="img-zoom !absolute inset-0 -z-20 h-full"
+                    sizes={wide ? "(max-width: 1024px) 100vw, 640px" : "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 420px"}
+                  />
+                  <div
+                    className="absolute inset-0 -z-10 bg-gradient-to-t from-brand-ink via-brand-ink/50 to-transparent"
+                    aria-hidden
+                  />
+                  <div className="flex items-end justify-between gap-4 p-6 sm:p-8">
+                    <div>
+                      <h3 className="font-display text-xl font-bold text-white sm:text-2xl">
+                        {service.name}
+                      </h3>
+                      <p className="mt-2 line-clamp-2 text-[0.9375rem] leading-relaxed text-white/75">
+                        {service.shortDescription}
+                      </p>
+                    </div>
+                    <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-md transition-colors group-hover:bg-brand-red">
+                      <ArrowRight size={18} aria-hidden className="transition-transform group-hover:-rotate-45" />
                     </span>
                   </div>
                 </Link>
               );
             })}
 
-            <div className="flex flex-col items-start justify-center rounded-xl border border-solid border-gray-200 bg-gray-50 p-4 sm:p-7">
-              <h3 className="text-base font-bold text-brand-navy sm:text-lg">Not Sure What You Need?</h3>
-              <p className="mt-1.5 text-xs text-gray-500 sm:mt-2 sm:text-sm">
-                Tell us about your project and we&apos;ll point you in the right direction — even
-                if that means we&apos;re not the right fit.
-              </p>
-              <Link
-                href="#estimate"
-                className="mt-5 rounded-full bg-brand-blue px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-brand-blue-dark"
+            <div
+              className={`bg-blueprint-light flex flex-col justify-between rounded-3xl border border-solid border-site-line bg-site-surface p-7 sm:p-8 ${
+                pairLayout
+                  ? "sm:col-span-2 lg:col-span-6 lg:flex-row lg:items-center lg:gap-10"
+                  : useFeatureLayout
+                    ? "sm:col-span-2 lg:col-span-2"
+                    : "lg:col-span-2"
+              }`}
+            >
+              <div>
+                <p className="eyebrow">Not sure?</p>
+                <h3 className="mt-4 font-display text-2xl font-bold">Not Sure What You Need?</h3>
+                <p className="mt-3 max-w-2xl text-[0.9375rem] leading-relaxed text-site-text">
+                  Tell us about your project and we&apos;ll point you in the right direction — even
+                  if that means we&apos;re not the right fit.
+                </p>
+              </div>
+              <EstimateCtaLink
+                href="/#estimate"
+                className={`btn btn-dark mt-8 self-start ${pairLayout ? "lg:mt-0 lg:self-center" : ""}`}
               >
                 Ask Us Anything
-              </Link>
+                <ArrowRight size={16} aria-hidden className="btn-arrow" />
+              </EstimateCtaLink>
             </div>
-          </div>
           </div>
         </div>
       </section>
 
       {/* ── Dual audience — homeowners + builders ────────────── */}
-      <section className="border-t border-solid border-gray-100 bg-gray-50/60 py-12 sm:py-24">
+      <section className="section bg-site-surface">
         <div className="site-container">
           <SectionIntro
             eyebrow="Who We Serve"
@@ -235,117 +295,102 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── About + stats ────────────────────────────────────── */}
-      <section className="border-y border-solid border-gray-100 bg-white py-12 sm:py-24">
-        <div className="site-container">
-          <SectionIntro
-            eyebrow="About Us"
-            title={`${business.displayName}: Framing Built On Craftsmanship, Not Shortcuts`}
-            lede={`Family-owned since ${business.foundedYear}. ${business.companyStory} ${integrityStatement}`}
-          />
-
-          <div className="mt-8 grid items-center gap-6 sm:mt-14 sm:gap-10 lg:grid-cols-2">
-            <ContentImage
-              src={homeImages.customHomeFramingCrew.src}
-              alt={homeImages.customHomeFramingCrew.alt}
-              className="h-48 rounded-lg sm:h-80 sm:rounded-xl lg:h-96"
-              sizes="(max-width: 1024px) 100vw, 50vw"
-              quality={90}
-            />
-            <div className="space-y-3 text-xs text-gray-600 sm:space-y-5 sm:text-base">
-              <p className="leading-relaxed">
+      {/* ── About ────────────────────────────────────────────── */}
+      <section className="section bg-white">
+        <div className="site-container grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
+          <div className="order-2 lg:order-1">
+            <p className="eyebrow">About Us</p>
+            <h2 className="section-title mt-4">
+              {business.displayName}: Framing Built On Craftsmanship, Not Shortcuts
+            </h2>
+            <p className="section-lede mt-5">
+              {business.companyStory}
+            </p>
+            <blockquote className="mt-8 border-l-2 border-solid border-brand-red pl-5 font-display text-lg font-medium leading-snug text-brand-ink sm:text-xl">
+              &ldquo;{integrityStatement}&rdquo;
+            </blockquote>
+            <div className="mt-8 space-y-4 text-[0.9375rem] leading-relaxed text-site-text sm:text-base">
+              <p>
                 From the first blueprint review to the final walkthrough, our crews bring decades of
                 framing experience to every job — residential, commercial, and everything in between.
               </p>
-              <p className="leading-relaxed">
+              <p>
                 We coordinate permits, keep your timeline on track, and build structures that pass
                 inspection the first time. That&apos;s how we&apos;ve earned trust across the Bay Area,
                 Central Valley, and Northern California.
               </p>
             </div>
+            <div className="mt-9 flex flex-wrap items-center gap-x-6 gap-y-4">
+              <Link href="/about" className="btn btn-dark">
+                Our Story
+                <ArrowRight size={16} aria-hidden className="btn-arrow" />
+              </Link>
+              <p className="text-sm text-site-text-muted">
+                Licensed California Contractor —{" "}
+                <span className="font-semibold text-brand-ink">{business.license}</span>
+              </p>
+            </div>
           </div>
 
-          <dl className="mx-auto mt-8 grid max-w-4xl grid-cols-2 gap-y-6 sm:mt-14 sm:gap-y-10 lg:grid-cols-4">
-            {trustStats.map(({ value, label }) => (
-              <div key={label} className="text-center">
-                <dd className="font-display text-2xl font-extrabold text-brand-blue sm:text-4xl">{value}</dd>
-                <dt className="mt-1 text-[11px] text-gray-500 sm:mt-1.5 sm:text-sm">{label}</dt>
-              </div>
-            ))}
-          </dl>
-
-          <p className="mt-6 text-center text-xs font-semibold text-gray-500 sm:mt-10 sm:text-sm">
-            Licensed California Contractor —{" "}
-            <span className="text-brand-navy">{business.license}</span>
-          </p>
+          <div className="relative order-1 lg:order-2">
+            <ContentImage
+              src={homeImages.customHomeFramingCrew.src}
+              alt={homeImages.customHomeFramingCrew.alt}
+              className="aspect-[4/5] rounded-3xl sm:aspect-[5/4] lg:aspect-[4/5]"
+              sizes="(max-width: 1024px) 100vw, 50vw"
+              quality={90}
+            />
+            <div className="absolute -bottom-6 -left-2 hidden w-56 overflow-hidden rounded-2xl border-4 border-solid border-white shadow-xl sm:block lg:-left-10">
+              <ContentImage
+                src={homeImages.framingContractorPlanning.src}
+                alt={homeImages.framingContractorPlanning.alt}
+                className="aspect-[4/3]"
+                sizes="224px"
+              />
+            </div>
+          </div>
         </div>
       </section>
 
       <WhyChooseUsSection items={whyChooseUs} lede={framingFirstTagline} />
 
       {/* ── Featured projects ────────────────────────────────── */}
-      <section className="border-y border-solid border-gray-100 bg-gray-50/60 py-12 sm:py-24">
+      <section className="section bg-white">
         <div className="site-container">
           <SectionIntro
             eyebrow="Recent Work"
             title="Framing Projects Across Northern California"
-            lede="A look at recent framing, siding, and deck projects across the Bay Area and Northern California."
+            lede="A look at recent framing projects across the Bay Area and Northern California."
+            align="left"
+            action={
+              <Link href="/projects" className="btn btn-outline">
+                View All Projects
+                <ArrowRight size={16} aria-hidden className="btn-arrow" />
+              </Link>
+            }
           />
 
-          <div className="mt-8 grid gap-4 sm:mt-14 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
-            {featuredProjects.map((project) => {
-              const img = homeImages[project.image];
-              return (
-              <article
-                key={project.id}
-                className="overflow-hidden rounded-lg border border-solid border-gray-200 bg-white transition-shadow hover:shadow-lg sm:rounded-xl"
-              >
-                <ContentImage src={img.src} alt={img.alt} className="h-36 sm:h-52" />
-                <div className="p-4 sm:p-6">
-                  <span className="text-xs font-bold uppercase tracking-wide text-brand-blue sm:text-sm">
-                    {project.type}
-                  </span>
-                  <h3 className="mt-1.5 text-base font-bold text-brand-navy sm:mt-2 sm:text-lg">{project.name}</h3>
-                  <p className="mt-1 flex items-center gap-1.5 text-xs text-gray-500 sm:text-sm">
-                    <MapPin size={14} aria-hidden />
-                    {project.location}
-                  </p>
-                  <p className="mt-2 text-xs leading-relaxed text-gray-500 sm:mt-3 sm:text-sm">
-                    {project.blurb}
-                  </p>
-                  <p className="mt-2 text-[10px] font-semibold text-brand-blue sm:mt-3 sm:text-xs">
-                    Built for {project.builder}
-                  </p>
-                </div>
-              </article>
-            );
-            })}
-          </div>
-
-          <div className="mt-8 text-center sm:mt-12">
-            <Link
-              href="/projects"
-              className="inline-flex items-center gap-2 rounded-full bg-brand-blue px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-brand-blue-dark sm:px-7 sm:py-3 sm:text-base"
-            >
-              View All Projects
-              <ArrowRight size={16} aria-hidden />
-            </Link>
+          <div className="mt-12 grid gap-6 sm:mt-16 sm:grid-cols-2 lg:grid-cols-3">
+            {featuredProjects.map((project) => (
+              <ProjectCard key={project.id} project={project} />
+            ))}
           </div>
         </div>
       </section>
 
       {/* ── Reviews (gallery until real reviews are added) ───── */}
-      <section id="reviews" className="scroll-mt-28 bg-white py-12 sm:py-24">
+      <section id="reviews" className="section scroll-mt-28 bg-site-surface">
         <div className="site-container">
           <SectionIntro eyebrow="Our Reviews" title="What Our Customers Say" />
 
-          <div className="mt-8 grid grid-cols-2 gap-2 sm:mt-14 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
-            {homepageGalleryImageKeys.map((key) => (
+          <div className="mt-12 grid grid-flow-dense auto-rows-[9rem] grid-cols-2 gap-3 sm:mt-16 sm:auto-rows-[12rem] sm:grid-cols-4 sm:gap-4 lg:auto-rows-[14rem]">
+            {homepageGalleryImageKeys.map((key, index) => (
               <ContentImage
                 key={key}
                 src={homeImages[key].src}
                 alt={homeImages[key].alt}
-                className="h-24 rounded-md sm:h-48 sm:rounded-lg"
+                className={`img-zoom h-full rounded-2xl ${galleryTileClass[index] ?? ""}`}
+                sizes={index === 0 ? "(max-width: 640px) 100vw, 50vw" : "(max-width: 640px) 50vw, 25vw"}
               />
             ))}
           </div>
@@ -353,111 +398,168 @@ export default async function HomePage() {
       </section>
 
       {/* ── Service areas ────────────────────────────────────── */}
-      <section className="border-y border-solid border-gray-100 bg-gray-50/60 py-12 sm:py-24">
-        <div className="site-container">
-          <SectionIntro
-            eyebrow="Where We Work"
-            title="Proudly Serving the Bay Area, Central Valley & Southern California"
-          />
-
-          <ContentImage
-            src={homeImages.bayAreaNorthBayService.src}
-            alt={homeImages.bayAreaNorthBayService.alt}
-            className="mt-6 h-40 rounded-lg sm:mt-12 sm:h-72 sm:rounded-xl"
-            sizes="(max-width: 1152px) 100vw, 1152px"
-            quality={80}
-          />
-
-          <div className="mt-6 grid gap-3 sm:mt-10 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3">
-            {featuredHomeServiceAreas.map((area) => (
-              <Link
-                key={area.slug}
-                href={area.href}
-                className="group flex items-start gap-3 rounded-lg border border-solid border-gray-200 bg-white p-4 transition-all hover:border-brand-sky/60 hover:shadow-md sm:gap-4 sm:rounded-xl sm:p-6"
-              >
-                <span className="rounded-full bg-brand-blue/5 p-2 text-brand-blue transition-colors group-hover:bg-brand-blue group-hover:text-white sm:p-2.5">
-                  <MapPin className="size-4 sm:size-[19px]" aria-hidden />
+      <section className="section bg-white">
+        <div className="site-container grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
+          <div className="relative overflow-hidden rounded-3xl">
+            <ContentImage
+              src={homeImages.bayAreaNorthBayService.src}
+              alt={homeImages.bayAreaNorthBayService.alt}
+              className="aspect-[4/3] lg:aspect-[4/5]"
+              sizes="(max-width: 1024px) 100vw, 50vw"
+              quality={85}
+            />
+            <div className="absolute inset-x-4 bottom-4 flex items-center gap-3 rounded-2xl bg-white/90 p-4 backdrop-blur-md sm:inset-x-6 sm:bottom-6">
+              <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-brand-red text-white">
+                <MapPin size={18} aria-hidden />
+              </span>
+              <p className="text-sm leading-snug text-site-text">
+                <span className="block font-display font-semibold text-brand-ink">
+                  Headquartered in {business.address.city}, {business.address.state}
                 </span>
-                <span>
-                  <span className="block text-sm font-bold text-brand-navy sm:text-base">
-                    {area.city === "Bay Area" ? "Bay Area" : `${area.city}, CA`}
-                  </span>
-                  <span className="mt-0.5 block text-xs text-gray-500 sm:mt-1 sm:text-sm">{area.blurb}</span>
-                </span>
-              </Link>
-            ))}
+                Crews across Northern & Southern California
+              </p>
+            </div>
           </div>
 
-          <div className="mt-6 text-center sm:mt-10">
-            <Link
-              href="/service-areas"
-              className="inline-flex items-center gap-2 rounded-full border border-solid border-brand-navy px-5 py-2.5 text-xs font-bold text-brand-navy transition-colors hover:bg-brand-navy hover:text-white sm:px-7 sm:py-3 sm:text-sm"
-            >
+          <div>
+            <p className="eyebrow">Where We Work</p>
+            <h2 className="section-title mt-4">
+              Proudly Serving the Bay Area, Central Valley &amp; Southern California
+            </h2>
+
+            <ul className="mt-10 grid gap-x-6 sm:grid-cols-2">
+              {featuredHomeServiceAreas.map((area) => (
+                <li key={area.slug} className="border-b border-solid border-site-line">
+                  <Link
+                    href={area.href}
+                    className="group flex items-center justify-between gap-3 py-4"
+                  >
+                    <span>
+                      <span className="block font-display font-semibold text-brand-ink transition-colors group-hover:text-brand-red">
+                        {area.city === "Bay Area" ? "Bay Area" : `${area.city}, CA`}
+                      </span>
+                      <span className="mt-0.5 block line-clamp-1 text-sm text-site-text-muted">
+                        {area.blurb}
+                      </span>
+                    </span>
+                    <ArrowRight
+                      size={16}
+                      aria-hidden
+                      className="shrink-0 text-site-text-muted transition-all group-hover:translate-x-1 group-hover:text-brand-red"
+                    />
+                  </Link>
+                </li>
+              ))}
+            </ul>
+
+            <Link href="/service-areas" className="btn btn-dark mt-10">
               View All Service Areas
-              <ArrowRight size={16} aria-hidden />
+              <ArrowRight size={16} aria-hidden className="btn-arrow" />
             </Link>
           </div>
         </div>
       </section>
 
       {/* ── FAQ ──────────────────────────────────────────────── */}
-      <section className="bg-white py-12 sm:py-24">
-        <div className="site-container">
-          <div className="mx-auto max-w-3xl">
-          <SectionIntro
-            eyebrow="FAQ"
-            title="Framing Contractor FAQ"
-            lede="Straight answers about our services, service areas, and what makes Elite Builders different."
-          />
+      <section className="section bg-site-surface">
+        <div className="site-container grid gap-12 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-20">
+          <div className="lg:sticky lg:top-32 lg:self-start">
+            <p className="eyebrow">FAQ</p>
+            <h2 className="section-title mt-4">Framing Contractor FAQ</h2>
+            <p className="section-lede mt-5">
+              Straight answers about our services, service areas, and what makes Elite Builders
+              different.
+            </p>
+            <div className="mt-8 rounded-3xl bg-white p-6 sm:p-7">
+              <p className="font-display font-semibold text-brand-ink">Still have questions?</p>
+              <p className="mt-1.5 text-[0.9375rem] text-site-text">
+                Talk to a real person on our team.
+              </p>
+              <a href={business.phoneHref} className="btn btn-primary mt-5">
+                <Phone size={16} aria-hidden />
+                Call {business.phone}
+              </a>
+            </div>
+          </div>
 
-          <div className="mt-6 space-y-2.5 sm:mt-12 sm:space-y-4">
+          <div className="border-t border-solid border-site-line">
             {faqs.map((faq) => (
-              <details
-                key={faq.question}
-                className="group rounded-lg border border-solid border-gray-200 bg-white px-4 py-3 transition-colors open:border-brand-sky/60 sm:rounded-xl sm:px-6 sm:py-5"
-              >
-                <summary className="flex items-center justify-between gap-3 text-sm font-bold text-brand-navy sm:gap-4 sm:text-base">
+              <details key={faq.question} className="faq-item group">
+                <summary>
                   {faq.question}
-                  <span className="shrink-0 text-brand-blue transition-transform group-open:rotate-90">
-                    <ArrowRight className="size-4 sm:size-[18px]" aria-hidden />
-                  </span>
+                  <span className="faq-icon" aria-hidden />
                 </summary>
-                <p className="mt-2 text-xs leading-relaxed text-gray-500 sm:mt-3 sm:text-sm">{faq.answer}</p>
+                <p className="faq-answer">{faq.answer}</p>
               </details>
             ))}
-          </div>
           </div>
         </div>
       </section>
 
       {/* ── Estimate form ────────────────────────────────────── */}
-      <section id="estimate" className="scroll-mt-24 border-t border-solid border-gray-100 bg-gray-50/60 py-12 sm:py-24">
-        <div className="site-container">
-          <SectionIntro
-            eyebrow="Free Estimate"
-            title="Ready to Start Your Project?"
-            lede="Tell us about your project and we'll respond within one business day — no pressure, no obligation."
-          />
-          <div className="mx-auto mt-6 grid max-w-5xl items-start gap-6 sm:mt-12 sm:gap-10 lg:grid-cols-2">
-            <ContactForm
-              formType="contact"
-              variant="card"
-              title="Get Your Free Estimate"
-              description="No pressure. No obligation. We respond within one business day."
-              submitLabel="Request My Free Estimate"
-            />
-            <ContentImage
-              src={homeImages.luxuryHomeInterior.src}
-              alt={homeImages.luxuryHomeInterior.alt}
-              className="hidden h-[32rem] rounded-xl lg:block"
-            />
+      <section id="estimate" className="section bg-ink relative isolate scroll-mt-24 overflow-hidden">
+        <ContentImage
+          src={homeImages.luxuryHomeInterior.src}
+          alt=""
+          className="!absolute inset-0 -z-20 h-full opacity-25"
+          sizes="100vw"
+        />
+        <div
+          className="absolute inset-0 -z-10 bg-gradient-to-r from-brand-ink via-brand-ink/95 to-brand-ink/80"
+          aria-hidden
+        />
+
+        <div className="site-container grid items-start gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:gap-20">
+          <div className="lg:pt-6">
+            <p className="eyebrow eyebrow-light">Free Estimate</p>
+            <h2 className="section-title mt-4">Ready to Start Your Project?</h2>
+            <p className="section-lede mt-5">
+              Tell us about your project and we&apos;ll respond within one business day — no
+              pressure, no obligation.
+            </p>
+
+            <ul className="mt-9 space-y-3">
+              {["Response within one business day", "Honest scope and pricing", `Licensed & insured — ${business.license}`].map(
+                (item) => (
+                  <li key={item} className="flex items-center gap-3 text-white/85">
+                    <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-brand-red/90">
+                      <Check size={13} strokeWidth={3} aria-hidden className="text-white" />
+                    </span>
+                    {item}
+                  </li>
+                ),
+              )}
+            </ul>
+
+            <div className="mt-10 grid gap-3 sm:grid-cols-2">
+              <a
+                href={business.phoneHref}
+                className="group rounded-2xl border border-solid border-white/10 bg-white/5 p-5 transition-colors hover:bg-white/10"
+              >
+                <Phone size={18} aria-hidden className="text-brand-sky" />
+                <p className="mt-3 text-xs uppercase tracking-[0.14em] text-white/50">Call us</p>
+                <p className="mt-1 font-display text-lg font-semibold text-white">{business.phone}</p>
+              </a>
+              <a
+                href={`mailto:${business.email}`}
+                className="group rounded-2xl border border-solid border-white/10 bg-white/5 p-5 transition-colors hover:bg-white/10"
+              >
+                <Mail size={18} aria-hidden className="text-brand-sky" />
+                <p className="mt-3 text-xs uppercase tracking-[0.14em] text-white/50">Email us</p>
+                <p className="mt-1 break-all font-display text-[0.9375rem] font-semibold text-white">
+                  {business.email}
+                </p>
+              </a>
+            </div>
           </div>
-          <p className="mt-5 text-center text-xs text-gray-500 sm:mt-8 sm:text-sm">
-            Prefer to talk?{" "}
-            <a href={business.phoneHref} className="font-bold text-brand-blue hover:text-brand-blue-dark">
-              Call {business.phone}
-            </a>
-          </p>
+
+          <ContactForm
+            formType="contact"
+            variant="card"
+            title="Get Your Free Estimate"
+            description="No pressure. No obligation. We respond within one business day."
+            submitLabel="Request My Free Estimate"
+          />
         </div>
       </section>
     </>

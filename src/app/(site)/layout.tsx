@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { Fira_Sans, Poppins } from "next/font/google";
+import { Archivo, Inter } from "next/font/google";
 import SiteHeader from "@/components/site/SiteHeader";
 import SiteFooter from "@/components/site/SiteFooter";
 import SiteAnalytics from "@/components/site/SiteAnalytics";
@@ -12,18 +12,16 @@ import { siteDefaultMetadata } from "@/lib/site/seo";
 
 export const metadata: Metadata = siteDefaultMetadata;
 
-/** Fira Sans body + Poppins headings & nav */
-const firaSans = Fira_Sans({
+/** Inter body + Archivo headings, nav & buttons */
+const inter = Inter({
   subsets: ["latin"],
-  weight: ["400", "600", "700"],
-  variable: "--font-fira",
+  variable: "--font-body",
   display: "swap",
 });
 
-const poppins = Poppins({
+const archivo = Archivo({
   subsets: ["latin"],
-  weight: ["400", "600", "700"],
-  variable: "--font-poppins",
+  variable: "--font-heading",
   display: "swap",
 });
 
@@ -32,7 +30,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
 
   return (
     <div
-      className={`site ${firaSans.variable} ${poppins.variable} flex min-h-screen flex-col${
+      className={`site ${inter.variable} ${archivo.variable} flex min-h-screen flex-col${
         adminSession.isAdmin ? " site-has-admin-bar" : ""
       }`}
       style={
@@ -49,7 +47,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
         />
       ) : null}
       <SiteHeader hasAdminBar={adminSession.isAdmin} />
-      <main className="flex-1 pb-16 sm:pb-0">{children}</main>
+      <main className="flex-1">{children}</main>
       <SiteFooter />
       <Suspense fallback={null}>
         <SiteAnalytics />
