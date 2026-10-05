@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import { useState, type FormEvent } from "react";
+import { ArrowRight, CheckCircle2, Lock } from "lucide-react";
 import type { ContactFormType } from "@/lib/contact/submissions.types";
 import { trackAnalyticsEvent } from "@/lib/site/analytics";
 import { business, services } from "@/lib/site/config";
@@ -85,27 +86,22 @@ export default function ContactForm({
     }
   };
 
+  const isCard = variant === "card";
+  const shellClass = isCard
+    ? "rounded-3xl border border-solid border-site-line bg-white p-6 shadow-[0_30px_60px_-30px_rgba(7,21,48,0.35)] sm:p-9"
+    : "rounded-3xl border border-solid border-white/10 bg-white/5 p-6 backdrop-blur-sm sm:p-9";
+  const labelClass = `field-label ${isCard ? "" : "!text-white/85"}`;
+
   if (submitState === "success") {
     return (
-      <div
-        className={
-          variant === "card"
-            ? "rounded-xl border border-solid border-gray-200 bg-white p-4 shadow-sm sm:p-8"
-            : "rounded-xl bg-white/10 p-4 sm:p-8"
-        }
-      >
-        <h3
-          className={`text-base font-extrabold sm:text-xl ${
-            variant === "card" ? "text-brand-navy" : "text-white"
-          }`}
-        >
+      <div className={shellClass} role="status">
+        <span className="flex size-12 items-center justify-center rounded-full bg-green-100 text-green-700">
+          <CheckCircle2 size={24} aria-hidden />
+        </span>
+        <h3 className={`mt-5 font-display text-xl font-bold sm:text-2xl ${isCard ? "text-brand-ink" : "text-white"}`}>
           Thank you — we got your message
         </h3>
-        <p
-          className={`mt-3 text-sm leading-relaxed ${
-            variant === "card" ? "text-gray-600" : "text-white/80"
-          }`}
-        >
+        <p className={`mt-3 leading-relaxed ${isCard ? "text-site-text" : "text-white/75"}`}>
           Our team will follow up within one business day. For urgent questions, call us directly.
         </p>
       </div>
@@ -115,29 +111,17 @@ export default function ContactForm({
   return (
     <form
       aria-label={formType === "contact" ? "Contact Elite Builders" : "Request a free estimate"}
-      className={
-        variant === "card"
-          ? "rounded-xl border border-solid border-gray-200 bg-white p-4 shadow-sm sm:p-8"
-          : "rounded-xl bg-white/10 p-4 sm:p-8"
-      }
+      className={shellClass}
       onSubmit={handleSubmit}
     >
-      <h3
-        className={`text-base font-extrabold sm:text-xl ${
-          variant === "card" ? "text-brand-navy" : "text-white"
-        }`}
-      >
+      <h3 className={`font-display text-xl font-bold sm:text-2xl ${isCard ? "text-brand-ink" : "text-white"}`}>
         {heading}
       </h3>
-      <p
-        className={`mt-1 text-sm ${
-          variant === "card" ? "text-gray-500" : "text-white/70"
-        }`}
-      >
+      <p className={`mt-2 text-[0.9375rem] ${isCard ? "text-site-text" : "text-white/70"}`}>
         {lede}
       </p>
 
-      <div className="mt-5 grid gap-4">
+      <div className="mt-7 grid gap-5">
         <input
           type="text"
           name="website"
@@ -147,14 +131,10 @@ export default function ContactForm({
           aria-hidden
         />
 
-        <div className="grid gap-4 sm:grid-cols-2">
-          <label className="grid gap-1.5">
-            <span
-              className={`text-xs font-semibold uppercase tracking-wide ${
-                variant === "card" ? "text-gray-600" : "text-white/80"
-              }`}
-            >
-              Full Name *
+        <div className="grid gap-5 sm:grid-cols-2">
+          <label className="grid gap-2">
+            <span className={labelClass}>
+              Full name <span className="text-brand-red">*</span>
             </span>
             <input
               type="text"
@@ -162,16 +142,12 @@ export default function ContactForm({
               required
               autoComplete="name"
               placeholder="John Smith"
-              className="rounded-md border border-solid border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 placeholder:text-gray-400"
+              className="field"
             />
           </label>
-          <label className="grid gap-1.5">
-            <span
-              className={`text-xs font-semibold uppercase tracking-wide ${
-                variant === "card" ? "text-gray-600" : "text-white/80"
-              }`}
-            >
-              Phone *
+          <label className="grid gap-2">
+            <span className={labelClass}>
+              Phone <span className="text-brand-red">*</span>
             </span>
             <input
               type="tel"
@@ -179,60 +155,38 @@ export default function ContactForm({
               required
               autoComplete="tel"
               placeholder={business.phone}
-              className="rounded-md border border-solid border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 placeholder:text-gray-400"
+              className="field"
             />
           </label>
         </div>
 
         {formType === "contact" ? (
-          <label className="grid gap-1.5">
-            <span
-              className={`text-xs font-semibold uppercase tracking-wide ${
-                variant === "card" ? "text-gray-600" : "text-white/80"
-              }`}
-            >
-              Email
-            </span>
+          <label className="grid gap-2">
+            <span className={labelClass}>Email</span>
             <input
               type="email"
               name="email"
               autoComplete="email"
               placeholder="you@example.com"
-              className="rounded-md border border-solid border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 placeholder:text-gray-400"
+              className="field"
             />
           </label>
         ) : null}
 
-        <div className="grid gap-4 sm:grid-cols-2">
-          <label className="grid gap-1.5">
-            <span
-              className={`text-xs font-semibold uppercase tracking-wide ${
-                variant === "card" ? "text-gray-600" : "text-white/80"
-              }`}
-            >
-              City
-            </span>
+        <div className="grid gap-5 sm:grid-cols-2">
+          <label className="grid gap-2">
+            <span className={labelClass}>City</span>
             <input
               type="text"
               name="city"
               autoComplete="address-level2"
               placeholder="San Jose"
-              className="rounded-md border border-solid border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 placeholder:text-gray-400"
+              className="field"
             />
           </label>
-          <label className="grid gap-1.5">
-            <span
-              className={`text-xs font-semibold uppercase tracking-wide ${
-                variant === "card" ? "text-gray-600" : "text-white/80"
-              }`}
-            >
-              Service Needed
-            </span>
-            <select
-              name="service"
-              defaultValue=""
-              className="rounded-md border border-solid border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900"
-            >
+          <label className="grid gap-2">
+            <span className={labelClass}>Service needed</span>
+            <select name="service" defaultValue="" className="field">
               <option value="">Select a service…</option>
               {services.map((service) => (
                 <option key={service.slug} value={service.slug}>
@@ -244,24 +198,21 @@ export default function ContactForm({
           </label>
         </div>
 
-        <label className="grid gap-1.5">
-          <span
-            className={`text-xs font-semibold uppercase tracking-wide ${
-              variant === "card" ? "text-gray-600" : "text-white/80"
-            }`}
-          >
-            Project Details
-          </span>
+        <label className="grid gap-2">
+          <span className={labelClass}>Project details</span>
           <textarea
             name="message"
-            rows={3}
+            rows={4}
             placeholder="Tell us about your project…"
-            className="resize-y rounded-md border border-solid border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 placeholder:text-gray-400"
+            className="field resize-y"
           />
         </label>
 
         {submitState === "error" ? (
-          <p className="rounded-md border border-solid border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+          <p
+            role="alert"
+            className="rounded-xl border border-solid border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+          >
             {errorMessage}
           </p>
         ) : null}
@@ -269,15 +220,19 @@ export default function ContactForm({
         <button
           type="submit"
           disabled={submitState === "submitting"}
-          className="rounded-full bg-brand-red px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-brand-red-dark disabled:cursor-not-allowed disabled:opacity-70 sm:px-6 sm:py-3.5 sm:text-base"
+          className="btn btn-primary btn-lg mt-1 w-full"
         >
           {submitState === "submitting" ? "Sending…" : buttonLabel}
+          {submitState === "submitting" ? null : (
+            <ArrowRight size={18} aria-hidden className="btn-arrow" />
+          )}
         </button>
         <p
-          className={`text-center text-xs ${
-            variant === "card" ? "text-gray-500" : "text-white/70"
+          className={`flex items-center justify-center gap-2 text-center text-xs ${
+            isCard ? "text-site-text-muted" : "text-white/60"
           }`}
         >
+          <Lock size={13} aria-hidden />
           Licensed &amp; insured. Your information is never shared.
         </p>
       </div>

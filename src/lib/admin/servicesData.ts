@@ -26,8 +26,6 @@ export type ServicePagesStore = {
 const PAGE_ID_BY_SLUG: Record<string, string> = {
   "framing-contractor": "services-framing-contractor",
   "home-builder": "services-home-builder",
-  "deck-builder": "services-deck-builder",
-  "siding-contractor": "services-siding-contractor",
 };
 
 export function servicePageIdForSlug(slug: string): string {

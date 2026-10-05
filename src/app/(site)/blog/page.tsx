@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ArrowRight } from "lucide-react";
+import CtaBand from "@/components/site/CtaBand";
+import PageHero from "@/components/site/PageHero";
 import {
   fetchPublishedPostsForSite,
   fetchRecentPostsForSite,
@@ -14,7 +17,7 @@ import { buildPageMetadata } from "@/lib/site/seo";
 export const metadata: Metadata = buildPageMetadata({
   title: "Blog",
   description:
-    "Framing, siding, remodeling, and construction tips for homeowners and builders across the Bay Area and Northern California from Elite Builders.",
+    "Framing, home building, and construction tips for homeowners and builders across the Bay Area and Northern California from Elite Builders.",
   path: "/blog",
 });
 
@@ -39,71 +42,67 @@ export default async function BlogPage() {
   const sidebarPosts = mapPostsToSidebarItems(recentPosts);
 
   return (
-    <section className="bg-white pb-16 pt-10">
-      <div className="site-container">
-        <div className="mt-0 grid grid-cols-1 items-start gap-8 lg:mt-6 lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-10">
-          <div className="min-w-0">
-            <div className="service-area-page-header">
-              <h1 className="service-area-page-title">Blog</h1>
-              <nav className="service-area-breadcrumbs" aria-label="Breadcrumb">
-                <Link href="/">Home</Link>
-                <span aria-hidden>/</span>
-                <span aria-current="page">Blog</span>
-              </nav>
-            </div>
+    <>
+      <PageHero
+        eyebrow="Blog"
+        title="Framing & Construction Insights"
+        breadcrumbs={[{ label: "Home", href: "/" }, { label: "Blog" }]}
+        lede={
+          <p>Construction tips, framing guides, and project stories from Elite Builders IX.</p>
+        }
+      />
 
-            <div className="service-area-featured-intro">
-              <div className="service-area-html-content service-area-default-intro">
-                <p>
-                  Construction tips, framing guides, and project stories from Elite
-                  Builders IX.
-                </p>
-              </div>
-
+      <section className="section-sm bg-white">
+        <div className="site-container">
+          <div className="grid grid-cols-1 items-start gap-10 lg:grid-cols-[minmax(0,1fr)_340px] lg:gap-14">
+            <div className="min-w-0">
               {posts.length === 0 ? (
-                <p className="mt-8 text-gray-600">No published posts yet.</p>
+                <p className="rounded-3xl border border-dashed border-site-line p-10 text-center text-site-text-muted">
+                  No published posts yet.
+                </p>
               ) : (
-                <ul className="mt-8 space-y-8">
+                <ul className="grid gap-5">
                   {posts.map((post) => (
-                    <li
-                      key={post.id}
-                      className="border-b border-solid border-gray-100 pb-8 last:border-b-0 last:pb-0"
-                    >
-                      <h2 className="text-2xl font-bold text-brand-navy">
-                        <Link
-                          href={`/blog/${post.slug}`}
-                          className="hover:text-brand-blue"
-                        >
-                          {post.title}
-                        </Link>
-                      </h2>
-                      {post.publishedAt ? (
-                        <p className="mt-2 text-sm text-gray-500">
-                          {formatBlogDate(post.publishedAt)}
-                        </p>
-                      ) : null}
-                      {post.excerpt ? (
-                        <p className="mt-3 text-gray-600">{post.excerpt}</p>
-                      ) : null}
-                      <Link
-                        href={`/blog/${post.slug}`}
-                        className="mt-4 inline-block font-semibold text-brand-blue hover:underline"
-                      >
-                        Read more
-                      </Link>
+                    <li key={post.id}>
+                      <article className="group relative rounded-3xl border border-solid border-site-line bg-white p-7 transition-all hover:border-brand-ink/25 hover:shadow-[0_20px_40px_-28px_rgba(7,21,48,0.45)] sm:p-8">
+                        {post.publishedAt ? (
+                          <p className="font-display text-xs font-semibold uppercase tracking-[0.16em] text-brand-red">
+                            {formatBlogDate(post.publishedAt)}
+                          </p>
+                        ) : null}
+                        <h2 className="mt-3 font-display text-xl font-bold sm:text-2xl">
+                          <Link
+                            href={`/blog/${post.slug}`}
+                            className="transition-colors after:absolute after:inset-0 after:rounded-3xl group-hover:text-brand-blue"
+                          >
+                            {post.title}
+                          </Link>
+                        </h2>
+                        {post.excerpt ? (
+                          <p className="mt-3 line-clamp-3 leading-relaxed text-site-text">
+                            {post.excerpt}
+                          </p>
+                        ) : null}
+                        <span className="link-arrow mt-5" aria-hidden>
+                          Read more
+                          <ArrowRight size={16} />
+                        </span>
+                      </article>
                     </li>
                   ))}
                 </ul>
               )}
             </div>
-          </div>
 
-          <ServiceAreaSidebar
-            estimateDescription={blogEstimateDescription}
-            recentPosts={sidebarPosts}
-          />
+            <ServiceAreaSidebar
+              estimateDescription={blogEstimateDescription}
+              recentPosts={sidebarPosts}
+            />
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
+
+      <CtaBand />
+    </>
   );
 }

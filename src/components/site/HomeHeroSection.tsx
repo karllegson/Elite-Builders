@@ -15,9 +15,11 @@ const HERO_INLINE_PLACEHOLDER =
 
 type HomeHeroSectionProps = {
   children: ReactNode;
+  /** Pinned to the bottom of the hero (e.g. trust stats). */
+  footer?: ReactNode;
 };
 
-export default function HomeHeroSection({ children }: HomeHeroSectionProps) {
+export default function HomeHeroSection({ children, footer }: HomeHeroSectionProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [showVideo, setShowVideo] = useState(true);
 
@@ -45,7 +47,7 @@ export default function HomeHeroSection({ children }: HomeHeroSectionProps) {
   return (
     <section
       id="home-hero"
-      className="relative min-h-[46dvh] overflow-hidden bg-brand-navy bg-cover bg-center sm:min-h-[75dvh]"
+      className="relative overflow-hidden bg-brand-ink bg-cover bg-center"
       style={{ backgroundImage: `url("${HERO_INLINE_PLACEHOLDER}")` }}
     >
       {showVideo ? (
@@ -79,11 +81,16 @@ export default function HomeHeroSection({ children }: HomeHeroSectionProps) {
 
       <div
         aria-hidden
-        className="absolute inset-0 bg-gradient-to-r from-brand-navy/35 via-brand-navy/12 to-transparent"
+        className="absolute inset-0 bg-gradient-to-r from-brand-ink/90 via-brand-ink/60 to-brand-ink/15"
+      />
+      <div
+        aria-hidden
+        className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-brand-ink/85 via-brand-ink/30 to-transparent"
       />
 
-      <div className="site-container relative z-10 flex min-h-[46dvh] items-center py-5 sm:min-h-[75dvh] sm:py-14">
-        {children}
+      <div className="site-container relative z-10 flex min-h-[min(calc(100svh-4.5rem),52rem)] flex-col justify-center gap-10 pb-6 pt-14 sm:pb-10 sm:pt-24 lg:min-h-[min(calc(100svh-7rem),56rem)]">
+        <div className="flex flex-1 items-center">{children}</div>
+        {footer}
       </div>
     </section>
   );

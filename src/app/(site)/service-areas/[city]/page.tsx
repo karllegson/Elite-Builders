@@ -16,7 +16,7 @@ export async function generateMetadata(
 
   return buildPageMetadata({
     title: `Framing Contractor ${label} CA`,
-    description: `Rough framing, remodeling, siding, and deck construction in ${label}, California. Licensed contractor ${business.license}. Request a free estimate from Elite Builders.`,
+    description: `Residential, new construction, rough, and structural framing plus custom home building in ${label}, California. Licensed contractor ${business.license}. Request a free estimate from Elite Builders.`,
     path: `/service-areas/${city}`,
   });
 }

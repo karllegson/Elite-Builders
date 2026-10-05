@@ -31,10 +31,10 @@ export default function BrandPillars() {
             <p className="text-sm font-medium uppercase tracking-[0.18em] text-brand-blue">
               What We Stand For
             </p>
-            <h2 className="mt-3 max-w-xl text-2xl font-bold leading-tight text-brand-navy sm:text-3xl lg:text-[2.25rem] lg:leading-[1.12]">
+            <h2 className="mt-3 max-w-xl text-3xl font-bold leading-tight tracking-tight text-brand-navy sm:text-4xl lg:text-[2.75rem] lg:leading-[1.08]">
               {brandPillarsHeading}
             </h2>
-            <p className="mt-4 max-w-xl text-sm leading-relaxed text-gray-600 sm:text-base">
+            <p className="mt-4 max-w-xl text-base leading-relaxed text-gray-600 sm:text-lg">
               {differentiationIntro}
             </p>
 
@@ -49,7 +49,7 @@ export default function BrandPillars() {
                   return (
                     <article
                       key={title}
-                      className="group flex flex-col p-2 text-center transition-colors duration-300 hover:bg-brand-navy/[0.02] sm:p-4 sm:text-left"
+                      className="group flex flex-col p-2.5 text-center transition-colors duration-300 hover:bg-brand-navy/[0.02] sm:p-5 sm:text-left"
                     >
                       <div className="flex items-center gap-1.5 sm:gap-2">
                         <span className="font-display text-[8px] font-bold uppercase tracking-[0.14em] text-brand-blue sm:text-[10px] sm:tracking-[0.18em]">
@@ -58,7 +58,7 @@ export default function BrandPillars() {
                         <span className="hidden h-px flex-1 bg-brand-navy/15 sm:block" aria-hidden />
                       </div>
 
-                      <span className="relative mx-auto mt-1.5 flex h-6 w-6 items-center justify-center border border-solid border-brand-blue/40 text-brand-blue transition-colors duration-300 group-hover:border-brand-navy group-hover:bg-brand-navy group-hover:text-white sm:mt-3 sm:h-9 sm:w-9">
+                      <span className="relative mx-auto mt-1.5 flex h-7 w-7 items-center justify-center border border-solid border-brand-blue/40 text-brand-blue transition-colors duration-300 group-hover:border-brand-navy group-hover:bg-brand-navy group-hover:text-white sm:mt-3 sm:h-11 sm:w-11">
                         <span
                           className="absolute -left-[2px] -top-[2px] h-1 w-1 border-l border-t border-solid border-brand-blue"
                           aria-hidden
@@ -67,13 +67,13 @@ export default function BrandPillars() {
                           className="absolute -bottom-[2px] -right-[2px] h-1 w-1 border-b border-r border-solid border-brand-blue"
                           aria-hidden
                         />
-                        <Icon className="size-3 sm:size-4" strokeWidth={1.75} aria-hidden />
+                        <Icon className="size-3.5 sm:size-5" strokeWidth={1.75} aria-hidden />
                       </span>
 
-                      <h3 className="mt-1.5 text-[10px] font-bold leading-tight tracking-tight text-brand-navy sm:mt-3 sm:text-sm">
+                      <h3 className="mt-1.5 text-[11px] font-bold leading-tight tracking-tight text-brand-navy sm:mt-3 sm:text-base">
                         {title}
                       </h3>
-                      <p className="mt-1 hidden text-xs leading-relaxed text-gray-600 sm:block">
+                      <p className="mt-1.5 hidden text-sm leading-relaxed text-gray-600 sm:block">
                         {body}
                       </p>
                     </article>

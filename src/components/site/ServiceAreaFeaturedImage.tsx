@@ -35,7 +35,7 @@ function shouldServeFeaturedImageUnoptimized(src: string): boolean {
 
 export function ServiceAreaFeaturedImage({ src, alt }: ServiceAreaFeaturedImageProps) {
   return (
-    <div className="service-area-featured-frame relative mt-6 aspect-[2/1] w-full overflow-hidden rounded-2xl">
+    <div className="service-area-featured-frame relative aspect-[2/1] w-full overflow-hidden rounded-3xl">
       {/* Overscan layer: pan animation moves this layer without upscaling a compressed bitmap. */}
       <div className="service-area-featured-motion absolute -inset-[5%] h-[110%] w-[110%]">
         <Image

@@ -6,7 +6,7 @@ import {
 import { homeImages } from "@/lib/site/images";
 
 export const blogEstimateDescription =
-  "Planning a remodel or new build? Tell us about your framing, siding, or deck needs and our team will follow up within one business day.";
+  "Planning a remodel or new build? Tell us about your framing or home building needs and our team will follow up within one business day.";
 
 const sidebarReview = getServiceAreaSidebarReview();
 

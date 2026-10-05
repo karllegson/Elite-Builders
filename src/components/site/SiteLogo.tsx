@@ -41,23 +41,23 @@ export default function SiteLogo({ variant = "header", linked = true }: SiteLogo
       height={64}
       priority={variant === "header"}
       quality={95}
-      className={`shrink-0 object-contain ${isFooter ? "size-12" : "size-14"}`}
+      className={`shrink-0 object-contain ${isFooter ? "size-11" : "size-11 mix-blend-multiply sm:size-12"}`}
       unoptimized={logoSrc.startsWith("blob:")}
     />
   );
 
   const label = (
-    <span className="leading-tight">
+    <span className="leading-none">
       <span
-        className={`font-display block text-lg font-semibold tracking-tight ${
-          isFooter ? "text-white" : "text-site-text-dark sm:text-xl"
+        className={`font-display block text-[1.0625rem] font-bold tracking-tight sm:text-lg ${
+          isFooter ? "text-white" : "text-brand-ink"
         }`}
       >
         {displayName}
       </span>
       <span
-        className={`block text-xs font-medium italic ${
-          isFooter ? "text-brand-sky" : "text-brand-red"
+        className={`mt-1 block text-[0.6875rem] font-semibold uppercase tracking-[0.16em] ${
+          isFooter ? "text-white/50" : "text-brand-red"
         }`}
       >
         {business.slogan}
@@ -67,7 +67,7 @@ export default function SiteLogo({ variant = "header", linked = true }: SiteLogo
 
   const inner = (
     <>
-      {isFooter ? <div className="rounded-md bg-white p-2">{icon}</div> : icon}
+      {isFooter ? <div className="rounded-xl bg-white p-1.5">{icon}</div> : icon}
       {label}
     </>
   );

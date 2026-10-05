@@ -27,7 +27,7 @@ export const siteIcons: NonNullable<Metadata["icons"]> = {
 };
 
 const DEFAULT_DESCRIPTION =
-  "Licensed California framing contractor serving the Bay Area, Central Valley, and Southern California since 2012. Custom, production, and addition framing plus siding and decks.";
+  "Licensed California framing contractor serving the Bay Area, Central Valley, and Southern California since 2012. Residential, new construction, and custom home framing plus custom home building.";
 
 export const defaultOgImage = {
   url: SITE_LOGO.path,
@@ -156,7 +156,7 @@ export const homepageMetadata: Metadata = {
     absolute: `Framing Contractor Bay Area & Northern California | ${SITE_BRAND}`,
   },
   description:
-    "Licensed framing contractor (CSLB #970551) serving the Bay Area, Central Valley & SoCal since 2012. Custom, production & addition framing plus siding & decks. Request a free estimate.",
+    "Licensed framing contractor (CSLB #970551) serving the Bay Area, Central Valley & SoCal since 2012. Residential, new construction & custom home framing plus home building. Request a free estimate.",
   keywords: [
     "framing contractor",
     "rough framing",
@@ -173,7 +173,7 @@ export const homepageMetadata: Metadata = {
   openGraph: {
     title: `Framing Contractor Bay Area & Northern California | ${SITE_BRAND}`,
     description:
-      "Licensed framing-first contractor since 2012. Custom, production & addition framing plus siding & decks across the Bay Area, Central Valley & Southern California.",
+      "Licensed framing-first contractor since 2012. Residential, new construction & custom home framing plus home building across the Bay Area, Central Valley & Southern California.",
     url: SITE_URL,
     siteName: SITE_NAME,
     type: "website",
@@ -184,7 +184,7 @@ export const homepageMetadata: Metadata = {
     card: "summary_large_image",
     title: `Framing Contractor Bay Area & Northern California | ${SITE_BRAND}`,
     description:
-      "Licensed framing-first contractor since 2012. Custom, production & addition framing plus siding & decks across Northern California.",
+      "Licensed framing-first contractor since 2012. Residential, new construction & custom home framing plus home building across Northern California.",
     images: [SITE_LOGO.path, homepageOgImage.url],
   },
 };

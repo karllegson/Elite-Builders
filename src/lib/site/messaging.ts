@@ -17,7 +17,7 @@ export const framingFirstTagline = "Framing-first specialists — structure is o
 export const heroSubheading = "Built on Quality. Driven by Precision.";
 
 export const heroIntro =
-  "Delivering structural framing, rough framing, and siding for commercial and residential projects across the Bay Area, Central Valley, and throughout California.";
+  "Delivering structural framing, rough framing, and new construction framing for commercial and residential projects across the Bay Area, Central Valley, and throughout California.";
 
 export const brandPillars = [
   {

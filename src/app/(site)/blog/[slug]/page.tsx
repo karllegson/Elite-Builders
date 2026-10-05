@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import CtaBand from "@/components/site/CtaBand";
+import PageHero from "@/components/site/PageHero";
 import { notFound } from "next/navigation";
 import {
   fetchFeaturedImageForPost,
@@ -14,6 +15,7 @@ import {
   blogEstimateDescription,
   mapPostsToSidebarItems,
 } from "@/lib/site/blogSidebar";
+import { formatBlogDateLong } from "@/lib/site/formatBlogDate";
 import { buildPageMetadata } from "@/lib/site/seo";
 
 type BlogPostPageProps = {
@@ -70,21 +72,21 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
   const article = (
     <>
-      <section className="bg-white pb-16 pt-10">
-        <div className="site-container">
-          <div className="mt-0 grid grid-cols-1 items-start gap-8 lg:mt-6 lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-10">
-            <div className="min-w-0">
-              <div className="service-area-page-header">
-                <h1 className="service-area-page-title">{pageTitle}</h1>
-                <nav className="service-area-breadcrumbs" aria-label="Breadcrumb">
-                  <Link href="/">Home</Link>
-                  <span aria-hidden>/</span>
-                  <Link href="/blog">Blog</Link>
-                  <span aria-hidden>/</span>
-                  <span aria-current="page">{post.title}</span>
-                </nav>
-              </div>
+      <PageHero
+        size="compact"
+        eyebrow={formatBlogDateLong(post.publishedAt) || "Blog"}
+        title={pageTitle}
+        breadcrumbs={[
+          { label: "Home", href: "/" },
+          { label: "Blog", href: "/blog" },
+          { label: post.title },
+        ]}
+      />
 
+      <section className="section-sm bg-white">
+        <div className="site-container">
+          <div className="grid grid-cols-1 items-start gap-10 lg:grid-cols-[minmax(0,1fr)_340px] lg:gap-14">
+            <div className="min-w-0">
               <BlogPostBody
                 content={post.content}
                 excerpt={post.excerpt}
@@ -101,6 +103,8 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
       </section>
 
       <ViewAllBlogPostsLink />
+
+      <CtaBand />
     </>
   );
 

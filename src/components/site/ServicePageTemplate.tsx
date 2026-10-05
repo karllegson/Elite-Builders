@@ -1,6 +1,10 @@
 import Link from "next/link";
-import { ArrowRight, CheckCircle2, MapPin, Phone } from "lucide-react";
+import { ArrowRight, Building2, Check, Home, Phone } from "lucide-react";
 import ContentImage from "@/components/site/ContentImage";
+import CtaBand from "@/components/site/CtaBand";
+import EstimateCtaLink from "@/components/site/EstimateCtaLink";
+import PageHero from "@/components/site/PageHero";
+import SectionIntro from "@/components/site/SectionIntro";
 import { business } from "@/lib/site/config";
 import { homeImages } from "@/lib/site/images";
 import type { ServiceDetail } from "@/lib/site/scope";
@@ -44,86 +48,71 @@ export default function ServicePageTemplate({
       )}
 
       {/* ── Hero ─────────────────────────────────────────────── */}
-      <section className="bg-brand-navy py-20 text-white">
-        <div className="site-container">
-          <p className="flex items-center gap-2 text-sm font-medium uppercase tracking-[0.18em] text-brand-sky">
-            <MapPin size={15} aria-hidden />
-            {business.heroLocationLine}
-          </p>
-          <h1 className="mt-3 max-w-3xl text-3xl font-bold leading-tight sm:text-4xl lg:text-5xl">
-            {detail.h1}
-          </h1>
-          <div className="mt-5 max-w-2xl space-y-4 text-base leading-relaxed text-white/85">
-            {detail.intro.map((paragraph) => (
-              <p key={paragraph}>{paragraph}</p>
-            ))}
-          </div>
-          <div className="mt-8 flex flex-wrap items-center gap-3">
-            <Link
-              href="/#estimate"
-              className="rounded-full bg-brand-red px-7 py-3 text-sm font-bold text-white transition-colors hover:bg-brand-red-dark"
-            >
-              Request a Free Estimate
-            </Link>
-            <a
-              href={business.phoneHref}
-              className="flex items-center gap-2 rounded-full border border-solid border-white/40 px-6 py-3 text-sm font-bold transition-colors hover:bg-white/10"
-            >
-              <Phone size={18} aria-hidden />
-              {business.phone}
-            </a>
-          </div>
+      <PageHero
+        eyebrow={business.heroLocationLine}
+        title={detail.h1}
+        image={img}
+        breadcrumbs={[
+          { label: "Home", href: "/" },
+          { label: "Services", href: "/services" },
+          { label: detail.name },
+        ]}
+        lede={detail.intro.map((paragraph) => (
+          <p key={paragraph}>{paragraph}</p>
+        ))}
+      >
+        <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+          <EstimateCtaLink href="/#estimate" className="btn btn-primary btn-lg">
+            Request a Free Estimate
+            <ArrowRight size={18} aria-hidden className="btn-arrow" />
+          </EstimateCtaLink>
+          <a href={business.phoneHref} className="btn btn-glass btn-lg">
+            <Phone size={17} aria-hidden />
+            {business.phone}
+          </a>
         </div>
-      </section>
+      </PageHero>
 
       {/* ── Dual audience ────────────────────────────────────── */}
-      <section className="bg-white py-20">
-        <div className="site-container">
-          <div className="grid items-center gap-10 lg:grid-cols-2">
-            <ContentImage
-              src={img.src}
-              alt={img.alt}
-              className="h-72 rounded-xl sm:h-80 lg:h-96"
-              sizes="(max-width: 1024px) 100vw, 50vw"
-              quality={90}
-              priority
-            />
-            <div className="grid gap-6">
-              <div className="rounded-xl border border-solid border-gray-200 bg-white p-7">
-                <h2 className="text-xl font-bold text-brand-navy">
-                  {detail.residential.heading}
-                </h2>
-                <p className="mt-2 text-sm leading-relaxed text-gray-500">
-                  {detail.residential.body}
-                </p>
+      <section className="section bg-white">
+        <div className="site-container grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
+          <ContentImage
+            src={img.src}
+            alt={img.alt}
+            className="aspect-[4/3] rounded-3xl lg:aspect-[5/6]"
+            sizes="(max-width: 1024px) 100vw, 50vw"
+            quality={90}
+          />
+          <div className="grid gap-5">
+            {[
+              { icon: Home, ...detail.residential },
+              { icon: Building2, ...detail.commercial },
+            ].map(({ icon: Icon, heading, body }) => (
+              <div
+                key={heading}
+                className="rounded-3xl border border-solid border-site-line bg-white p-7 sm:p-8"
+              >
+                <span className="flex size-12 items-center justify-center rounded-xl bg-site-surface text-brand-navy">
+                  <Icon size={22} strokeWidth={1.75} aria-hidden />
+                </span>
+                <h2 className="mt-5 font-display text-xl font-bold sm:text-2xl">{heading}</h2>
+                <p className="mt-3 leading-relaxed text-site-text">{body}</p>
               </div>
-              <div className="rounded-xl border border-solid border-gray-200 bg-white p-7">
-                <h2 className="text-xl font-bold text-brand-navy">
-                  {detail.commercial.heading}
-                </h2>
-                <p className="mt-2 text-sm leading-relaxed text-gray-500">
-                  {detail.commercial.body}
-                </p>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* ── Sub-services for this category ───────────────────── */}
       {subPages.length > 0 && (
-        <section className="border-t border-solid border-gray-100 bg-white py-20">
+        <section className="section bg-site-surface">
           <div className="site-container">
-            <div className="mx-auto max-w-3xl text-center">
-              <p className="text-sm font-medium uppercase tracking-[0.18em] text-site-accent">
-                {detail.name} Services
-              </p>
-              <h2 className="mt-3 text-3xl font-bold text-site-text-dark sm:text-4xl">
-                Explore Our {detail.name} Sub-Services
-              </h2>
-            </div>
+            <SectionIntro
+              eyebrow={`${detail.name} Services`}
+              title={`Explore Our ${detail.name} Sub-Services`}
+            />
 
-            <div className="mx-auto mt-12 grid max-w-4xl gap-4 sm:grid-cols-2">
+            <div className="mx-auto mt-12 grid max-w-5xl gap-4 sm:mt-14 sm:grid-cols-2 lg:grid-cols-3">
               {subPages.map((subPage) => {
                 const isActive = activeSubPage === subPage.slug;
                 return (
@@ -131,26 +120,28 @@ export default function ServicePageTemplate({
                     key={subPage.href}
                     href={subPage.href}
                     aria-current={isActive ? "page" : undefined}
-                    className={`group flex items-center justify-between gap-3 rounded-xl border border-solid p-5 transition-all ${
+                    className={`group flex items-center justify-between gap-3 rounded-2xl border border-solid p-5 transition-all ${
                       isActive
-                        ? "border-brand-blue bg-brand-blue/5 shadow-sm"
-                        : "border-gray-200 bg-white hover:-translate-y-1 hover:border-brand-sky/60 hover:shadow-md"
+                        ? "border-brand-ink bg-brand-ink text-white"
+                        : "border-site-line bg-white hover:-translate-y-0.5 hover:border-brand-ink/30 hover:shadow-[0_16px_32px_-20px_rgba(7,21,48,0.4)]"
                     }`}
                   >
                     <span
-                      className={`text-sm font-bold ${
-                        isActive ? "text-brand-blue" : "text-brand-navy"
+                      className={`font-display font-semibold ${
+                        isActive ? "text-white" : "text-brand-ink"
                       }`}
                     >
                       {subPage.label}
                     </span>
-                    <ArrowRight
-                      size={16}
-                      aria-hidden
-                      className={`shrink-0 transition-transform group-hover:translate-x-1 ${
-                        isActive ? "text-brand-blue" : "text-brand-blue group-hover:text-brand-red"
+                    <span
+                      className={`flex size-9 shrink-0 items-center justify-center rounded-full transition-colors ${
+                        isActive
+                          ? "bg-brand-red text-white"
+                          : "bg-site-surface text-brand-ink group-hover:bg-brand-red group-hover:text-white"
                       }`}
-                    />
+                    >
+                      <ArrowRight size={16} aria-hidden />
+                    </span>
                   </Link>
                 );
               })}
@@ -161,83 +152,78 @@ export default function ServicePageTemplate({
 
       {/* ── Featured specialty (e.g. Framing) ────────────────── */}
       {detail.featured && (
-        <section id="framing" className="scroll-mt-28 border-t border-solid border-gray-100 bg-brand-navy py-20 text-white">
-          <div className="site-container">
-            <div className="grid items-center gap-10 lg:grid-cols-2">
-              <div>
-                <p className="text-sm font-medium uppercase tracking-[0.18em] text-brand-sky">
-                  Our Specialty
-                </p>
-                <h2 className="mt-3 text-3xl font-bold sm:text-4xl">{detail.featured.heading}</h2>
-                <p className="mt-5 max-w-xl text-base leading-relaxed text-white/85">
-                  {detail.featured.body}
-                </p>
-              </div>
-              <ul className="grid gap-4 sm:grid-cols-2">
-                {detail.featured.items.map((item) => {
-                  const subPage = subPages.find((page) => page.label === item);
-                  const content = (
-                    <>
-                      <CheckCircle2 size={20} aria-hidden className="mt-0.5 shrink-0 text-brand-sky" />
-                      <span className="text-sm font-semibold leading-relaxed text-white">{item}</span>
-                    </>
-                  );
+        <section id="framing" className="section bg-ink relative scroll-mt-28 overflow-hidden">
+          <div className="bg-blueprint pointer-events-none absolute inset-0" aria-hidden />
+          <div className="site-container relative grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
+            <div>
+              <p className="eyebrow eyebrow-light">Our Specialty</p>
+              <h2 className="section-title mt-4">{detail.featured.heading}</h2>
+              <p className="section-lede mt-5 max-w-xl">{detail.featured.body}</p>
+            </div>
+            <ul className="grid gap-3 sm:grid-cols-2">
+              {detail.featured.items.map((item) => {
+                const subPage = subPages.find((page) => page.label === item);
+                const content = (
+                  <>
+                    <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-brand-red">
+                      <Check size={13} strokeWidth={3} aria-hidden className="text-white" />
+                    </span>
+                    <span className="font-display font-semibold leading-snug text-white">{item}</span>
+                  </>
+                );
 
-                  if (subPage) {
-                    return (
-                      <li key={item}>
-                        <Link
-                          href={subPage.href}
-                          className="flex items-start gap-3 rounded-xl border border-solid border-white/15 bg-white/5 p-5 transition-colors hover:border-brand-sky/50 hover:bg-white/10"
-                        >
-                          {content}
-                        </Link>
-                      </li>
-                    );
-                  }
-
+                if (subPage) {
                   return (
-                    <li
-                      key={item}
-                      className="flex items-start gap-3 rounded-xl border border-solid border-white/15 bg-white/5 p-5"
-                    >
-                      {content}
+                    <li key={item}>
+                      <Link
+                        href={subPage.href}
+                        className="flex h-full items-start gap-3 rounded-2xl border border-solid border-white/10 bg-white/5 p-5 transition-colors hover:border-white/25 hover:bg-white/10"
+                      >
+                        {content}
+                      </Link>
                     </li>
                   );
-                })}
-              </ul>
-            </div>
+                }
+
+                return (
+                  <li
+                    key={item}
+                    className="flex items-start gap-3 rounded-2xl border border-solid border-white/10 bg-white/5 p-5"
+                  >
+                    {content}
+                  </li>
+                );
+              })}
+            </ul>
           </div>
         </section>
       )}
 
       {/* ── Scope of work ────────────────────────────────────── */}
-      <section className="border-y border-solid border-gray-100 bg-gray-50/60 py-20">
+      <section className="section bg-white">
         <div className="site-container">
-          <div className="mx-auto max-w-3xl text-center">
-            <p className="text-sm font-medium uppercase tracking-[0.18em] text-site-accent">
-              Scope of Work
-            </p>
-            <h2 className="mt-3 text-3xl font-bold text-site-text-dark sm:text-4xl">
-              {detail.scopeHeading}
-            </h2>
-          </div>
+          <SectionIntro eyebrow="Scope of Work" title={detail.scopeHeading} />
 
-          <ul className="mx-auto mt-12 grid max-w-4xl gap-4 sm:grid-cols-2">
+          <ul className="mx-auto mt-12 grid max-w-5xl gap-3 sm:mt-14 sm:grid-cols-2">
             {detail.scope.map((item) => {
               const subPage = subPages.find((page) => page.label === item);
+              const content = (
+                <>
+                  <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-brand-red/10">
+                    <Check size={13} strokeWidth={3} aria-hidden className="text-brand-red" />
+                  </span>
+                  <span className="leading-relaxed text-site-text-dark">{item}</span>
+                </>
+              );
 
               if (subPage) {
                 return (
                   <li key={item}>
                     <Link
                       href={subPage.href}
-                      className="group flex items-start gap-3 rounded-xl border border-solid border-gray-200 bg-white p-5 transition-all hover:-translate-y-0.5 hover:border-brand-sky/60 hover:shadow-sm"
+                      className="flex h-full items-start gap-3 rounded-2xl border border-solid border-site-line bg-site-surface p-5 transition-all hover:border-brand-ink/30 hover:bg-white"
                     >
-                      <CheckCircle2 size={20} aria-hidden className="mt-0.5 shrink-0 text-brand-sky" />
-                      <span className="text-sm leading-relaxed text-gray-600 group-hover:text-brand-navy">
-                        {item}
-                      </span>
+                      {content}
                     </Link>
                   </li>
                 );
@@ -246,10 +232,9 @@ export default function ServicePageTemplate({
               return (
                 <li
                   key={item}
-                  className="flex items-start gap-3 rounded-xl border border-solid border-gray-200 bg-white p-5"
+                  className="flex items-start gap-3 rounded-2xl border border-solid border-site-line bg-site-surface p-5"
                 >
-                  <CheckCircle2 size={20} aria-hidden className="mt-0.5 shrink-0 text-brand-sky" />
-                  <span className="text-sm leading-relaxed text-gray-600">{item}</span>
+                  {content}
                 </li>
               );
             })}
@@ -259,34 +244,30 @@ export default function ServicePageTemplate({
 
       {/* ── FAQ ──────────────────────────────────────────────── */}
       {detail.faqs.length > 0 && (
-        <section className="bg-white py-20">
-          <div className="site-container">
-            <div className="mx-auto max-w-3xl">
-              <div className="text-center">
-                <p className="text-sm font-medium uppercase tracking-[0.18em] text-site-accent">
-                  FAQ
-                </p>
-                <h2 className="mt-3 text-3xl font-bold text-site-text-dark sm:text-4xl">
-                  {detail.name} Questions
-                </h2>
-              </div>
+        <section className="section bg-site-surface">
+          <div className="site-container grid gap-12 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-20">
+            <div className="lg:sticky lg:top-32 lg:self-start">
+              <p className="eyebrow">FAQ</p>
+              <h2 className="section-title mt-4">{detail.name} Questions</h2>
+              <p className="section-lede mt-5">
+                Still have a question? Call{" "}
+                <a href={business.phoneHref} className="font-semibold text-brand-ink underline-offset-4 hover:underline">
+                  {business.phone}
+                </a>
+                .
+              </p>
+            </div>
 
-              <div className="mt-12 space-y-4">
-                {detail.faqs.map((faq) => (
-                  <details
-                    key={faq.question}
-                    className="group rounded-xl border border-solid border-gray-200 bg-white px-6 py-5 transition-colors open:border-brand-sky/60"
-                  >
-                    <summary className="flex items-center justify-between gap-4 font-bold text-brand-navy">
-                      {faq.question}
-                      <span className="text-brand-blue transition-transform group-open:rotate-90">
-                        <ArrowRight size={18} aria-hidden />
-                      </span>
-                    </summary>
-                    <p className="mt-3 text-sm leading-relaxed text-gray-500">{faq.answer}</p>
-                  </details>
-                ))}
-              </div>
+            <div className="border-t border-solid border-site-line">
+              {detail.faqs.map((faq) => (
+                <details key={faq.question} className="faq-item group">
+                  <summary>
+                    {faq.question}
+                    <span className="faq-icon" aria-hidden />
+                  </summary>
+                  <p className="faq-answer">{faq.answer}</p>
+                </details>
+              ))}
             </div>
           </div>
         </section>
@@ -294,30 +275,23 @@ export default function ServicePageTemplate({
 
       {/* ── Related services (internal links) ────────────────── */}
       {detail.relatedServices.length > 0 && (
-        <section className="bg-white py-20">
+        <section className="section-sm bg-white">
           <div className="site-container">
-            <div className="mx-auto max-w-3xl text-center">
-              <p className="text-sm font-medium uppercase tracking-[0.18em] text-site-accent">
-                Explore More
-              </p>
-              <h2 className="mt-3 text-3xl font-bold text-site-text-dark sm:text-4xl">
-                Related Services
-              </h2>
-            </div>
+            <SectionIntro eyebrow="Explore More" title="Related Services" align="left" />
 
-            <div className="mx-auto mt-12 grid max-w-4xl gap-4 sm:grid-cols-3">
+            <div className="mt-10 grid gap-4 sm:grid-cols-3">
               {detail.relatedServices.map((related) => (
                 <Link
                   key={related.href}
                   href={related.href}
-                  className="group flex items-center justify-between gap-3 rounded-xl border border-solid border-gray-200 bg-white p-5 transition-all hover:-translate-y-1 hover:border-brand-sky/60 hover:shadow-md"
+                  className="group flex items-center justify-between gap-3 rounded-2xl border border-solid border-site-line bg-white p-6 transition-all hover:-translate-y-0.5 hover:border-brand-ink/30 hover:shadow-[0_16px_32px_-20px_rgba(7,21,48,0.4)]"
                 >
-                  <span className="text-sm font-bold text-brand-navy">{related.label}</span>
-                  <ArrowRight
-                    size={16}
-                    aria-hidden
-                    className="shrink-0 text-brand-blue transition-transform group-hover:translate-x-1 group-hover:text-brand-red"
-                  />
+                  <span className="font-display text-lg font-semibold text-brand-ink">
+                    {related.label}
+                  </span>
+                  <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-site-surface text-brand-ink transition-colors group-hover:bg-brand-red group-hover:text-white">
+                    <ArrowRight size={16} aria-hidden />
+                  </span>
                 </Link>
               ))}
             </div>
@@ -325,33 +299,7 @@ export default function ServicePageTemplate({
         </section>
       )}
 
-      {/* ── CTA ──────────────────────────────────────────────── */}
-      <section className="border-t border-solid border-gray-100 bg-gray-50/60 py-20">
-        <div className="site-container text-center">
-          <h2 className="text-2xl font-bold text-brand-navy sm:text-3xl">
-            Ready to Start Your Project?
-          </h2>
-          <p className="mx-auto mt-3 max-w-2xl text-gray-500">
-            Tell us about your project and we&apos;ll respond within one business day — no pressure,
-            no obligation.
-          </p>
-          <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
-            <Link
-              href="/#estimate"
-              className="rounded-full bg-brand-red px-7 py-3 text-sm font-bold text-white transition-colors hover:bg-brand-red-dark"
-            >
-              Request a Free Estimate
-            </Link>
-            <Link
-              href="/projects"
-              className="inline-flex items-center gap-2 rounded-full border border-solid border-brand-navy px-7 py-3 text-sm font-bold text-brand-navy transition-colors hover:bg-brand-navy hover:text-white"
-            >
-              View Our Projects
-              <ArrowRight size={16} aria-hidden />
-            </Link>
-          </div>
-        </div>
-      </section>
+      <CtaBand />
     </>
   );
 }

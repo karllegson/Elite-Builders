@@ -1,3 +1,7 @@
+import { ArrowRight } from "lucide-react";
+import EstimateCtaLink from "@/components/site/EstimateCtaLink";
+import SectionIntro from "@/components/site/SectionIntro";
+
 type WhyChooseUsItem = {
   title: string;
   body: string;
@@ -10,63 +14,67 @@ type WhyChooseUsSectionProps = {
 
 export default function WhyChooseUsSection({ items, lede }: WhyChooseUsSectionProps) {
   return (
-    <section id="why-us" className="scroll-mt-28 bg-[#eef4fb] py-12 sm:py-24">
-      <div className="site-container">
-        <div className="mx-auto max-w-3xl text-center">
-          <p className="text-xs font-medium uppercase tracking-[0.14em] text-brand-blue sm:text-sm sm:tracking-[0.18em]">
-            Why Choose Us
-          </p>
-          <h2 className="mt-2 text-lg font-bold leading-snug text-site-text-dark sm:mt-3 sm:text-3xl sm:leading-tight lg:text-4xl">
-            Framing-First Specialists You Can Trust
-          </h2>
-          <p className="mt-2 text-xs leading-relaxed text-site-text sm:mt-4 sm:text-base">
-            {lede ?? "Straight answers and real craftsmanship — not sales gimmicks or the cheapest bid."}
-          </p>
-        </div>
+    <section id="why-us" className="section bg-ink relative scroll-mt-28 overflow-hidden">
+      <div className="bg-blueprint pointer-events-none absolute inset-0" aria-hidden />
+      <div
+        className="pointer-events-none absolute -left-40 top-1/3 size-[32rem] rounded-full bg-brand-blue/20 blur-3xl"
+        aria-hidden
+      />
 
-        <div className="relative mx-auto mt-8 grid max-w-6xl gap-3 sm:mt-14 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3 lg:gap-7">
+      <div className="site-container relative">
+        <SectionIntro
+          eyebrow="Why Choose Us"
+          title="Framing-first specialists you can trust"
+          lede={lede ?? "Straight answers and real craftsmanship — not sales gimmicks or the cheapest bid."}
+          align="left"
+          tone="dark"
+        />
+
+        <div className="mt-12 grid gap-px overflow-hidden rounded-3xl border border-solid border-white/10 bg-white/10 sm:mt-16 sm:grid-cols-2 lg:grid-cols-4">
           {items.map(({ title, body }, index) => {
-            const label = String(index + 1).padStart(2, "0");
             const isFeatured = index === 0;
-
             return (
               <article
                 key={title}
-                className={`flex flex-col rounded-lg border border-solid px-4 py-4 shadow-sm sm:rounded-xl sm:px-7 sm:py-7 ${
-                  isFeatured
-                    ? "border-brand-navy/25 bg-white ring-1 ring-brand-red/25 sm:col-span-2 lg:col-span-1"
-                    : "border-gray-200 bg-white"
+                className={`flex flex-col p-7 transition-colors duration-300 hover:bg-brand-ink-2 sm:p-8 ${
+                  isFeatured ? "bg-brand-ink-2" : "bg-brand-ink"
                 }`}
               >
-                <div className="flex items-center gap-2 sm:gap-3">
-                  <span
-                    className={`font-mono text-[10px] font-bold tracking-[0.18em] sm:text-xs sm:tracking-[0.22em] ${
-                      isFeatured ? "text-brand-red" : "text-brand-blue"
-                    }`}
-                  >
-                    {label}
-                  </span>
-                  <span className="h-px flex-1 bg-gray-200" aria-hidden />
-                </div>
+                <span className="font-display text-sm font-semibold tracking-[0.16em] text-[#ff6b70]">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
                 <h3
-                  className={`mt-2 font-bold leading-snug sm:mt-3 ${
-                    isFeatured
-                      ? "text-base text-brand-navy sm:text-lg"
-                      : "text-sm text-brand-navy sm:text-[17px]"
+                  className={`mt-6 font-display font-semibold text-white ${
+                    isFeatured ? "text-xl" : "text-lg"
                   }`}
                 >
                   {title}
                 </h3>
                 <p
-                  className={`mt-1 leading-relaxed text-gray-600 sm:mt-2 ${
-                    isFeatured ? "text-sm sm:text-[15px]" : "text-xs sm:text-[15px]"
-                  }`}
+                  className="mt-3 text-[0.9375rem] leading-relaxed text-white/65"
                 >
                   {body}
                 </p>
               </article>
             );
           })}
+
+          <EstimateCtaLink
+            href="/#estimate"
+            className="group flex flex-col justify-between bg-brand-red p-7 transition-colors hover:bg-brand-red-dark sm:p-8"
+          >
+            <span className="font-display text-sm font-semibold uppercase tracking-[0.16em] text-white/80">
+              Free Estimate
+            </span>
+            <span className="mt-6 flex items-end justify-between gap-4">
+              <span className="font-display text-2xl font-semibold leading-tight text-white">
+                Let&apos;s talk about your project
+              </span>
+              <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-white text-brand-red transition-transform group-hover:translate-x-1">
+                <ArrowRight size={18} aria-hidden />
+              </span>
+            </span>
+          </EstimateCtaLink>
         </div>
       </div>
     </section>
