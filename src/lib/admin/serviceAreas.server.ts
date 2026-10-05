@@ -1,8 +1,11 @@
 import {
   createDefaultStore,
+  isTopLevelServiceArea,
   normalizeServiceAreaRecord,
   type ServiceAreasStore,
 } from "@/lib/admin/serviceAreasData";
+import { serviceLandingSlugForRoute } from "@/lib/site/serviceLandingPages";
+import { getServiceAreaPublicHref } from "@/lib/site/serviceAreaUrls";
 import {
   readServiceAreasStoreFromDisk,
   writeServiceAreasStoreToDisk,
@@ -154,4 +157,28 @@ export async function getPublishedPublicServiceAreaSubPage(
 ): Promise<PublicServiceAreaSubPage | null> {
   const store = await loadServiceAreasStore();
   return findPublicServiceAreaSubPage(parentSlug, childSlug, store);
+}
+
+/**
+ * Public URL of the dashboard-built page that replaces a built-in /services route,
+ * or null when none is published (the built-in template page is used instead).
+ */
+export async function findServiceLandingHrefForRoute(route: string): Promise<string | null> {
+  const slug = serviceLandingSlugForRoute(route);
+  if (!slug) return null;
+
+  try {
+    const store = await loadServiceAreasStore();
+    const record = store.areas.find(
+      (area) =>
+        area.slug === slug &&
+        isTopLevelServiceArea(area) &&
+        area.status === "published" &&
+        !area.hidden &&
+        !area.unused,
+    );
+    return record ? getServiceAreaPublicHref(record, store.areas) : null;
+  } catch {
+    return null;
+  }
 }

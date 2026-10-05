@@ -136,6 +136,18 @@ export function formatServiceAreaLabel(city: string, stateCode: string): string 
   return `${city}, ${stateCode.toUpperCase()}`;
 }
 
+/**
+ * Title for a top-level page: keeps a state suffix only when one was typed
+ * ("Fresno, CA"), so service pages like "Rough Framing" aren't saved as "Rough Framing, CA".
+ */
+export function formatTopLevelServiceAreaTitle(
+  typedTitle: string,
+  city: string,
+  stateCode: string,
+): string {
+  return typedTitle.includes(",") ? formatServiceAreaLabel(city, stateCode) : typedTitle.trim();
+}
+
 /** Top-level service area — no parentId means this record IS the parent page at /service-areas/{slug}. */
 export function isTopLevelServiceArea(area: Pick<ServiceAreaRecord, "parentId">): boolean {
   return area.parentId === null;
@@ -426,7 +438,9 @@ export function upsertServiceArea(input: UpsertServiceAreaInput): ServiceAreaRec
   const parsed = parseServiceAreaTitle(trimmedTitle, parent?.stateCode ?? "CA");
   const city = isSubPage ? trimmedTitle : parsed.city;
   const stateCode = isSubPage ? (parent?.stateCode ?? parsed.stateCode) : parsed.stateCode;
-  const displayTitle = isSubPage ? trimmedTitle : formatServiceAreaLabel(parsed.city, stateCode);
+  const displayTitle = isSubPage
+    ? trimmedTitle
+    : formatTopLevelServiceAreaTitle(trimmedTitle, parsed.city, stateCode);
   const slug = slugifyServiceAreaPermalink(input.slug.trim() || trimmedTitle);
   const id = input.id ?? createServiceAreaRecordId(slug, resolvedParentId, parent);
   const existingIndex = store.areas.findIndex((area) => area.id === id);
@@ -577,7 +591,7 @@ export function saveSortingLayout(
         stateCode: isUnused ? area.stateCode : (stateCode ?? area.stateCode),
         title: isUnused
           ? area.title
-          : formatServiceAreaLabel(area.city, stateCode ?? area.stateCode),
+          : formatTopLevelServiceAreaTitle(area.title, area.city, stateCode ?? area.stateCode),
         updatedAt: new Date().toISOString(),
       });
     });

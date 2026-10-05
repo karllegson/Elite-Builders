@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import ServicePageTemplate from "@/components/site/ServicePageTemplate";
+import { findServiceLandingHrefForRoute } from "@/lib/admin/serviceAreas.server";
 import { buildPageMetadata } from "@/lib/site/seo";
 import {
   buildServiceSubPageDetail,
@@ -45,6 +46,12 @@ export default async function ServiceSubPage({ params }: ServiceSubPageProps) {
 
   if (!findServiceSubPage(category, subslug)) {
     notFound();
+  }
+
+  // A dashboard-built page for this service takes over the URL.
+  const landingHref = await findServiceLandingHrefForRoute(serviceSubPageHref(category, subslug));
+  if (landingHref) {
+    permanentRedirect(landingHref);
   }
 
   const detail = buildServiceSubPageDetail(category, subslug);

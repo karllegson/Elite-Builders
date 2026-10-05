@@ -9,6 +9,7 @@ import {
 } from "@/lib/admin/serviceAreasData";
 import type { ServiceAreaFeaturedImage } from "@/lib/admin/serviceAreaEditor";
 import { serviceAreas as staticServiceAreas, type ServiceArea } from "@/lib/site/config";
+import { isServiceLandingSlug } from "@/lib/site/serviceLandingPages";
 import { getServiceAreaPublicHref } from "@/lib/site/serviceAreaUrls";
 
 export { SERVICE_AREAS_CHANGED_EVENT };
@@ -33,6 +34,8 @@ export type PublicServiceArea = ServiceArea & {
   sortOrder: number;
   /** Stable key for project lookups when the public slug changes. */
   projectSlug: string;
+  /** Dashboard-built service landing page (e.g. Rough Framing), not a city. */
+  isServicePage: boolean;
 };
 
 function resolveStaticMeta(record: ServiceAreaRecord): ServiceArea | undefined {
@@ -83,6 +86,7 @@ export function toPublicServiceArea(
     breadcrumbsLinkInactive: record.breadcrumbsLinkInactive,
     sortOrder: record.sortOrder,
     projectSlug: staticMeta?.slug ?? record.id,
+    isServicePage: isServiceLandingSlug(record.slug),
   };
 }
 
@@ -109,6 +113,7 @@ function getStaticPublicServiceAreas(): PublicServiceArea[] {
     mapEmbed: "",
     breadcrumbsLinkInactive: false,
     projectSlug: area.slug,
+    isServicePage: false,
     sortOrder: index,
   }));
 }

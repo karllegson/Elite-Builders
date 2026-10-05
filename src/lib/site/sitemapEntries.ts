@@ -8,6 +8,7 @@ import {
 import { serviceAreas as staticServiceAreas, services } from "@/lib/site/config";
 import { SITE_URL } from "@/lib/site/seo";
 import { getServiceAreaPublicHref } from "@/lib/site/serviceAreaUrls";
+import { SERVICE_LANDING_ROUTES } from "@/lib/site/serviceLandingPages";
 import { getAllServiceSubPages } from "@/lib/site/serviceSubPages";
 
 const STATIC_ROUTES = [
@@ -38,7 +39,13 @@ function sitemapUrl(
   };
 }
 
-async function getServiceAreaSitemapEntries(): Promise<MetadataRoute.Sitemap> {
+async function getServiceAreaSitemapEntries(): Promise<{
+  entries: MetadataRoute.Sitemap;
+  /** Built-in /services routes that redirect to a dashboard-built page. */
+  replacedServiceRoutes: Set<string>;
+}> {
+  const replacedServiceRoutes = new Set<string>();
+
   try {
     const store = await loadServiceAreasStore();
     const entries: MetadataRoute.Sitemap = [];
@@ -52,6 +59,10 @@ async function getServiceAreaSitemapEntries(): Promise<MetadataRoute.Sitemap> {
         continue;
       }
 
+      if (isTopLevelServiceArea(area) && SERVICE_LANDING_ROUTES[area.slug]) {
+        replacedServiceRoutes.add(SERVICE_LANDING_ROUTES[area.slug]);
+      }
+
       entries.push(
         sitemapUrl(getServiceAreaPublicHref(area, store.areas), {
           changeFrequency: "monthly",
@@ -61,18 +72,21 @@ async function getServiceAreaSitemapEntries(): Promise<MetadataRoute.Sitemap> {
     }
 
     if (entries.length > 0) {
-      return entries;
+      return { entries, replacedServiceRoutes };
     }
   } catch {
     // Fall back to static config when the store is unavailable at build time.
   }
 
-  return staticServiceAreas.map((area) =>
-    sitemapUrl(area.href, {
-      changeFrequency: "monthly",
-      priority: 0.7,
-    }),
-  );
+  return {
+    entries: staticServiceAreas.map((area) =>
+      sitemapUrl(area.href, {
+        changeFrequency: "monthly",
+        priority: 0.7,
+      }),
+    ),
+    replacedServiceRoutes,
+  };
 }
 
 async function getBlogSitemapEntries(): Promise<MetadataRoute.Sitemap> {
@@ -93,10 +107,9 @@ async function getBlogSitemapEntries(): Promise<MetadataRoute.Sitemap> {
 
 /** All indexable public URLs for /sitemap.xml (Phase 1 SEO foundation). */
 export async function buildSitemapEntries(): Promise<MetadataRoute.Sitemap> {
-  const [serviceAreaEntries, blogEntries] = await Promise.all([
-    getServiceAreaSitemapEntries(),
-    getBlogSitemapEntries(),
-  ]);
+  const [{ entries: serviceAreaEntries, replacedServiceRoutes }, blogEntries] =
+    await Promise.all([getServiceAreaSitemapEntries(), getBlogSitemapEntries()]);
+  const isLive = (href: string) => !replacedServiceRoutes.has(href);
 
   return [
     ...STATIC_ROUTES.map((path) =>
@@ -105,13 +118,15 @@ export async function buildSitemapEntries(): Promise<MetadataRoute.Sitemap> {
         priority: path === "" ? 1 : 0.8,
       }),
     ),
-    ...services.map((service) =>
+    ...services.filter((service) => isLive(service.href)).map((service) =>
       sitemapUrl(service.href, {
         changeFrequency: "monthly",
         priority: 0.8,
       }),
     ),
-    ...getAllServiceSubPages().map((subPage) =>
+    ...getAllServiceSubPages()
+      .filter((subPage) => isLive(subPage.href))
+      .map((subPage) =>
       sitemapUrl(subPage.href, {
         changeFrequency: "monthly",
         priority: 0.75,

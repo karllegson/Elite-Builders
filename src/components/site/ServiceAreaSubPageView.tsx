@@ -29,7 +29,8 @@ export function ServiceAreaSubPageView({
     notFound();
   }
 
-  const pageTitle = page.seoTitle || page.title;
+  // On-page heading drops the " | Elite Builders IX" brand suffix used in the browser title.
+  const pageTitle = (page.seoTitle || page.title).replace(/\s+\|\s+[^|]+$/, "");
   const parentLabel = page.parent.title;
 
   return (

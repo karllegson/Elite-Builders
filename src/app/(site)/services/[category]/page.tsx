@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import ServicePageTemplate from "@/components/site/ServicePageTemplate";
+import { findServiceLandingHrefForRoute } from "@/lib/admin/serviceAreas.server";
 import { listPublishedPublicServicePages } from "@/lib/admin/services.server";
 import { getPublicServicePagesFallback } from "@/lib/site/servicesPublic";
 import { buildPageMetadata } from "@/lib/site/seo";
@@ -44,6 +45,13 @@ export async function generateMetadata({ params }: ServiceCategoryPageProps): Pr
 
 export default async function ServiceCategoryPage({ params }: ServiceCategoryPageProps) {
   const { category } = await params;
+
+  // A dashboard-built page for this service takes over the URL.
+  const landingHref = await findServiceLandingHrefForRoute(`/services/${category}`);
+  if (landingHref) {
+    permanentRedirect(landingHref);
+  }
+
   const pages = await listPublishedPublicServicePages();
   const detail =
     pages.find((page) => page.slug === category) ??

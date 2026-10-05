@@ -31,9 +31,11 @@ export function ServiceAreaCityView({ citySlug }: ServiceAreaCityViewProps) {
     notFound();
   }
 
+  const isServicePage = area.isServicePage;
   const isRegional = area.city === "Bay Area";
-  const cityLabel = isRegional ? area.city : `${area.city}, CA`;
-  const pageTitle = area.seoTitle || cityLabel;
+  const cityLabel = isRegional || isServicePage ? area.city : `${area.city}, CA`;
+  // On-page heading drops the " | Elite Builders IX" brand suffix used in the browser title.
+  const pageTitle = (area.seoTitle || cityLabel).replace(/\s+\|\s+[^|]+$/, "");
   const hasCustomContent = area.content.trim().length > 0;
   const localProjects = projectsForCity(area.projectSlug);
 
@@ -41,11 +43,13 @@ export function ServiceAreaCityView({ citySlug }: ServiceAreaCityViewProps) {
     <>
       <PageHero
         size="compact"
-        eyebrow="Service Area"
+        eyebrow={isServicePage ? "Our Services" : "Service Area"}
         title={pageTitle}
         breadcrumbs={[
           { label: "Home", href: "/" },
-          { label: "Service Areas", href: "/service-areas" },
+          isServicePage
+            ? { label: "Services", href: "/services" }
+            : { label: "Service Areas", href: "/service-areas" },
           { label: cityLabel },
         ]}
       />
@@ -93,12 +97,12 @@ export function ServiceAreaCityView({ citySlug }: ServiceAreaCityViewProps) {
               </div>
             </div>
 
-            <ServiceAreaSidebar city={area.city} />
+            <ServiceAreaSidebar city={isServicePage ? undefined : area.city} />
           </div>
         </div>
       </section>
 
-      {!hasCustomContent && localProjects.length > 0 ? (
+      {!hasCustomContent && !isServicePage && localProjects.length > 0 ? (
         <section className="section bg-site-surface">
           <div className="site-container">
             <SectionIntro eyebrow="Recent Work" title={`Projects in ${area.city}`} align="left" />
@@ -113,8 +117,8 @@ export function ServiceAreaCityView({ citySlug }: ServiceAreaCityViewProps) {
       ) : null}
 
       <div className="site-container pt-4 text-center">
-        <Link href="/service-areas" className="link-arrow">
-          View All Service Areas
+        <Link href={isServicePage ? "/services" : "/service-areas"} className="link-arrow">
+          {isServicePage ? "View All Services" : "View All Service Areas"}
           <ArrowRight size={16} aria-hidden />
         </Link>
       </div>

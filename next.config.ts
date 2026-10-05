@@ -196,6 +196,12 @@ const nextConfig: NextConfig = {
         destination: "/services/home-builder/new-home-construction",
         permanent: true,
       },
+      // Dashboard page renamed to match the GBP service name
+      {
+        source: "/service-areas/home-addition-framing",
+        destination: "/service-areas/home-addition-construction",
+        permanent: true,
+      },
       // Retired services (not on Google Business Profile) → closest active page
       { source: "/services/framing-contractor/remodel-framing", destination: "/services/framing-contractor", permanent: true },
       { source: "/services/framing-contractor/commercial-framing", destination: "/services/framing-contractor", permanent: true },
