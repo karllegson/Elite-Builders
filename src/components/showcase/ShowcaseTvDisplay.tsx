@@ -1,19 +1,74 @@
 "use client";
 
-import { ImageIcon } from "lucide-react";
 import Image from "next/image";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState, type CSSProperties } from "react";
+import { builders } from "@/lib/site/builders";
 import { business } from "@/lib/site/config";
 import type { ShowcaseProject, ShowcaseSettings } from "@/lib/admin/showcaseData";
 
 type ShowcaseTvDisplayProps = {
   settings: ShowcaseSettings;
   projects: ShowcaseProject[];
+  /** Zero-based slide to open on (from ?slide=N) — for checking one slide without waiting. */
+  initialSlide?: number;
 };
 
-type Slide = { kind: "calendar" } | { kind: "project"; project: ShowcaseProject };
+type ClientGroup = {
+  key: string;
+  name: string;
+  logo: string | null;
+  projects: ShowcaseProject[];
+};
+
+type Slide =
+  | { kind: "intro" }
+  | { kind: "calendar" }
+  | { kind: "spotlight"; group: ClientGroup }
+  | { kind: "roster"; groups: ClientGroup[] }
+  | { kind: "feature"; project: ShowcaseProject };
+
+const AMBIENT_VIDEO_SRC = "/videos/elite-builders-hero-loop.mp4";
+const AMBIENT_VIDEO_POSTER = "/videos/elite-builders-hero-poster.jpg";
+
+/** Clients with at least this many jobs get their own full-screen spotlight. */
+const SPOTLIGHT_MIN_JOBS = 2;
+
+/** Rows that fit a spotlight's job list before collapsing to "+N more". */
+const SPOTLIGHT_MAX_ROWS = 6;
+
+/** Smaller clients share one roster slide, up to this many per slide. */
+const ROSTER_PER_SLIDE = 6;
+
+/** Client names in the jobs list that differ from the logo roster in builders.ts. */
+const CLIENT_LOGO_ALIASES: Record<string, string> = {
+  "riviera construction": "Riviera Development Company",
+  durkin: "Durkin Inc",
+  tjh: "Thomas James Homes",
+};
+
+/**
+ * White-on-transparent logo versions for the dark TV (public/images/builders/tv),
+ * keyed by the site logo in builders.ts. Builders missing here show as a wordmark.
+ */
+/** TV logos that are a monogram only, so the client name is printed beside them. */
+const MONOGRAM_LOGOS = new Set(["/images/builders/tv/thomas-james-homes-white.png"]);
+
+const TV_LOGOS: Record<string, string> = {
+  "/images/builders/city-ventures-dark.svg": "/images/builders/city-ventures-dark.svg",
+  "/images/builders/branagh-development.png": "/images/builders/tv/branagh-development-white.png",
+  "/images/builders/durkin-inc.png": "/images/builders/tv/durkin-inc-white.png",
+  "/images/builders/riviera-development-company.png":
+    "/images/builders/tv/riviera-development-company-white.png",
+  "/images/builders/thomas-james-homes.jpg": "/images/builders/tv/thomas-james-homes-white.png",
+};
+
+/** Job chips that fit in one calendar day box before collapsing to "+N more". */
+const CALENDAR_CHIPS_PER_DAY = 2;
 
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as const;
+
+/** Only call out the countdown when it is close enough to matter. */
+const COUNTDOWN_WINDOW_DAYS = 45;
 
 function parseDueDate(value: string | null): Date | null {
   if (!value) {
@@ -22,21 +77,6 @@ function parseDueDate(value: string | null): Date | null {
 
   const date = new Date(`${value}T12:00:00`);
   return Number.isNaN(date.getTime()) ? null : date;
-}
-
-function formatLongDate(value: string | null): string {
-  const date = parseDueDate(value);
-
-  if (!date) {
-    return "To be scheduled";
-  }
-
-  return date.toLocaleDateString("en-US", {
-    weekday: "long",
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-  });
 }
 
 /** Whole-day difference from today — negative once the date has passed. */
@@ -52,151 +92,288 @@ function daysUntil(value: string | null): number | null {
   return Math.round((date.getTime() - today.getTime()) / 86_400_000);
 }
 
-function countdownLabel(value: string | null): string {
-  const days = daysUntil(value);
-
-  if (days === null) {
-    return "TBD";
-  }
-
-  if (days < 0) {
-    return `${Math.abs(days)} days past`;
-  }
-
-  if (days === 0) {
-    return "Due today";
-  }
-
-  if (days === 1) {
-    return "1 day out";
-  }
-
-  return `${days} days out`;
-}
-
-function formatDeadlineParts(value: string | null): { day: string; month: string } {
+function formatShortDate(value: string | null, now: Date): string | null {
   const date = parseDueDate(value);
 
   if (!date) {
-    return { day: "—", month: "TBD" };
+    return null;
   }
 
-  return {
-    day: String(date.getDate()),
-    month: date.toLocaleDateString("en-US", { month: "short" }),
-  };
+  return date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    ...(date.getFullYear() !== now.getFullYear() ? { year: "numeric" } : {}),
+  });
 }
 
-function urgencyTone(days: number | null): "soon" | "mid" | "later" | "tbd" {
-  if (days === null) {
-    return "tbd";
+function formatLongDate(value: string | null): string | null {
+  const date = parseDueDate(value);
+
+  if (!date) {
+    return null;
   }
 
-  if (days <= 21) {
-    return "soon";
-  }
-
-  if (days <= 60) {
-    return "mid";
-  }
-
-  return "later";
+  return date.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
 }
 
-function StatusLabel({ status }: { status: ShowcaseProject["status"] }) {
-  const isCurrent = status === "current";
+/**
+ * Lobby-safe countdown: only upcoming dates get one. Past targets are never
+ * shown as "overdue" to visitors.
+ */
+function countdownLabel(value: string | null): string | null {
+  const days = daysUntil(value);
 
-  return (
-    <span className={`showcase-status ${isCurrent ? "showcase-status--current" : "showcase-status--completed"}`}>
-      {isCurrent ? "In progress" : "Completed"}
+  if (days === null || days < 0 || days > COUNTDOWN_WINDOW_DAYS) {
+    return null;
+  }
+
+  if (days === 0) {
+    return "Today";
+  }
+
+  return days === 1 ? "Tomorrow" : `In ${days} days`;
+}
+
+function normalizeClient(name: string): string {
+  return name.trim().toLowerCase().replace(/\s+/g, " ");
+}
+
+function findClientLogo(name: string): string | null {
+  const key = normalizeClient(name);
+  const target = normalizeClient(CLIENT_LOGO_ALIASES[key] ?? name);
+  const logo = builders.find((builder) => normalizeClient(builder.name) === target)?.logo;
+  return logo ? (TV_LOGOS[logo] ?? null) : null;
+}
+
+/** "850 Glenview Dr, San Bruno" → "San Bruno" */
+function cityOf(location: string): string {
+  const parts = location.split(",").map((part) => part.trim()).filter(Boolean);
+  const last = parts.at(-1) ?? "";
+  return /^(CA|California)$/i.test(last) ? (parts.at(-2) ?? "") : last;
+}
+
+function unique(values: string[]): string[] {
+  return [...new Set(values.filter(Boolean))];
+}
+
+function groupByClient(projects: ShowcaseProject[]): ClientGroup[] {
+  const groups = new Map<string, ClientGroup>();
+
+  projects.forEach((project) => {
+    const key = normalizeClient(project.builder) || "other";
+    const group = groups.get(key) ?? {
+      key,
+      name: project.builder.trim() || "Other",
+      logo: findClientLogo(project.builder),
+      projects: [],
+    };
+    group.projects.push(project);
+    groups.set(key, group);
+  });
+
+  return [...groups.values()].sort((a, b) => b.projects.length - a.projects.length);
+}
+
+/**
+ * Intro → calendar → client spotlights interleaved with job-site photos →
+ * roster of smaller clients. Big moments alternate with dense ones.
+ */
+function buildSlides(projects: ShowcaseProject[]): Slide[] {
+  const groups = groupByClient(projects);
+  const spotlights = groups.filter((group) => group.projects.length >= SPOTLIGHT_MIN_JOBS);
+  const rest = groups.filter((group) => group.projects.length < SPOTLIGHT_MIN_JOBS);
+  const features = projects.filter((project) => project.featuredImage);
+  const slides: Slide[] = [{ kind: "intro" }, { kind: "calendar" }];
+
+  for (let index = 0; index < Math.max(spotlights.length, features.length); index += 1) {
+    if (spotlights[index]) {
+      slides.push({ kind: "spotlight", group: spotlights[index] });
+    }
+
+    if (features[index]) {
+      slides.push({ kind: "feature", project: features[index] });
+    }
+  }
+
+  for (let start = 0; start < rest.length; start += ROSTER_PER_SLIDE) {
+    slides.push({ kind: "roster", groups: rest.slice(start, start + ROSTER_PER_SLIDE) });
+  }
+
+  return slides;
+}
+
+/** Eases a number up from zero when the slide mounts. */
+function useCountUp(target: number, durationMs = 1600): number {
+  const [value, setValue] = useState(0);
+
+  useEffect(() => {
+    let frame = 0;
+    const started = performance.now();
+
+    const tick = (time: number) => {
+      const progress = Math.min(1, (time - started) / durationMs);
+      setValue(Math.round(target * (1 - (1 - progress) ** 3)));
+
+      if (progress < 1) {
+        frame = requestAnimationFrame(tick);
+      }
+    };
+
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [durationMs, target]);
+
+  return value;
+}
+
+/** Stagger index for entrance animations (see .tv-rise in showcase.css). */
+function rise(index: number): CSSProperties {
+  return { "--i": index } as CSSProperties;
+}
+
+/** Client logo rendered as a white mark, or the name set as a wordmark when no file exists. */
+function ClientMark({ group, size }: { group: Pick<ClientGroup, "name" | "logo">; size: "lg" | "sm" }) {
+  return group.logo ? (
+    <span className={`tv-mark tv-mark--${size}`}>
+      <Image src={group.logo} alt={group.name} width={480} height={160} unoptimized />
     </span>
+  ) : (
+    <span className={`tv-wordmark tv-wordmark--${size}`}>{group.name}</span>
   );
 }
 
-function DeadlineCountdown({ dueDate }: { dueDate: string | null }) {
-  const days = daysUntil(dueDate);
-  const tone = urgencyTone(days);
-
+function TopBar({ now }: { now: Date }) {
   return (
-    <span className={`showcase-deadline-countdown showcase-deadline-countdown--${tone}`}>
-      {countdownLabel(dueDate)}
-    </span>
-  );
-}
-
-function ShowcaseHeader({ now }: { now: Date }) {
-  return (
-    <header className="showcase-header">
-      <div className="showcase-brand">
-        <Image
-          src="/logo.png"
-          alt=""
-          width={96}
-          height={96}
-          priority
-          quality={95}
-          className="showcase-brand-logo"
-        />
-        <div className="showcase-brand-copy">
-          <p className="showcase-brand-name">{business.displayName}</p>
-          <p className="showcase-brand-tag">{business.slogan}</p>
-        </div>
+    <header className="tv-topbar">
+      <div className="tv-brand">
+        <span className="tv-brand-mark">
+          <Image src="/logo.png" alt="" width={120} height={120} priority quality={95} />
+        </span>
+        <span className="tv-brand-copy">
+          <span className="tv-brand-name">{business.displayName}</span>
+          <span className="tv-brand-tag">Framing Contractor · Since {business.foundedYear}</span>
+        </span>
       </div>
 
-      <div className="showcase-clock">
-        <p className="showcase-clock-time">
+      <div className="tv-clock">
+        <span className="tv-clock-time">
           {now.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}
-        </p>
-        <p className="showcase-clock-date">
-          {now.toLocaleDateString("en-US", {
-            weekday: "long",
-            month: "long",
-            day: "numeric",
-          })}
-        </p>
+        </span>
+        <span className="tv-clock-date">
+          {now.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}
+        </span>
       </div>
     </header>
   );
 }
 
-function ShowcaseFooter({
-  slideCount,
-  activeIndex,
-}: {
-  slideCount: number;
-  activeIndex: number;
-}) {
+function BottomBar({ activeIndex, durationsMs }: { activeIndex: number; durationsMs: number[] }) {
   return (
-    <footer className="showcase-footer">
-      <p className="showcase-footer-meta">
-        {business.license} · Licensed &amp; Insured California Contractor
-      </p>
+    <footer className="tv-bottombar">
+      <div className="tv-bottombar-row">
+        <span>{business.license} · Licensed &amp; Insured</span>
+        <span className="tv-bottombar-contact">
+          {business.domain.replace(/^https?:\/\/(www\.)?/, "")}
+          <span className="tv-bottombar-sep" aria-hidden />
+          {business.phone}
+        </span>
+      </div>
 
-      {slideCount > 1 ? (
-        <div className="showcase-progress" aria-hidden>
-          {Array.from({ length: slideCount }, (_, index) => (
+      {durationsMs.length > 1 ? (
+        <div className="tv-progress" aria-hidden>
+          {durationsMs.map((duration, index) => (
             <span
               key={index}
-              className={`showcase-progress-dot ${
-                index === activeIndex ? "showcase-progress-dot--active" : ""
-              }`}
-            />
+              className={`tv-progress-seg${index < activeIndex ? " tv-progress-seg--done" : ""}`}
+            >
+              {index === activeIndex ? (
+                <span
+                  key={`fill-${activeIndex}`}
+                  className="tv-progress-fill"
+                  style={{ animationDuration: `${duration}ms` }}
+                />
+              ) : null}
+            </span>
           ))}
         </div>
       ) : null}
-
-      <p className="showcase-footer-meta showcase-footer-meta--end">{business.phone}</p>
     </footer>
   );
 }
 
-function CalendarMonth({ projects, now }: { projects: ShowcaseProject[]; now: Date }) {
+function IntroSlide({ projects }: { projects: ShowcaseProject[] }) {
+  const groups = useMemo(() => groupByClient(projects), [projects]);
+  const jobs = useCountUp(projects.length);
+  const clients = useCountUp(groups.length);
+  const years = useCountUp(new Date().getFullYear() - business.foundedYear);
+
+  // Everyone on the board, plus past builders from the site roster that have logos.
+  const marks = useMemo(() => {
+    const seen = new Set<string>();
+    const list: Pick<ClientGroup, "name" | "logo">[] = [];
+
+    [...groups, ...builders.map((builder) => ({ name: builder.name, logo: TV_LOGOS[builder.logo] ?? null }))].forEach(
+      (mark) => {
+        const key = normalizeClient(CLIENT_LOGO_ALIASES[normalizeClient(mark.name)] ?? mark.name);
+
+        if (!seen.has(key)) {
+          seen.add(key);
+          list.push({ name: mark.name, logo: mark.logo });
+        }
+      },
+    );
+
+    return list;
+  }, [groups]);
+
+  return (
+    <section className="tv-slide tv-intro">
+      <div className="tv-intro-body">
+        <p className="tv-eyebrow tv-eyebrow--light tv-rise" style={rise(0)}>
+          Now framing across Northern California
+        </p>
+        <h1 className="tv-intro-title tv-rise" style={rise(1)}>
+          Framing the Bay Area
+          <br />
+          &amp; Central Valley.
+        </h1>
+
+        <dl className="tv-stats">
+          {[
+            { value: jobs, label: "Active jobs" },
+            { value: clients, label: "Builders & GCs" },
+            { value: years, label: "Years framing" },
+          ].map((stat, index) => (
+            <div key={stat.label} className="tv-stat tv-rise" style={rise(index + 2)}>
+              <dt>{stat.label}</dt>
+              <dd>{stat.value}</dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+
+      <div className="tv-marquee tv-rise" style={rise(5)} aria-label="Builders we work with">
+        <span className="tv-marquee-label">Trusted by</span>
+        <div className="tv-marquee-window">
+          <div className="tv-marquee-track">
+            {[...marks, ...marks].map((mark, index) => (
+              <span key={`${mark.name}-${index}`} className="tv-marquee-item">
+                <ClientMark group={mark} size="sm" />
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function CalendarSlide({ projects, now }: { projects: ShowcaseProject[]; now: Date }) {
   const year = now.getFullYear();
   const month = now.getMonth();
-  const monthLabel = now.toLocaleDateString("en-US", { month: "long" });
+  const todayDate = now.getDate();
   const firstWeekday = new Date(year, month, 1).getDay();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const todayDate = now.getDate();
 
   const dueByDay = useMemo(() => {
     const map = new Map<number, ShowcaseProject[]>();
@@ -204,192 +381,285 @@ function CalendarMonth({ projects, now }: { projects: ShowcaseProject[]; now: Da
     projects.forEach((project) => {
       const date = parseDueDate(project.dueDate);
 
-      if (!date || date.getFullYear() !== year || date.getMonth() !== month) {
-        return;
+      if (date && date.getFullYear() === year && date.getMonth() === month) {
+        map.set(date.getDate(), [...(map.get(date.getDate()) ?? []), project]);
       }
-
-      const day = date.getDate();
-      map.set(day, [...(map.get(day) ?? []), project]);
     });
 
     return map;
   }, [month, projects, year]);
 
-  const cells: (number | null)[] = [
-    ...Array.from({ length: firstWeekday }, () => null),
-    ...Array.from({ length: daysInMonth }, (_, index) => index + 1),
-  ];
+  const dueThisMonth = [...dueByDay.values()].reduce((total, list) => total + list.length, 0);
+  const cellCount = Math.ceil((firstWeekday + daysInMonth) / 7) * 7;
 
   return (
-    <div className="showcase-calendar">
-      <header className="showcase-calendar-head">
-        <h2 className="showcase-calendar-month">
-          <span className="showcase-calendar-month-name">{monthLabel}</span>
-          <span className="showcase-calendar-month-year">{year}</span>
-        </h2>
-      </header>
-
-      <div className="showcase-calendar-grid">
-        <div className="showcase-calendar-weekdays" aria-hidden>
-          {WEEKDAYS.map((day) => (
-            <span key={day}>{day.slice(0, 1)}</span>
-          ))}
+    <section className="tv-slide tv-panel tv-calendar">
+      <header className="tv-panel-head tv-rise" style={rise(0)}>
+        <div>
+          <p className="tv-eyebrow">Project calendar</p>
+          <h1 className="tv-panel-title">
+            {now.toLocaleDateString("en-US", { month: "long" })}{" "}
+            <span className="tv-calendar-year">{year}</span>
+          </h1>
         </div>
-
-        <div className="showcase-calendar-days">
-          {cells.map((day, index) => {
-            if (day === null) {
-              return <span key={`pad-${index}`} className="showcase-day showcase-day--empty" />;
-            }
-
-            const due = dueByDay.get(day);
-
-            return (
-              <span
-                key={day}
-                className={`showcase-day${day === todayDate ? " showcase-day--today" : ""}${
-                  due ? " showcase-day--due" : ""
-                }`}
-              >
-                <span className="showcase-day-number">{day}</span>
-                {due ? <span className="showcase-day-marker" aria-hidden /> : null}
-              </span>
-            );
-          })}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function CalendarSlide({ projects, now }: { projects: ShowcaseProject[]; now: Date }) {
-  const upcoming = projects.slice(0, 5);
-
-  return (
-    <section className="showcase-slide showcase-slide--calendar">
-      <header className="showcase-slide-intro">
-        <p className="showcase-kicker">Project schedule</p>
-        <h1 className="showcase-slide-title">
-          Active <span className="showcase-title-accent">job sites</span>
-        </h1>
-        <p className="showcase-slide-lede">
-          Target completion dates across current framing projects.
+        <p className="tv-panel-count">
+          <span className="tv-panel-count-num">{dueThisMonth}</span>
+          <span className="tv-panel-count-label">
+            {dueThisMonth === 1 ? "Job finishing" : "Jobs finishing"}
+            <span className="tv-panel-count-sub">This month</span>
+          </span>
         </p>
       </header>
 
-      <div className="showcase-calendar-layout">
-        <CalendarMonth projects={projects} now={now} />
+      <div className="tv-calendar-weekdays tv-rise" style={rise(1)} aria-hidden>
+        {WEEKDAYS.map((day) => (
+          <span key={day}>{day}</span>
+        ))}
+      </div>
 
-        <div className="showcase-deadlines">
-          <h2 className="showcase-section-title">Upcoming deadlines</h2>
+      <div
+        className="tv-calendar-grid tv-rise"
+        style={{ ...rise(2), gridTemplateRows: `repeat(${cellCount / 7}, minmax(0, 1fr))` }}
+      >
+        {Array.from({ length: cellCount }, (_, index) => {
+          const day = index - firstWeekday + 1;
 
-          {upcoming.length === 0 ? (
-            <p className="showcase-empty">No published projects yet.</p>
-          ) : (
-            <ul className="showcase-deadline-list">
-              {upcoming.map((project) => {
-                const parts = formatDeadlineParts(project.dueDate);
-                const tone = urgencyTone(daysUntil(project.dueDate));
+          if (day < 1 || day > daysInMonth) {
+            return <span key={`pad-${index}`} className="tv-day tv-day--pad" />;
+          }
+
+          const due = dueByDay.get(day) ?? [];
+          const isToday = day === todayDate;
+          const hidden = due.length - CALENDAR_CHIPS_PER_DAY;
+
+          return (
+            <div
+              key={day}
+              className={`tv-day${isToday ? " tv-day--today" : ""}${
+                day < todayDate ? " tv-day--past" : ""
+              }`}
+            >
+              <span className="tv-day-head">
+                <span className="tv-day-num">{day}</span>
+                {isToday ? <span className="tv-day-today">Today</span> : null}
+              </span>
+
+              {due.slice(0, CALENDAR_CHIPS_PER_DAY).map((project) => (
+                <span key={project.id} className="tv-day-job">
+                  <span className="tv-day-job-name">{project.name}</span>
+                  <span className="tv-day-job-builder">{project.builder}</span>
+                </span>
+              ))}
+
+              {hidden > 0 ? <span className="tv-day-more">+{hidden} more</span> : null}
+            </div>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+function SpotlightSlide({ group, now }: { group: ClientGroup; now: Date }) {
+  const count = useCountUp(group.projects.length, 1200);
+  const photo = group.projects.find((project) => project.featuredImage)?.featuredImage ?? null;
+  const cities = unique(group.projects.map((project) => cityOf(project.location)));
+  const scopes = unique(group.projects.map((project) => project.type));
+  const shown = group.projects.slice(0, SPOTLIGHT_MAX_ROWS);
+  const hidden = group.projects.length - shown.length;
+
+  return (
+    <section className={`tv-slide tv-spotlight${photo ? " tv-spotlight--photo" : ""}`}>
+      {photo ? (
+        <div className="tv-spotlight-photo" aria-hidden>
+          <Image
+            src={photo.src}
+            alt=""
+            fill
+            sizes="100vw"
+            quality={85}
+            className="tv-feature-img"
+          />
+        </div>
+      ) : null}
+
+      <div className="tv-spotlight-grid">
+        <div className="tv-spotlight-id">
+          <p className="tv-eyebrow tv-eyebrow--light tv-rise" style={rise(0)}>
+            Client spotlight
+          </p>
+          <div className="tv-spotlight-mark tv-rise" style={rise(1)}>
+            <ClientMark group={group} size="lg" />
+          </div>
+          {group.logo && MONOGRAM_LOGOS.has(group.logo) ? (
+            <p className="tv-spotlight-name tv-rise" style={rise(2)}>
+              {group.name}
+            </p>
+          ) : null}
+
+          <div className="tv-spotlight-count tv-rise" style={rise(3)}>
+            <span className="tv-spotlight-count-num">{count}</span>
+            <span className="tv-spotlight-count-label">
+              Active {group.projects.length === 1 ? "build" : "builds"}
+              <span>{scopes.join(" · ")}</span>
+            </span>
+          </div>
+
+          {cities.length > 0 ? (
+            <p className="tv-spotlight-cities tv-rise" style={rise(4)}>
+              {cities.join("  ·  ")}
+            </p>
+          ) : null}
+        </div>
+
+        <ol className="tv-spotlight-jobs">
+          {shown.map((project, index) => {
+            const target = formatShortDate(project.dueDate, now);
+
+            return (
+              <li key={project.id} className="tv-spotlight-job tv-rise" style={rise(index + 3)}>
+                <span className="tv-spotlight-job-index">{String(index + 1).padStart(2, "0")}</span>
+                <span className="tv-spotlight-job-copy">
+                  <span className="tv-spotlight-job-name">{project.name}</span>
+                  {project.location ? (
+                    <span className="tv-spotlight-job-location">{project.location}</span>
+                  ) : null}
+                </span>
+                <span className="tv-spotlight-job-date">
+                  {project.status === "completed" ? "Completed" : target ? `Due ${target}` : ""}
+                </span>
+              </li>
+            );
+          })}
+          {hidden > 0 ? (
+            <li className="tv-spotlight-more tv-rise" style={rise(shown.length + 3)}>
+              +{hidden} more
+            </li>
+          ) : null}
+        </ol>
+      </div>
+    </section>
+  );
+}
+
+function RosterSlide({ groups, now }: { groups: ClientGroup[]; now: Date }) {
+  return (
+    <section className="tv-slide tv-panel tv-roster">
+      <header className="tv-panel-head tv-rise" style={rise(0)}>
+        <div>
+          <p className="tv-eyebrow">Also on the schedule</p>
+          <h1 className="tv-panel-title">More builders we frame for</h1>
+        </div>
+      </header>
+
+      <div className="tv-roster-grid">
+        {groups.map((group, index) => (
+          <article key={group.key} className="tv-roster-item tv-rise" style={rise(index + 1)}>
+            <div className="tv-roster-mark">
+              <ClientMark group={group} size="sm" />
+            </div>
+            {group.logo && MONOGRAM_LOGOS.has(group.logo) ? (
+              <p className="tv-roster-name">{group.name}</p>
+            ) : null}
+            <ul className="tv-roster-jobs">
+              {group.projects.map((project) => {
+                const target = formatShortDate(project.dueDate, now);
 
                 return (
-                  <li key={project.id} className={`showcase-deadline showcase-deadline--${tone}`}>
-                    <time className="showcase-deadline-when" dateTime={project.dueDate ?? undefined}>
-                      <span className="showcase-deadline-day">{parts.day}</span>
-                      <span className="showcase-deadline-month">{parts.month}</span>
-                    </time>
-
-                    <span className="showcase-deadline-copy">
-                      <strong>{project.name}</strong>
-                      <span>{project.builder}</span>
+                  <li key={project.id}>
+                    <span>{project.name}</span>
+                    <span className="tv-roster-meta">
+                      {[project.type, target ? `Due ${target}` : ""].filter(Boolean).join(" · ")}
                     </span>
-
-                    <DeadlineCountdown dueDate={project.dueDate} />
                   </li>
                 );
               })}
             </ul>
-          )}
-        </div>
+          </article>
+        ))}
       </div>
     </section>
   );
 }
 
-function ProjectPhoto({ project }: { project: ShowcaseProject }) {
+function FeatureSlide({ project, durationMs }: { project: ShowcaseProject; durationMs: number }) {
   const photo = project.featuredImage;
+  const completed = project.status === "completed";
+  const daysLeft = daysUntil(project.dueDate);
+  const target = formatLongDate(project.dueDate);
+  const countdown = countdownLabel(project.dueDate);
+  const description = project.details || project.blurb;
 
   return (
-    <figure className="showcase-project-photo">
-      <div className="showcase-project-photo-frame">
-        {photo ? (
+    <section className="tv-slide tv-feature">
+      {photo ? (
+        <div className="tv-feature-photo" style={{ animationDuration: `${durationMs + 1000}ms` }}>
           <Image
             src={photo.src}
             alt={photo.alt || `${project.name} job site`}
             fill
-            sizes="45vw"
+            priority
+            sizes="100vw"
             quality={90}
-            className="showcase-project-photo-img"
+            className="tv-feature-img"
             unoptimized={photo.src.startsWith("blob:")}
           />
-        ) : (
-          <div className="showcase-photo-placeholder">
-            <ImageIcon className="showcase-photo-placeholder-icon" aria-hidden />
-            <p className="showcase-photo-placeholder-text">Site photo coming soon</p>
-          </div>
-        )}
-      </div>
+        </div>
+      ) : null}
+      <div className="tv-feature-scrim" aria-hidden />
 
-      <figcaption className="showcase-project-photo-caption">
-        <span className="showcase-photo-caption-copy">
-          <span className="showcase-photo-caption-label">Target completion</span>
-          <span className="showcase-photo-caption-date">{formatLongDate(project.dueDate)}</span>
-        </span>
-        <DeadlineCountdown dueDate={project.dueDate} />
-      </figcaption>
-    </figure>
-  );
-}
-
-function ProjectSlide({ project }: { project: ShowcaseProject }) {
-  return (
-    <section className="showcase-slide showcase-slide--project">
-      <div className="showcase-project-grid">
-        <div className="showcase-project-main">
-          <div className="showcase-project-meta">
-            <span className="showcase-project-type">{project.type}</span>
-            <StatusLabel status={project.status} />
-          </div>
-
-          <h1 className="showcase-slide-title showcase-project-title">{project.name}</h1>
-
-          <p className="showcase-project-subline">
-            <span className="showcase-project-builder">{project.builder}</span>
-            {project.location ? (
-              <span className="showcase-project-location">{project.location}</span>
-            ) : null}
+      <div className="tv-feature-body">
+        <div className="tv-feature-copy">
+          <p className="tv-eyebrow tv-eyebrow--light tv-rise" style={rise(0)}>
+            {completed ? "Recently completed" : "Now building"}
+            <span className="tv-eyebrow-sep" aria-hidden />
+            {project.type}
           </p>
-
-          {project.details || project.blurb ? (
-            <p className="showcase-project-details">{project.details || project.blurb}</p>
+          <h1 className="tv-feature-title tv-rise" style={rise(1)}>
+            {project.name}
+          </h1>
+          <p className="tv-feature-subline tv-rise" style={rise(2)}>
+            <span className="tv-feature-builder">{project.builder}</span>
+            {project.location ? <span>{project.location}</span> : null}
+          </p>
+          {description ? (
+            <p className="tv-feature-details tv-rise" style={rise(3)}>
+              {description}
+            </p>
           ) : null}
         </div>
 
-        <ProjectPhoto project={project} />
+        {!completed && target && daysLeft !== null && daysLeft >= 0 ? (
+          <div className="tv-feature-target tv-rise" style={rise(3)}>
+            <span className="tv-feature-target-label">Target completion</span>
+            <span className="tv-feature-target-date">{target}</span>
+            {countdown ? <span className="tv-feature-target-countdown">{countdown}</span> : null}
+          </div>
+        ) : null}
       </div>
     </section>
   );
 }
 
-export default function ShowcaseTvDisplay({ settings, projects }: ShowcaseTvDisplayProps) {
-  const slides = useMemo<Slide[]>(
-    () => [
-      { kind: "calendar" as const },
-      ...projects.map((project) => ({ kind: "project" as const, project })),
-    ],
-    [projects],
+export default function ShowcaseTvDisplay({
+  settings,
+  projects,
+  initialSlide = 0,
+}: ShowcaseTvDisplayProps) {
+  const slides = useMemo(() => buildSlides(projects), [projects]);
+
+  const durationsMs = useMemo(
+    () =>
+      slides.map(
+        (slide) =>
+          (slide.kind === "feature"
+            ? settings.slideDurationSeconds
+            : settings.calendarSlideDurationSeconds) * 1000,
+      ),
+    [settings.calendarSlideDurationSeconds, settings.slideDurationSeconds, slides],
   );
 
-  const [activeIndex, setActiveIndex] = useState(0);
+  const [activeIndex, setActiveIndex] = useState(initialSlide);
   const [visible, setVisible] = useState(true);
   const [now, setNow] = useState(() => new Date());
 
@@ -434,13 +704,8 @@ export default function ShowcaseTvDisplay({ settings, projects }: ShowcaseTvDisp
       return;
     }
 
-    const current = slides[activeIndex % slides.length];
-    const durationMs =
-      (current.kind === "calendar"
-        ? settings.calendarSlideDurationSeconds
-        : settings.slideDurationSeconds) * 1000;
-
-    const fadeOut = window.setTimeout(() => setVisible(false), durationMs - 500);
+    const durationMs = durationsMs[activeIndex % slides.length];
+    const fadeOut = window.setTimeout(() => setVisible(false), durationMs - 600);
     const advance = window.setTimeout(() => {
       setActiveIndex((index) => (index + 1) % slides.length);
       setVisible(true);
@@ -450,7 +715,7 @@ export default function ShowcaseTvDisplay({ settings, projects }: ShowcaseTvDisp
       window.clearTimeout(fadeOut);
       window.clearTimeout(advance);
     };
-  }, [activeIndex, settings.calendarSlideDurationSeconds, settings.slideDurationSeconds, slides]);
+  }, [activeIndex, durationsMs, slides.length]);
 
   // Pick up newly published projects without anyone touching the TV.
   useEffect(() => {
@@ -462,28 +727,37 @@ export default function ShowcaseTvDisplay({ settings, projects }: ShowcaseTvDisp
   const slide = slides[slideIndex];
 
   return (
-    <div className="showcase-screen">
-      <div className="showcase-backdrop" aria-hidden />
-
-      <div className="showcase-shell">
-        <ShowcaseHeader now={now} />
-
-        <main className={`showcase-stage ${visible ? "showcase-stage--visible" : ""}`}>
-          {slide?.kind === "calendar" ? (
-            <CalendarSlide projects={projects} now={now} />
-          ) : slide?.kind === "project" ? (
-            <ProjectSlide project={slide.project} />
-          ) : (
-            <section className="showcase-slide showcase-slide--empty">
-              <p className="showcase-empty">
-                Add projects in the admin dashboard to populate this display.
-              </p>
-            </section>
-          )}
-        </main>
-
-        <ShowcaseFooter slideCount={slides.length} activeIndex={slideIndex} />
+    <div className={`tv-screen tv-screen--${slide?.kind ?? "intro"}`}>
+      {/* One continuous video under every slide — full strength on the intro, a dim texture elsewhere */}
+      <div className="tv-ambient" aria-hidden>
+        <video
+          className="tv-ambient-video"
+          src={AMBIENT_VIDEO_SRC}
+          poster={AMBIENT_VIDEO_POSTER}
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+        />
       </div>
+
+      <main key={slideIndex} className={`tv-stage${visible ? " tv-stage--visible" : ""}`}>
+        {slide?.kind === "intro" ? (
+          <IntroSlide projects={projects} />
+        ) : slide?.kind === "calendar" ? (
+          <CalendarSlide projects={projects} now={now} />
+        ) : slide?.kind === "spotlight" ? (
+          <SpotlightSlide group={slide.group} now={now} />
+        ) : slide?.kind === "roster" ? (
+          <RosterSlide groups={slide.groups} now={now} />
+        ) : slide?.kind === "feature" ? (
+          <FeatureSlide project={slide.project} durationMs={durationsMs[slideIndex]} />
+        ) : null}
+      </main>
+
+      <TopBar now={now} />
+      <BottomBar activeIndex={slideIndex} durationsMs={durationsMs} />
     </div>
   );
 }

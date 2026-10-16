@@ -20,6 +20,10 @@ const PROJECT_TYPES: ProjectType[] = [
   "Custom Homes",
   "Production Homes",
   "Multi-Family",
+  "Single Family",
+  "Roof Framing",
+  "Remodeling",
+  "Framing",
 ];
 
 type ShowcaseProjectEditorProps = {
