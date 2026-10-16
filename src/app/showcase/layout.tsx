@@ -1,18 +1,11 @@
 import type { Metadata, Viewport } from "next";
-import { Fira_Sans, Poppins } from "next/font/google";
+import { Archivo } from "next/font/google";
 import "./showcase.css";
 
-const firaSans = Fira_Sans({
+const archivo = Archivo({
   subsets: ["latin"],
-  weight: ["400", "600", "700"],
-  variable: "--font-fira",
-  display: "swap",
-});
-
-const poppins = Poppins({
-  subsets: ["latin"],
-  weight: ["400", "600", "700"],
-  variable: "--font-poppins",
+  axes: ["wdth"],
+  variable: "--font-archivo",
   display: "swap",
 });
 
@@ -24,11 +17,9 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#00205b",
+  themeColor: "#050d1f",
 };
 
 export default function ShowcaseLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <div className={`${firaSans.variable} ${poppins.variable} showcase-root`}>{children}</div>
-  );
+  return <div className={`${archivo.variable} tv-root`}>{children}</div>;
 }

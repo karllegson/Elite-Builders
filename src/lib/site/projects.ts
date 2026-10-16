@@ -6,7 +6,11 @@ export type ProjectType =
   | "Condominiums"
   | "Custom Homes"
   | "Production Homes"
-  | "Multi-Family";
+  | "Multi-Family"
+  | "Single Family"
+  | "Roof Framing"
+  | "Remodeling"
+  | "Framing";
 
 export type ProjectStatus = "completed" | "current";
 
