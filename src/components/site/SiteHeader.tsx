@@ -7,7 +7,6 @@ import {
   ArrowRight,
   Building2,
   ChevronDown,
-  ExternalLink,
   Fence,
   HardHat,
   Home,
@@ -321,16 +320,9 @@ export default function SiteHeader({ hasAdminBar = false }: SiteHeaderProps) {
               Projects
             </Link>
 
-            <a
-              href={business.financingUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={navLinkClass(false)}
-            >
+            <Link href="/financing" className={navLinkClass(pathname.startsWith("/financing"))}>
               Financing
-              <ExternalLink size={13} aria-hidden className="opacity-60" />
-              <span className="sr-only">(opens in a new tab)</span>
-            </a>
+            </Link>
 
             <div
               className="relative"
@@ -455,6 +447,7 @@ export default function SiteHeader({ hasAdminBar = false }: SiteHeaderProps) {
             {[
               { href: "/", label: "Home" },
               { href: "/projects", label: "Projects" },
+              { href: "/financing", label: "Financing" },
             ].map((item) => (
               <li key={item.href} className="border-b border-solid border-site-line">
                 <Link
@@ -467,19 +460,6 @@ export default function SiteHeader({ hasAdminBar = false }: SiteHeaderProps) {
               </li>
             ))}
 
-            <li className="border-b border-solid border-site-line">
-              <a
-                href={business.financingUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 py-4 font-display text-lg font-semibold text-brand-ink"
-                onClick={closeMenus}
-              >
-                Financing
-                <ExternalLink size={16} aria-hidden className="opacity-60" />
-                <span className="sr-only">(opens in a new tab)</span>
-              </a>
-            </li>
 
             {(
               [
