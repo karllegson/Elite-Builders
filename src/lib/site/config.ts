@@ -25,6 +25,8 @@ export const business = {
   license: "CSLB #970551",
   licenseNumber: "970551",
   domain: "https://www.elitebuildersco.com",
+  /** Customer financing through RenoFi — linked from the main nav. */
+  financingUrl: "https://pros.renofi.com/pros/elite-builders-ix-corp/financing",
 } as const;
 
 export type SiteService = {
