@@ -15,14 +15,17 @@ export type ShowcaseProjectImage = {
  */
 export type ShowcaseStatus = "bidding" | "current" | "completed" | "lost";
 
-/** Framing stages for an active job, in order. Edit this list to change the dropdown. */
+/**
+ * Stages for an active job, in order — framing, plus siding when it's in scope
+ * (framing-only jobs go Sheathing → Punch list). Edit this list to change the dropdown.
+ */
 export const JOB_STAGES = [
   "Starting",
   "Layout",
   "Walls",
-  "Floors",
   "Roof",
   "Sheathing",
+  "Siding",
   "Punch list",
 ] as const;
 
