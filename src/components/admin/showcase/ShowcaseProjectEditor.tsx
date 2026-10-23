@@ -190,6 +190,7 @@ export function ShowcaseProjectEditor({ projectId }: ShowcaseProjectEditorProps)
               onChange={(event) => setStatus(event.target.value as ShowcaseStatus)}
             >
               <option value="bidding">Bidding</option>
+              <option value="awarded">Awarded (not started)</option>
               <option value="current">In Progress</option>
               <option value="completed">Completed</option>
               <option value="lost">Bid declined</option>

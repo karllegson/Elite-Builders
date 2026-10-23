@@ -16,6 +16,7 @@ import type {
 
 const STATUS_LABELS: Record<ShowcaseStatus, string> = {
   bidding: "Bidding",
+  awarded: "Awarded",
   current: "In Progress",
   completed: "Completed",
   lost: "Bid declined",

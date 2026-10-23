@@ -9,11 +9,11 @@ export type ShowcaseProjectImage = {
 };
 
 /**
- * One list of jobs, mirroring the office whiteboard:
- * bidding (takeoff → sent) → current (awarded, with a work stage) → completed,
- * or a bid ends as lost (declined).
+ * One list of jobs, mirroring the office whiteboards:
+ * bidding (takeoff → sent) → awarded (won, not started) → current (in the field,
+ * with a work stage) → completed. A bid can instead end as lost (declined).
  */
-export type ShowcaseStatus = "bidding" | "current" | "completed" | "lost";
+export type ShowcaseStatus = "bidding" | "awarded" | "current" | "completed" | "lost";
 
 /**
  * Starting list of stages for an active job. The office edits the real list on
@@ -29,7 +29,7 @@ export const DEFAULT_JOB_STAGES = [
   "Punch list",
 ] as const;
 
-/** How long an awarded or declined bid stays on the TV bids board. */
+/** How long a declined bid stays on the bids board. Awarded ones stay until the job starts. */
 export const BID_RESULT_VISIBLE_DAYS = 14;
 
 export type ShowcaseProject = {
@@ -233,15 +233,22 @@ function daysSince(value: string | null): number {
   return Number.isNaN(time) ? Infinity : (Date.now() - time) / 86_400_000;
 }
 
-/** Bids still open, plus bids awarded or declined recently enough to show the result. */
+/** Open bids, awarded jobs waiting to start, and recently declined bids. */
 export function isOnBidsBoard(project: ShowcaseProject): boolean {
-  if (project.status === "bidding") {
+  if (project.status === "bidding" || project.status === "awarded") {
     return true;
   }
 
+  return project.status === "lost" && daysSince(project.bidResultAt) <= BID_RESULT_VISIBLE_DAYS;
+}
+
+/** Bids board order: open bids, then awarded, then declined — each by bid due date. */
+export function compareBidsBoard(a: ShowcaseProject, b: ShowcaseProject): number {
+  const rank = { bidding: 0, awarded: 1, lost: 2, current: 3, completed: 3 } as const;
   return (
-    (project.status === "current" || project.status === "lost") &&
-    daysSince(project.bidResultAt) <= BID_RESULT_VISIBLE_DAYS
+    rank[a.status] - rank[b.status] ||
+    (a.bidDueDate ?? "9999").localeCompare(b.bidDueDate ?? "9999") ||
+    a.name.localeCompare(b.name)
   );
 }
 

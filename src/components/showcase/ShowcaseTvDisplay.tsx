@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useState, type CSSProperties } from "r
 import { builders } from "@/lib/site/builders";
 import { business } from "@/lib/site/config";
 import {
+  compareBidsBoard,
   isOnBidsBoard,
   isWonJob,
   type ShowcaseProject,
@@ -206,14 +207,7 @@ function pageBoard(kind: "bids" | "jobs", rows: ShowcaseProject[]): Slide[] {
  */
 function buildSlides(allProjects: ShowcaseProject[]): Slide[] {
   const projects = allProjects.filter(isWonJob);
-  // Open bids first by due date, then recent awards / declines.
-  const bids = allProjects
-    .filter(isOnBidsBoard)
-    .sort(
-      (a, b) =>
-        Number(a.status !== "bidding") - Number(b.status !== "bidding") ||
-        byDateField("bidDueDate")(a, b),
-    );
+  const bids = allProjects.filter(isOnBidsBoard).sort(compareBidsBoard);
   const active = allProjects
     .filter((project) => project.status === "current")
     .sort(byDateField("dueDate"));
@@ -662,7 +656,7 @@ function BidStatus({ project }: { project: ShowcaseProject }) {
     return <span className="tv-pill tv-pill--lost">Declined</span>;
   }
 
-  if (project.status !== "bidding") {
+  if (project.status === "awarded") {
     return <span className="tv-pill tv-pill--won">Awarded</span>;
   }
 

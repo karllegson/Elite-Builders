@@ -390,6 +390,10 @@
   margin-left: auto;
 }
 
+.db-row-push {
+  margin-left: auto;
+}
+
 .db-check {
   display: inline-flex;
   align-items: center;
@@ -559,7 +563,8 @@
     gap: 8px;
   }
 
-  .db-row-result {
+  .db-row-result,
+  .db-row-push {
     margin-left: 0;
   }
 

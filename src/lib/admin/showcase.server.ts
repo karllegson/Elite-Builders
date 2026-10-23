@@ -237,8 +237,9 @@ export type ShowcaseJobPatch = Partial<
 >;
 
 /**
- * Applies a small edit from the office dashboard. Moving a bid to awarded (current)
- * or declined (lost) stamps bidResultAt so the TV can show the result for a while.
+ * Applies a small edit from the office dashboard. Awarding or declining a bid stamps
+ * bidResultAt (declined bids leave the board after a while); starting a job puts it
+ * on the first stage.
  */
 export async function patchShowcaseProject(
   id: string,
@@ -255,7 +256,7 @@ export async function patchShowcaseProject(
   const next: ShowcaseProject = { ...existing, ...patch, updatedAt: now };
 
   if (patch.status && patch.status !== existing.status) {
-    if (existing.status === "bidding" && (patch.status === "current" || patch.status === "lost")) {
+    if (existing.status === "bidding" && (patch.status === "awarded" || patch.status === "lost")) {
       next.bidResultAt = now;
     } else if (patch.status === "bidding") {
       next.bidResultAt = null;

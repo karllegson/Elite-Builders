@@ -11,7 +11,11 @@ import {
   type NewJobInput,
 } from "@/app/dashboard/actions";
 import type { ShowcaseJobPatch } from "@/lib/admin/showcase.server";
-import { isOnBidsBoard, type ShowcaseProject } from "@/lib/admin/showcaseData";
+import {
+  compareBidsBoard,
+  isOnBidsBoard,
+  type ShowcaseProject,
+} from "@/lib/admin/showcaseData";
 
 type Tab = "bids" | "active" | "done";
 
@@ -84,18 +88,7 @@ export default function JobsBoard({
   const [error, setError] = useState<string | null>(null);
   const [, startTransition] = useTransition();
 
-  // Open bids first by due date, then recent results.
-  const bids = useMemo(
-    () =>
-      jobs
-        .filter(isOnBidsBoard)
-        .sort(
-          (a, b) =>
-            Number(a.status !== "bidding") - Number(b.status !== "bidding") ||
-            byDate("bidDueDate")(a, b),
-        ),
-    [jobs],
-  );
+  const bids = useMemo(() => jobs.filter(isOnBidsBoard).sort(compareBidsBoard), [jobs]);
   const active = useMemo(
     () => jobs.filter((job) => job.status === "current").sort(byDate("dueDate")),
     [jobs],
@@ -390,6 +383,15 @@ function BidRow({ job, editingId, onEdit, onUpdate, onDelete }: RowProps) {
               >
                 Undo
               </button>
+              {job.status === "awarded" ? (
+                <button
+                  type="button"
+                  className="db-btn db-btn--primary db-row-push"
+                  onClick={() => onUpdate(job, { status: "current" })}
+                >
+                  Start job →
+                </button>
+              ) : null}
             </>
           ) : (
             <>
@@ -407,7 +409,7 @@ function BidRow({ job, editingId, onEdit, onUpdate, onDelete }: RowProps) {
                 <button
                   type="button"
                   className="db-btn db-btn--won"
-                  onClick={() => onUpdate(job, { status: "current" })}
+                  onClick={() => onUpdate(job, { status: "awarded" })}
                 >
                   Awarded
                 </button>
