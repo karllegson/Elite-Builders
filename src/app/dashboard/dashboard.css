@@ -627,3 +627,28 @@
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
+
+.db-msg-columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: 16px;
+}
+
+.db-msg-column-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 10px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--db-text-2);
+}
+
+@media (max-width: 760px) {
+  .db-msg-columns {
+    grid-template-columns: 1fr;
+  }
+}

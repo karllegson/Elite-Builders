@@ -1,7 +1,10 @@
 "use client";
 
 import { useTransition } from "react";
-import { deleteMessageAction, markMessageReadAction } from "@/app/dashboard/actions";
+import {
+  deleteMessageAction,
+  markMessageReadAction,
+} from "@/app/dashboard/actions";
 import {
   formatContactFormType,
   formatContactService,
@@ -46,7 +49,9 @@ export default function MessagesList({
   const setRead = (message: ContactSubmission, isRead: boolean) => {
     onError(null);
     const apply = (value: boolean) =>
-      messages.map((item) => (item.id === message.id ? { ...item, isRead: value } : item));
+      messages.map((item) =>
+        item.id === message.id ? { ...item, isRead: value } : item,
+      );
     onChange(apply(isRead));
 
     startTransition(async () => {
@@ -60,7 +65,11 @@ export default function MessagesList({
   };
 
   const remove = (message: ContactSubmission) => {
-    if (!window.confirm(`Delete the message from ${message.name}? This can't be undone.`)) {
+    if (
+      !window.confirm(
+        `Delete the message from ${message.name}? This can't be undone.`,
+      )
+    ) {
       return;
     }
 
@@ -77,57 +86,97 @@ export default function MessagesList({
     });
   };
 
+  const renderMessage = (message: ContactSubmission) => {
+    const details = [
+      message.city,
+      message.service ? formatContactService(message.service) : "",
+      formatContactFormType(message.formType),
+    ].filter(Boolean);
+
+    return (
+      <li
+        key={message.id}
+        className={`db-row db-msg${message.isRead ? " db-row--resolved" : ""}`}
+      >
+        <div className="db-msg-head">
+          <div className="db-job-title">
+            <strong>
+              {message.isRead ? null : (
+                <span className="db-dot" aria-label="Unread" />
+              )}
+              {message.name}
+            </strong>
+            <span>{details.join(" · ")}</span>
+          </div>
+          <span className="db-msg-date">
+            {formatReceived(message.createdAt)}
+          </span>
+        </div>
+
+        <div className="db-msg-contact">
+          <a
+            href={`tel:${message.phone.replace(/[^\d+]/g, "")}`}
+            className="db-btn db-btn--ghost"
+          >
+            {message.phone}
+          </a>
+          {message.email ? (
+            <a
+              href={`mailto:${message.email}`}
+              className="db-btn db-btn--ghost"
+            >
+              {message.email}
+            </a>
+          ) : null}
+          <button
+            type="button"
+            className="db-link db-row-push"
+            onClick={() => setRead(message, !message.isRead)}
+          >
+            {message.isRead ? "Mark unread" : "Mark read"}
+          </button>
+          <button
+            type="button"
+            className="db-link db-link--danger-only"
+            onClick={() => remove(message)}
+          >
+            Delete
+          </button>
+        </div>
+
+        {message.message ? (
+          <p className="db-msg-body">{message.message}</p>
+        ) : null}
+      </li>
+    );
+  };
+
+  const unread = messages.filter((message) => !message.isRead);
+  const read = messages.filter((message) => message.isRead);
+
+  // New on the left, read on the right; stacks (new first) on a phone.
   return (
-    <ul className="db-list">
-      {messages.map((message) => {
-        const details = [
-          message.city,
-          message.service ? formatContactService(message.service) : "",
-          formatContactFormType(message.formType),
-        ].filter(Boolean);
-
-        return (
-          <li key={message.id} className={`db-row db-msg${message.isRead ? " db-row--resolved" : ""}`}>
-            <div className="db-msg-head">
-              <div className="db-job-title">
-                <strong>
-                  {message.isRead ? null : <span className="db-dot" aria-label="Unread" />}
-                  {message.name}
-                </strong>
-                <span>{details.join(" · ")}</span>
-              </div>
-              <span className="db-msg-date">{formatReceived(message.createdAt)}</span>
-            </div>
-
-            <div className="db-msg-contact">
-              <a href={`tel:${message.phone.replace(/[^\d+]/g, "")}`} className="db-btn db-btn--ghost">
-                {message.phone}
-              </a>
-              {message.email ? (
-                <a href={`mailto:${message.email}`} className="db-btn db-btn--ghost">
-                  {message.email}
-                </a>
-              ) : null}
-              <button
-                type="button"
-                className="db-link db-row-push"
-                onClick={() => setRead(message, !message.isRead)}
-              >
-                {message.isRead ? "Mark unread" : "Mark read"}
-              </button>
-              <button
-                type="button"
-                className="db-link db-link--danger-only"
-                onClick={() => remove(message)}
-              >
-                Delete
-              </button>
-            </div>
-
-            {message.message ? <p className="db-msg-body">{message.message}</p> : null}
-          </li>
-        );
-      })}
-    </ul>
+    <div className="db-msg-columns">
+      <section className="db-msg-column" aria-label="New messages">
+        <h2 className="db-msg-column-head">
+          New <span className="db-tab-count">{unread.length}</span>
+        </h2>
+        {unread.length > 0 ? (
+          <ul className="db-list">{unread.map(renderMessage)}</ul>
+        ) : (
+          <p className="db-empty">All caught up.</p>
+        )}
+      </section>
+      <section className="db-msg-column" aria-label="Read messages">
+        <h2 className="db-msg-column-head">
+          Read <span className="db-tab-count">{read.length}</span>
+        </h2>
+        {read.length > 0 ? (
+          <ul className="db-list">{read.map(renderMessage)}</ul>
+        ) : (
+          <p className="db-empty">Messages you mark read move here.</p>
+        )}
+      </section>
+    </div>
   );
 }
