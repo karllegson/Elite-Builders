@@ -16,10 +16,10 @@ export type ShowcaseProjectImage = {
 export type ShowcaseStatus = "bidding" | "current" | "completed" | "lost";
 
 /**
- * Stages for an active job, in order — framing, plus siding when it's in scope
- * (framing-only jobs go Sheathing → Punch list). Edit this list to change the dropdown.
+ * Starting list of stages for an active job. The office edits the real list on
+ * /dashboard (settings.jobStages); this is only the default.
  */
-export const JOB_STAGES = [
+export const DEFAULT_JOB_STAGES = [
   "Starting",
   "Layout",
   "Walls",
@@ -47,7 +47,7 @@ export type ShowcaseProject = {
   bidSent: boolean;
   /** When the bid was awarded or declined — null for jobs that never went through bidding here. */
   bidResultAt: string | null;
-  /** Current framing stage for an active job (one of JOB_STAGES, or free text) */
+  /** Current stage for an active job (one of settings.jobStages, or a since-removed one) */
   stage: string;
   blurb: string;
   /** Extra detail shown on the lobby TV project slide */
@@ -63,7 +63,17 @@ export type ShowcaseProject = {
 export type ShowcaseSettings = {
   slideDurationSeconds: number;
   calendarSlideDurationSeconds: number;
+  /** Ordered stages offered for active jobs and drawn as the TV progress bar */
+  jobStages: string[];
 };
+
+/** Trims, drops blanks and duplicates; falls back to the default list when empty. */
+export function normalizeJobStages(stages: unknown): string[] {
+  const list = Array.isArray(stages)
+    ? [...new Set(stages.map((stage) => String(stage).trim()).filter(Boolean))]
+    : [];
+  return list.length > 0 ? list : [...DEFAULT_JOB_STAGES];
+}
 
 export type ShowcaseStore = {
   version: 1;
@@ -141,16 +151,14 @@ export function createDefaultShowcaseStore(): ShowcaseStore {
     settings: {
       slideDurationSeconds: 12,
       calendarSlideDurationSeconds: 16,
+      jobStages: [...DEFAULT_JOB_STAGES],
     },
     projects,
   };
 }
 
 export function normalizeShowcaseStore(store: ShowcaseStore): ShowcaseStore {
-  const settings = store.settings ?? {
-    slideDurationSeconds: 12,
-    calendarSlideDurationSeconds: 16,
-  };
+  const settings: Partial<ShowcaseSettings> = store.settings ?? {};
 
   const projects = Array.isArray(store.projects)
     ? store.projects.map((project, index) => normalizeShowcaseProject(project, index))
@@ -164,6 +172,7 @@ export function normalizeShowcaseStore(store: ShowcaseStore): ShowcaseStore {
         5,
         settings.calendarSlideDurationSeconds ?? 16,
       ),
+      jobStages: normalizeJobStages(settings.jobStages),
     },
     projects: projects.sort((a, b) => a.displayOrder - b.displayOrder),
   };

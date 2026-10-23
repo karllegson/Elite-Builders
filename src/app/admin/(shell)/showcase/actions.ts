@@ -1,7 +1,10 @@
 "use server";
 
 import { isAuthBypassEnabled } from "@/lib/admin/auth";
-import type { UpsertShowcaseProjectInput } from "@/lib/admin/showcaseData";
+import {
+  DEFAULT_JOB_STAGES,
+  type UpsertShowcaseProjectInput,
+} from "@/lib/admin/showcaseData";
 import {
   deleteShowcaseProjects,
   getShowcaseProjectById,
@@ -43,7 +46,11 @@ export async function fetchShowcaseProjectsAction() {
   } catch (error) {
     return {
       projects: [],
-      settings: { slideDurationSeconds: 12, calendarSlideDurationSeconds: 16 },
+      settings: {
+        slideDurationSeconds: 12,
+        calendarSlideDurationSeconds: 16,
+        jobStages: [...DEFAULT_JOB_STAGES],
+      },
       error: error instanceof Error ? error.message : "Could not load showcase projects.",
     };
   }
@@ -97,7 +104,11 @@ export async function saveShowcaseSettingsAction(settings: {
 }) {
   try {
     await assertAdminAuth();
-    const saved = await updateShowcaseSettings(settings);
+    // Only the timings — the job stage list is edited from /dashboard.
+    const saved = await updateShowcaseSettings({
+      slideDurationSeconds: settings.slideDurationSeconds,
+      calendarSlideDurationSeconds: settings.calendarSlideDurationSeconds,
+    });
     return { settings: saved };
   } catch (error) {
     return {

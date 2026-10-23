@@ -6,15 +6,12 @@ import {
   addJobAction,
   deleteJobAction,
   logoutAction,
+  saveStagesAction,
   updateJobAction,
   type NewJobInput,
 } from "@/app/dashboard/actions";
 import type { ShowcaseJobPatch } from "@/lib/admin/showcase.server";
-import {
-  JOB_STAGES,
-  isOnBidsBoard,
-  type ShowcaseProject,
-} from "@/lib/admin/showcaseData";
+import { isOnBidsBoard, type ShowcaseProject } from "@/lib/admin/showcaseData";
 
 type Tab = "bids" | "active" | "done";
 
@@ -69,11 +66,18 @@ const EMPTY_NEW_JOB: Omit<NewJobInput, "status"> = {
   builder: "",
   bidDueDate: null,
   dueDate: null,
-  stage: "Starting",
 };
 
-export default function JobsBoard({ initialJobs }: { initialJobs: ShowcaseProject[] }) {
+export default function JobsBoard({
+  initialJobs,
+  initialStages,
+}: {
+  initialJobs: ShowcaseProject[];
+  initialStages: string[];
+}) {
   const [jobs, setJobs] = useState(initialJobs);
+  const [stages, setStages] = useState(initialStages);
+  const [editingStages, setEditingStages] = useState(false);
   const [tab, setTab] = useState<Tab>("bids");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [adding, setAdding] = useState(false);
@@ -157,6 +161,21 @@ export default function JobsBoard({ initialJobs }: { initialJobs: ShowcaseProjec
     });
   };
 
+  const saveStages = (next: string[]) => {
+    setError(null);
+
+    startTransition(async () => {
+      const result = await saveStagesAction(next);
+
+      if (result.stages) {
+        setStages(result.stages);
+        setEditingStages(false);
+      } else {
+        setError(result.error ?? "Could not save the stages.");
+      }
+    });
+  };
+
   const tabs: { key: Tab; label: string; count: number }[] = [
     { key: "bids", label: "Bids", count: bids.filter((job) => job.status === "bidding").length },
     { key: "active", label: "Active jobs", count: active.length },
@@ -201,6 +220,7 @@ export default function JobsBoard({ initialJobs }: { initialJobs: ShowcaseProjec
             onClick={() => {
               setTab(item.key);
               setAdding(false);
+              setEditingStages(false);
               setEditingId(null);
             }}
           >
@@ -217,22 +237,37 @@ export default function JobsBoard({ initialJobs }: { initialJobs: ShowcaseProjec
       ) : null}
 
       <main className="db-main">
-        {tab !== "done" ? (
-          adding ? (
-            <NewJobForm
-              kind={tab === "bids" ? "bidding" : "current"}
-              onCancel={() => setAdding(false)}
-              onSubmit={add}
-            />
-          ) : (
-            <button
-              type="button"
-              className="db-btn db-btn--primary db-add"
-              onClick={() => setAdding(true)}
-            >
+        {tab !== "done" && !adding && !editingStages ? (
+          <div className="db-toolbar">
+            <button type="button" className="db-btn db-btn--primary" onClick={() => setAdding(true)}>
               + {tab === "bids" ? "Add bid" : "Add active job"}
             </button>
-          )
+            {tab === "active" ? (
+              <button
+                type="button"
+                className="db-btn db-btn--ghost"
+                onClick={() => setEditingStages(true)}
+              >
+                Edit stages
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {adding ? (
+          <NewJobForm
+            kind={tab === "bids" ? "bidding" : "current"}
+            onCancel={() => setAdding(false)}
+            onSubmit={add}
+          />
+        ) : null}
+
+        {editingStages ? (
+          <StagesEditor
+            stages={stages}
+            onCancel={() => setEditingStages(false)}
+            onSave={saveStages}
+          />
         ) : null}
 
         {tab === "bids" ? (
@@ -244,7 +279,7 @@ export default function JobsBoard({ initialJobs }: { initialJobs: ShowcaseProjec
         ) : tab === "active" ? (
           <JobList empty="No active jobs.">
             {active.map((job) => (
-              <ActiveRow key={job.id} job={job} {...rowProps} />
+              <ActiveRow key={job.id} job={job} stages={stages} {...rowProps} />
             ))}
           </JobList>
         ) : (
@@ -398,12 +433,16 @@ function BidRow({ job, editingId, onEdit, onUpdate, onDelete }: RowProps) {
   );
 }
 
-function ActiveRow({ job, editingId, onEdit, onUpdate, onDelete }: RowProps) {
-  const stages: string[] = [...JOB_STAGES];
-
-  if (job.stage && !stages.includes(job.stage)) {
-    stages.push(job.stage);
-  }
+function ActiveRow({
+  job,
+  stages: stageList,
+  editingId,
+  onEdit,
+  onUpdate,
+  onDelete,
+}: RowProps & { stages: string[] }) {
+  // Keep a since-removed stage selectable so the job doesn't silently change.
+  const stages = job.stage && !stageList.includes(job.stage) ? [...stageList, job.stage] : stageList;
 
   return (
     <li className="db-row">
@@ -558,6 +597,93 @@ function JobEditor({
         </button>
         <button type="submit" className="db-btn db-btn--primary">
           Save
+        </button>
+      </div>
+    </form>
+  );
+}
+
+function StagesEditor({
+  stages,
+  onCancel,
+  onSave,
+}: {
+  stages: string[];
+  onCancel: () => void;
+  onSave: (stages: string[]) => void;
+}) {
+  const [draft, setDraft] = useState(stages);
+
+  const move = (index: number, offset: number) => {
+    const next = [...draft];
+    const [item] = next.splice(index, 1);
+    next.splice(index + offset, 0, item);
+    setDraft(next);
+  };
+
+  return (
+    <form
+      className="db-editor db-editor--new"
+      onSubmit={(event) => {
+        event.preventDefault();
+        onSave(draft);
+      }}
+    >
+      <h2>Job stages</h2>
+      <p className="db-hint">
+        In order, first to last. New and newly awarded jobs start on the first one. The TV shows
+        progress along this list.
+      </p>
+      <ol className="db-stage-list">
+        {draft.map((stage, index) => (
+          <li key={index}>
+            <span className="db-stage-num">{index + 1}</span>
+            <input
+              value={stage}
+              aria-label={`Stage ${index + 1}`}
+              onChange={(event) =>
+                setDraft(draft.map((item, position) => (position === index ? event.target.value : item)))
+              }
+            />
+            <button
+              type="button"
+              className="db-icon-btn"
+              aria-label="Move up"
+              disabled={index === 0}
+              onClick={() => move(index, -1)}
+            >
+              ↑
+            </button>
+            <button
+              type="button"
+              className="db-icon-btn"
+              aria-label="Move down"
+              disabled={index === draft.length - 1}
+              onClick={() => move(index, 1)}
+            >
+              ↓
+            </button>
+            <button
+              type="button"
+              className="db-icon-btn db-icon-btn--danger"
+              aria-label="Remove stage"
+              disabled={draft.length === 1}
+              onClick={() => setDraft(draft.filter((_, position) => position !== index))}
+            >
+              ✕
+            </button>
+          </li>
+        ))}
+      </ol>
+      <div className="db-editor-actions">
+        <button type="button" className="db-link db-link--push" onClick={() => setDraft([...draft, ""])}>
+          + Add stage
+        </button>
+        <button type="button" className="db-btn db-btn--ghost" onClick={onCancel}>
+          Cancel
+        </button>
+        <button type="submit" className="db-btn db-btn--primary">
+          Save stages
         </button>
       </div>
     </form>

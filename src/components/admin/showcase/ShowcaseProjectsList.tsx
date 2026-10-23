@@ -40,6 +40,7 @@ export function ShowcaseProjectsList() {
   const [settings, setSettings] = useState<ShowcaseSettings>({
     slideDurationSeconds: 12,
     calendarSlideDurationSeconds: 16,
+    jobStages: [],
   });
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);

@@ -286,13 +286,13 @@ body {
 }
 
 .tv-clock-time {
-  font-size: calc(var(--u) * 3.4);
+  font-size: calc(var(--u) * 4.6);
   font-weight: 600;
   letter-spacing: -0.02em;
 }
 
 .tv-clock-date {
-  font-size: calc(var(--u) * 1.5);
+  font-size: calc(var(--u) * 2.1);
   font-weight: 500;
   color: rgb(255 255 255 / 0.72);
 }

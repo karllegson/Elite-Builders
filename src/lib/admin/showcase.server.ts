@@ -262,7 +262,7 @@ export async function patchShowcaseProject(
     }
 
     if (patch.status === "current" && !next.stage) {
-      next.stage = "Starting";
+      next.stage = store.settings.jobStages[0] ?? "";
     }
   }
 

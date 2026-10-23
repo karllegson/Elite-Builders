@@ -7,7 +7,15 @@ import {
   upsertShowcaseProject,
   type ShowcaseJobPatch,
 } from "@/lib/admin/showcase.server";
-import type { ShowcaseProject, ShowcaseStatus } from "@/lib/admin/showcaseData";
+import {
+  getShowcaseSettings,
+  updateShowcaseSettings,
+} from "@/lib/admin/showcase.server";
+import {
+  normalizeJobStages,
+  type ShowcaseProject,
+  type ShowcaseStatus,
+} from "@/lib/admin/showcaseData";
 import {
   assertDashboardSession,
   checkDashboardPassword,
@@ -48,7 +56,6 @@ export type NewJobInput = {
   builder: string;
   bidDueDate: string | null;
   dueDate: string | null;
-  stage: string;
 };
 
 export async function addJobAction(input: NewJobInput): Promise<JobResult> {
@@ -59,6 +66,7 @@ export async function addJobAction(input: NewJobInput): Promise<JobResult> {
       return { error: "Job name is required." };
     }
 
+    const { jobStages } = await getShowcaseSettings();
     const job = await upsertShowcaseProject({
       name: input.name,
       location: input.location,
@@ -67,7 +75,7 @@ export async function addJobAction(input: NewJobInput): Promise<JobResult> {
       status: input.status,
       dueDate: input.dueDate,
       bidDueDate: input.bidDueDate,
-      stage: input.status === "current" ? input.stage || "Starting" : "",
+      stage: input.status === "current" ? (jobStages[0] ?? "") : "",
       blurb: "",
       details: "",
       featuredImage: null,
@@ -93,6 +101,18 @@ export async function updateJobAction(id: string, patch: ShowcaseJobPatch): Prom
     return { job };
   } catch (error) {
     return { error: errorMessage(error, "Could not save the change.") };
+  }
+}
+
+export async function saveStagesAction(
+  stages: string[],
+): Promise<{ stages?: string[]; error?: string }> {
+  try {
+    await assertDashboardSession();
+    const saved = await updateShowcaseSettings({ jobStages: normalizeJobStages(stages) });
+    return { stages: saved.jobStages };
+  } catch (error) {
+    return { error: errorMessage(error, "Could not save the stages.") };
   }
 }
 

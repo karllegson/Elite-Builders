@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import JobsBoard from "@/components/dashboard/JobsBoard";
-import { listShowcaseProjects } from "@/lib/admin/showcase.server";
+import { getShowcaseSettings, listShowcaseProjects } from "@/lib/admin/showcase.server";
 import { hasDashboardSession } from "@/lib/dashboard/session";
 
 export const dynamic = "force-dynamic";
@@ -10,7 +10,7 @@ export default async function DashboardPage() {
     redirect("/dashboard/login");
   }
 
-  const jobs = await listShowcaseProjects();
+  const [jobs, settings] = await Promise.all([listShowcaseProjects(), getShowcaseSettings()]);
 
-  return <JobsBoard initialJobs={jobs} />;
+  return <JobsBoard initialJobs={jobs} initialStages={settings.jobStages} />;
 }

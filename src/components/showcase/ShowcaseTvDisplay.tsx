@@ -5,7 +5,6 @@ import { useCallback, useEffect, useMemo, useState, type CSSProperties } from "r
 import { builders } from "@/lib/site/builders";
 import { business } from "@/lib/site/config";
 import {
-  JOB_STAGES,
   isOnBidsBoard,
   isWonJob,
   type ShowcaseProject,
@@ -748,15 +747,15 @@ function BidsSlide({
   );
 }
 
-function StageTrack({ stage }: { stage: string }) {
-  const index = JOB_STAGES.findIndex((item) => item === stage);
+function StageTrack({ stage, stages }: { stage: string; stages: string[] }) {
+  const index = stages.findIndex((item) => item === stage);
 
   return (
     <span className="tv-stage-track">
       <span className="tv-stage-name">{stage || "—"}</span>
       {index >= 0 ? (
         <span className="tv-stage-bar" aria-hidden>
-          {JOB_STAGES.map((item, position) => (
+          {stages.map((item, position) => (
             <span
               key={item}
               className={`tv-stage-seg${position < index ? " tv-stage-seg--done" : ""}${
@@ -772,12 +771,14 @@ function StageTrack({ stage }: { stage: string }) {
 
 function JobsSlide({
   rows,
+  stages,
   total,
   page,
   pages,
   now,
 }: {
   rows: ShowcaseProject[];
+  stages: string[];
   total: number;
   page: number;
   pages: number;
@@ -823,7 +824,7 @@ function JobsSlide({
                 {project.builder || "—"}
               </span>
               <span role="cell">
-                <StageTrack stage={project.stage} />
+                <StageTrack stage={project.stage} stages={stages} />
               </span>
               {showTarget ? (
                 <span className="tv-board-date" role="cell">
@@ -1013,7 +1014,7 @@ export default function ShowcaseTvDisplay({
         ) : slide?.kind === "bids" ? (
           <BidsSlide rows={slide.rows} total={openBids} page={slide.page} pages={slide.pages} now={now} />
         ) : slide?.kind === "jobs" ? (
-          <JobsSlide rows={slide.rows} total={activeJobs} page={slide.page} pages={slide.pages} now={now} />
+          <JobsSlide rows={slide.rows} stages={settings.jobStages} total={activeJobs} page={slide.page} pages={slide.pages} now={now} />
         ) : slide?.kind === "calendar" ? (
           <CalendarSlide projects={wonProjects} now={now} />
         ) : slide?.kind === "spotlight" ? (

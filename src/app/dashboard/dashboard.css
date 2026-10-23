@@ -91,8 +91,12 @@
   cursor: pointer;
 }
 
+.db-link--push,
 .db-link--danger {
   margin-right: auto;
+}
+
+.db-link--danger {
   color: var(--db-red) !important;
 }
 
@@ -224,8 +228,67 @@
   background: var(--db-red-bg);
 }
 
-.db-add {
+.db-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
   margin-bottom: 12px;
+}
+
+.db-hint {
+  margin: -4px 0 0;
+  font-size: 13px;
+  color: var(--db-text-2);
+}
+
+.db-stage-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.db-stage-list li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.db-stage-num {
+  width: 24px;
+  font-weight: 700;
+  text-align: right;
+  color: var(--db-text-2);
+}
+
+.db-stage-list input {
+  flex: 1;
+  min-width: 0;
+  min-height: 40px;
+  padding: 0 10px;
+  border: 1px solid var(--db-line);
+  border-radius: 8px;
+  font-size: 16px;
+}
+
+.db-icon-btn {
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--db-line);
+  border-radius: 8px;
+  background: var(--db-surface);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.db-icon-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.db-icon-btn--danger {
+  color: var(--db-red) !important;
 }
 
 /* ── Rows ────────────────────────────── */
