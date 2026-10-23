@@ -6,7 +6,6 @@ import { builders } from "@/lib/site/builders";
 import {
   CA_CITY_POINTS,
   CA_COUNTY_LINES_PATH,
-  CA_MAP_VIEWBOX,
   CA_OUTLINE_PATH,
 } from "@/lib/site/californiaMap";
 import { business } from "@/lib/site/config";
@@ -872,6 +871,37 @@ const MAP_LANDMARKS: [string, "left" | "right"][] = [
 
 const MAP_HQ_CITY = "Modesto";
 
+/** Full-state map space is 600 wide × 680 tall (see CA_MAP_VIEWBOX). */
+const MAP_FULL_WIDTH = 600;
+const MAP_FULL_SIZE = 680;
+
+/** Default framing: Northern California, north border down to about Fresno. */
+const MAP_NORCAL_FRAME = { x: 20, y: 0, size: 470 };
+
+/**
+ * Square window onto the map: Northern California, widened to keep every dot in
+ * view (with room for its glow) if jobs show up further south.
+ */
+function mapView(places: MapPlace[]): { x: number; y: number; size: number } {
+  const pad = 40;
+  let minX = MAP_NORCAL_FRAME.x;
+  let minY = MAP_NORCAL_FRAME.y;
+  let maxX = MAP_NORCAL_FRAME.x + MAP_NORCAL_FRAME.size;
+  let maxY = MAP_NORCAL_FRAME.y + MAP_NORCAL_FRAME.size;
+
+  places.forEach((place) => {
+    minX = Math.min(minX, place.x - pad);
+    minY = Math.min(minY, place.y - pad);
+    maxX = Math.max(maxX, place.x + pad);
+    maxY = Math.max(maxY, place.y + pad);
+  });
+
+  const size = Math.min(MAP_FULL_SIZE, Math.max(maxX - minX, maxY - minY));
+  const x = Math.max(0, Math.min(MAP_FULL_WIDTH - size, (minX + maxX - size) / 2));
+  const y = Math.max(0, Math.min(MAP_FULL_SIZE - size, (minY + maxY - size) / 2));
+  return { x, y, size };
+}
+
 type MapPlace = { city: string; x: number; y: number; active: number; done: number };
 
 /** Longest names first so "South San Francisco" wins over "San Francisco". */
@@ -928,34 +958,46 @@ function MapSlide({ projects }: { projects: ShowcaseProject[] }) {
     .sort((a, b) => b.active - a.active || a.city.localeCompare(b.city));
   const activeJobs = places.reduce((total, place) => total + place.active, 0);
   const doneJobs = places.reduce((total, place) => total + place.done, 0);
+  const view = mapView(places);
+  // Keeps dots and labels the same size on screen however far the map is zoomed.
+  const k = view.size / MAP_FULL_SIZE;
+  const hq = CA_CITY_POINTS[MAP_HQ_CITY];
 
   return (
     <section className="tv-slide tv-panel tv-map">
       <div className="tv-map-art tv-rise" style={rise(1)}>
-        <svg viewBox={CA_MAP_VIEWBOX} role="img" aria-label="Map of California job locations">
+        <svg
+          viewBox={`${view.x} ${view.y} ${view.size} ${view.size}`}
+          role="img"
+          aria-label="Map of Northern California job locations"
+        >
           <path d={CA_OUTLINE_PATH} className="tv-map-land" />
           <path d={CA_COUNTY_LINES_PATH} className="tv-map-counties" />
           {MAP_LANDMARKS.map(([city, side]) => {
             const [x, y] = CA_CITY_POINTS[city];
 
             return (
-              <g key={city} className="tv-map-landmark">
-                <circle cx={x} cy={y} r={1.6} />
-                <text x={side === "left" ? x - 14 : x + 7} y={y + 3} textAnchor={side === "left" ? "end" : "start"}>
+              <g key={city} className="tv-map-landmark" style={{ fontSize: 10 * k }}>
+                <circle cx={x} cy={y} r={1.6 * k} />
+                <text
+                  x={side === "left" ? x - 14 * k : x + 7 * k}
+                  y={y + 3 * k}
+                  textAnchor={side === "left" ? "end" : "start"}
+                >
                   {city}
                 </text>
               </g>
             );
           })}
-          <g className="tv-map-hq">
+          <g className="tv-map-hq" style={{ fontSize: 10 * k }}>
             <rect
-              x={CA_CITY_POINTS[MAP_HQ_CITY][0] - 4}
-              y={CA_CITY_POINTS[MAP_HQ_CITY][1] - 4}
-              width={8}
-              height={8}
-              transform={`rotate(45 ${CA_CITY_POINTS[MAP_HQ_CITY][0]} ${CA_CITY_POINTS[MAP_HQ_CITY][1]})`}
+              x={hq[0] - 4 * k}
+              y={hq[1] - 4 * k}
+              width={8 * k}
+              height={8 * k}
+              transform={`rotate(45 ${hq[0]} ${hq[1]})`}
             />
-            <text x={CA_CITY_POINTS[MAP_HQ_CITY][0] + 9} y={CA_CITY_POINTS[MAP_HQ_CITY][1] + 3.5}>
+            <text x={hq[0] + 9 * k} y={hq[1] + 3.5 * k}>
               HQ
             </text>
           </g>
@@ -966,12 +1008,12 @@ function MapSlide({ projects }: { projects: ShowcaseProject[] }) {
                 key={`done-${place.city}`}
                 cx={place.x}
                 cy={place.y}
-                r={3 + Math.sqrt(place.done) * 1.6}
+                r={(3 + Math.sqrt(place.done) * 1.6) * k}
                 className="tv-map-dot tv-map-dot--done"
               />
             ))}
           {activeCities.map((place, index) => {
-            const radius = 4.5 + Math.sqrt(place.active) * 2.2;
+            const radius = (4.5 + Math.sqrt(place.active) * 2.2) * k;
 
             return (
               <g key={`active-${place.city}`} style={{ "--i": index } as CSSProperties}>

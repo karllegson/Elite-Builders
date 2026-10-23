@@ -972,7 +972,13 @@ body {
   display: block;
   width: 100%;
   height: 100%;
-  overflow: visible;
+  overflow: hidden;
+}
+
+/* The zoomed map is cut off at the edges — fade the cut instead of a hard line. */
+.tv-map-art {
+  -webkit-mask-image: radial-gradient(closest-side, #000 78%, transparent 100%);
+  mask-image: radial-gradient(closest-side, #000 78%, transparent 100%);
 }
 
 .tv-map-land {
@@ -980,6 +986,7 @@ body {
   stroke: var(--tv-line-strong);
   stroke-width: 1.2;
   stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
 }
 
 .tv-map-counties {
@@ -987,6 +994,7 @@ body {
   stroke: rgb(255 255 255 / 0.07);
   stroke-width: 0.6;
   stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
 }
 
 .tv-map-landmark circle {
@@ -996,7 +1004,6 @@ body {
 .tv-map-landmark text,
 .tv-map-hq text {
   font-family: var(--font-archivo), system-ui, sans-serif;
-  font-size: 10px;
   font-weight: 500;
   letter-spacing: 0.06em;
   fill: rgb(232 237 245 / 0.38);
@@ -1020,6 +1027,7 @@ body {
   fill: #3ccf7a;
   stroke: var(--tv-ink);
   stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
 }
 
 .tv-map-pulse {
