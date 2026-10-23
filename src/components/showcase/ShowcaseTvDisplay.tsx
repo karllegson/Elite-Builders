@@ -3,7 +3,12 @@
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useState, type CSSProperties } from "react";
 import { builders } from "@/lib/site/builders";
-import { CA_CITY_POINTS, CA_MAP_VIEWBOX, CA_OUTLINE_PATH } from "@/lib/site/californiaMap";
+import {
+  CA_CITY_POINTS,
+  CA_COUNTY_LINES_PATH,
+  CA_MAP_VIEWBOX,
+  CA_OUTLINE_PATH,
+} from "@/lib/site/californiaMap";
 import { business } from "@/lib/site/config";
 import {
   compareBidsBoard,
@@ -855,6 +860,18 @@ function JobsSlide({
   );
 }
 
+/** Faint reference labels so the state reads at a glance; [city, label side]. */
+const MAP_LANDMARKS: [string, "left" | "right"][] = [
+  ["San Francisco", "left"],
+  ["Sacramento", "right"],
+  ["Fresno", "right"],
+  ["Los Angeles", "left"],
+  ["San Diego", "left"],
+  ["Redding", "right"],
+];
+
+const MAP_HQ_CITY = "Modesto";
+
 type MapPlace = { city: string; x: number; y: number; active: number; done: number };
 
 /** Longest names first so "South San Francisco" wins over "San Francisco". */
@@ -917,6 +934,31 @@ function MapSlide({ projects }: { projects: ShowcaseProject[] }) {
       <div className="tv-map-art tv-rise" style={rise(1)}>
         <svg viewBox={CA_MAP_VIEWBOX} role="img" aria-label="Map of California job locations">
           <path d={CA_OUTLINE_PATH} className="tv-map-land" />
+          <path d={CA_COUNTY_LINES_PATH} className="tv-map-counties" />
+          {MAP_LANDMARKS.map(([city, side]) => {
+            const [x, y] = CA_CITY_POINTS[city];
+
+            return (
+              <g key={city} className="tv-map-landmark">
+                <circle cx={x} cy={y} r={1.6} />
+                <text x={side === "left" ? x - 14 : x + 7} y={y + 3} textAnchor={side === "left" ? "end" : "start"}>
+                  {city}
+                </text>
+              </g>
+            );
+          })}
+          <g className="tv-map-hq">
+            <rect
+              x={CA_CITY_POINTS[MAP_HQ_CITY][0] - 4}
+              y={CA_CITY_POINTS[MAP_HQ_CITY][1] - 4}
+              width={8}
+              height={8}
+              transform={`rotate(45 ${CA_CITY_POINTS[MAP_HQ_CITY][0]} ${CA_CITY_POINTS[MAP_HQ_CITY][1]})`}
+            />
+            <text x={CA_CITY_POINTS[MAP_HQ_CITY][0] + 9} y={CA_CITY_POINTS[MAP_HQ_CITY][1] + 3.5}>
+              HQ
+            </text>
+          </g>
           {places
             .filter((place) => place.done > 0)
             .map((place) => (
