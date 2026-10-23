@@ -12,7 +12,7 @@ export const business = {
     "Family-owned framing-first specialists since 2012 — known for integrity, straight answers, and experienced crews who treat every structure like their own across the Bay Area, Central Valley, and Southern California.",
   phone: "(209) 484-2743",
   phoneHref: "tel:+12094842743",
-  email: "marketing@elitebuildersco.com",
+  email: "estimating@elitebuildersco.com",
   foundedYear: 2012,
   address: {
     street: "450 Burney Street",
