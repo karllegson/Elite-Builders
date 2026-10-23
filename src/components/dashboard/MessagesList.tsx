@@ -167,7 +167,7 @@ export default function MessagesList({
           <p className="db-empty">All caught up.</p>
         )}
       </section>
-      <section className="db-msg-column" aria-label="Read messages">
+      <section className="db-msg-column db-msg-column--read" aria-label="Read messages">
         <h2 className="db-msg-column-head">
           Read <span className="db-tab-count">{read.length}</span>
         </h2>

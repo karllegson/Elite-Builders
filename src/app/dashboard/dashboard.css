@@ -630,7 +630,7 @@
 
 .db-msg-columns {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
   align-items: start;
   gap: 16px;
 }
@@ -651,4 +651,37 @@
   .db-msg-columns {
     grid-template-columns: 1fr;
   }
+}
+
+/* Read messages stay out of the way: narrower, faded, two-line preview. */
+.db-msg-column--read .db-msg {
+  gap: 6px;
+  padding: 10px 14px;
+  border-style: dashed;
+  background: transparent;
+  opacity: 0.6;
+  transition: opacity 0.15s ease;
+}
+
+.db-msg-column--read .db-msg:hover,
+.db-msg-column--read .db-msg:focus-within {
+  opacity: 1;
+}
+
+.db-msg-column--read .db-job-title strong {
+  font-size: 14px;
+}
+
+.db-msg-column--read .db-msg-contact .db-btn {
+  min-height: 28px;
+  padding: 0 10px;
+  font-size: 13px;
+}
+
+.db-msg-column--read .db-msg-body {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-size: 13px;
 }
