@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useState, type CSSProperties } from "react";
 import { builders } from "@/lib/site/builders";
+import { CA_CITY_POINTS, CA_MAP_VIEWBOX, CA_OUTLINE_PATH } from "@/lib/site/californiaMap";
 import { business } from "@/lib/site/config";
 import {
   compareBidsBoard,
@@ -30,6 +31,7 @@ type Slide =
   | { kind: "intro" }
   | { kind: "bids"; rows: ShowcaseProject[]; page: number; pages: number }
   | { kind: "jobs"; rows: ShowcaseProject[]; page: number; pages: number }
+  | { kind: "map" }
   | { kind: "calendar" }
   | { kind: "spotlight"; group: ClientGroup }
   | { kind: "roster"; groups: ClientGroup[] }
@@ -216,7 +218,12 @@ function buildSlides(allProjects: ShowcaseProject[]): Slide[] {
   const active = allProjects
     .filter((project) => project.status === "current")
     .sort(byDateField("dueDate"));
-  const slides: Slide[] = [{ kind: "intro" }, ...pageBoard("bids", bids), ...pageBoard("jobs", active)];
+  const slides: Slide[] = [
+    { kind: "intro" },
+    ...pageBoard("bids", bids),
+    ...pageBoard("jobs", active),
+    ...(placeOnMap(allProjects).length > 0 ? [{ kind: "map" } as const] : []),
+  ];
 
   if (!SHOW_EXTRA_SLIDES) {
     return slides;
@@ -345,10 +352,18 @@ function BottomBar({ activeIndex, durationsMs }: { activeIndex: number; duration
   );
 }
 
-function IntroSlide({ projects }: { projects: ShowcaseProject[] }) {
+function IntroSlide({
+  projects,
+  activeCount,
+  bidCount,
+}: {
+  projects: ShowcaseProject[];
+  activeCount: number;
+  bidCount: number;
+}) {
   const groups = useMemo(() => groupByClient(projects), [projects]);
-  const jobs = useCountUp(projects.length);
-  const clients = useCountUp(groups.length);
+  const jobs = useCountUp(activeCount);
+  const bids = useCountUp(bidCount);
   const years = useCountUp(new Date().getFullYear() - business.foundedYear);
 
   // Everyone on the board, plus past builders from the site roster that have logos.
@@ -385,7 +400,7 @@ function IntroSlide({ projects }: { projects: ShowcaseProject[] }) {
         <dl className="tv-stats">
           {[
             { value: jobs, label: "Active jobs" },
-            { value: clients, label: "Builders & GCs" },
+            { value: bids, label: "Open bids" },
             { value: years, label: "Years framing" },
           ].map((stat, index) => (
             <div key={stat.label} className="tv-stat tv-rise" style={rise(index + 2)}>
@@ -840,6 +855,131 @@ function JobsSlide({
   );
 }
 
+type MapPlace = { city: string; x: number; y: number; active: number; done: number };
+
+/** Longest names first so "South San Francisco" wins over "San Francisco". */
+const MAP_CITIES = Object.keys(CA_CITY_POINTS).sort((a, b) => b.length - a.length);
+
+function findMapCity(project: ShowcaseProject): string | null {
+  const haystacks = [project.location, project.name].map((text) =>
+    ` ${text.toLowerCase().replace(/\bsaint\b/g, "st.").replace(/\bst\b(?!\.)/g, "st.")} `,
+  );
+
+  for (const city of MAP_CITIES) {
+    const needle = city.toLowerCase();
+    // A city name followed by a street suffix is an address ("2417 San Carlos Ave"), not the city.
+    const pattern = new RegExp(
+      `[^a-z]${needle.replace(".", "\\.")}(?![a-z]|\\s+(?:ave|avenue|st|street|rd|road|dr|drive|blvd|way|ln|lane|ct|court|pl|cir)\\b)`,
+    );
+
+    if (haystacks.some((text) => pattern.test(text))) {
+      return city;
+    }
+  }
+
+  return null;
+}
+
+/** Active and completed jobs grouped by the city we can place them in. */
+function placeOnMap(projects: ShowcaseProject[]): MapPlace[] {
+  const places = new Map<string, MapPlace>();
+
+  projects.forEach((project) => {
+    if (project.status !== "current" && project.status !== "completed") {
+      return;
+    }
+
+    const city = findMapCity(project);
+
+    if (!city) {
+      return;
+    }
+
+    const [x, y] = CA_CITY_POINTS[city];
+    const place = places.get(city) ?? { city, x, y, active: 0, done: 0 };
+    place[project.status === "current" ? "active" : "done"] += 1;
+    places.set(city, place);
+  });
+
+  return [...places.values()];
+}
+
+function MapSlide({ projects }: { projects: ShowcaseProject[] }) {
+  const places = useMemo(() => placeOnMap(projects), [projects]);
+  const activeCities = places
+    .filter((place) => place.active > 0)
+    .sort((a, b) => b.active - a.active || a.city.localeCompare(b.city));
+  const activeJobs = places.reduce((total, place) => total + place.active, 0);
+  const doneJobs = places.reduce((total, place) => total + place.done, 0);
+
+  return (
+    <section className="tv-slide tv-panel tv-map">
+      <div className="tv-map-art tv-rise" style={rise(1)}>
+        <svg viewBox={CA_MAP_VIEWBOX} role="img" aria-label="Map of California job locations">
+          <path d={CA_OUTLINE_PATH} className="tv-map-land" />
+          {places
+            .filter((place) => place.done > 0)
+            .map((place) => (
+              <circle
+                key={`done-${place.city}`}
+                cx={place.x}
+                cy={place.y}
+                r={3 + Math.sqrt(place.done) * 1.6}
+                className="tv-map-dot tv-map-dot--done"
+              />
+            ))}
+          {activeCities.map((place, index) => {
+            const radius = 4.5 + Math.sqrt(place.active) * 2.2;
+
+            return (
+              <g key={`active-${place.city}`} style={{ "--i": index } as CSSProperties}>
+                <circle cx={place.x} cy={place.y} r={radius} className="tv-map-pulse" />
+                <circle cx={place.x} cy={place.y} r={radius} className="tv-map-dot tv-map-dot--active" />
+              </g>
+            );
+          })}
+        </svg>
+      </div>
+
+      <div className="tv-map-side">
+        <header className="tv-rise" style={rise(0)}>
+          <p className="tv-eyebrow">Our footprint</p>
+          <h1 className="tv-panel-title">Where we&apos;re framing</h1>
+        </header>
+
+        <ul className="tv-map-legend tv-rise" style={rise(1)}>
+          <li>
+            <span className="tv-map-key tv-map-key--active" aria-hidden />
+            <span className="tv-map-legend-num">{activeJobs}</span>
+            Active {activeJobs === 1 ? "job" : "jobs"}
+          </li>
+          {doneJobs > 0 ? (
+            <li>
+              <span className="tv-map-key tv-map-key--done" aria-hidden />
+              <span className="tv-map-legend-num">{doneJobs}</span>
+              Completed
+            </li>
+          ) : null}
+        </ul>
+
+        <ol className="tv-map-cities">
+          {activeCities.slice(0, 8).map((place, index) => (
+            <li key={place.city} className="tv-rise" style={rise(index + 2)}>
+              <span>{place.city}</span>
+              <span className="tv-map-city-count">{place.active}</span>
+            </li>
+          ))}
+          {activeCities.length > 8 ? (
+            <li className="tv-map-more tv-rise" style={rise(10)}>
+              +{activeCities.length - 8} more cities
+            </li>
+          ) : null}
+        </ol>
+      </div>
+    </section>
+  );
+}
+
 function FeatureSlide({ project, durationMs }: { project: ShowcaseProject; durationMs: number }) {
   const photo = project.featuredImage;
   const completed = project.status === "completed";
@@ -1011,11 +1151,13 @@ export default function ShowcaseTvDisplay({
 
       <main key={slideIndex} className={`tv-stage${visible ? " tv-stage--visible" : ""}`}>
         {slide?.kind === "intro" ? (
-          <IntroSlide projects={wonProjects} />
+          <IntroSlide projects={wonProjects} activeCount={activeJobs} bidCount={openBids} />
         ) : slide?.kind === "bids" ? (
           <BidsSlide rows={slide.rows} total={openBids} page={slide.page} pages={slide.pages} now={now} />
         ) : slide?.kind === "jobs" ? (
           <JobsSlide rows={slide.rows} stages={settings.jobStages} total={activeJobs} page={slide.page} pages={slide.pages} now={now} />
+        ) : slide?.kind === "map" ? (
+          <MapSlide projects={projects} />
         ) : slide?.kind === "calendar" ? (
           <CalendarSlide projects={wonProjects} now={now} />
         ) : slide?.kind === "spotlight" ? (
