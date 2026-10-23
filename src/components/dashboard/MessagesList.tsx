@@ -1,7 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
-import { markMessageReadAction } from "@/app/dashboard/actions";
+import { deleteMessageAction, markMessageReadAction } from "@/app/dashboard/actions";
 import {
   formatContactFormType,
   formatContactService,
@@ -59,6 +59,24 @@ export default function MessagesList({
     });
   };
 
+  const remove = (message: ContactSubmission) => {
+    if (!window.confirm(`Delete the message from ${message.name}? This can't be undone.`)) {
+      return;
+    }
+
+    onError(null);
+    onChange(messages.filter((item) => item.id !== message.id));
+
+    startTransition(async () => {
+      const result = await deleteMessageAction(message.id);
+
+      if (result.error) {
+        onChange(messages);
+        onError(result.error);
+      }
+    });
+  };
+
   return (
     <ul className="db-list">
       {messages.map((message) => {
@@ -96,6 +114,13 @@ export default function MessagesList({
                 onClick={() => setRead(message, !message.isRead)}
               >
                 {message.isRead ? "Mark unread" : "Mark read"}
+              </button>
+              <button
+                type="button"
+                className="db-link db-link--danger-only"
+                onClick={() => remove(message)}
+              >
+                Delete
               </button>
             </div>
 

@@ -16,7 +16,10 @@ import {
   type ShowcaseProject,
   type ShowcaseStatus,
 } from "@/lib/admin/showcaseData";
-import { markContactSubmissionRead } from "@/lib/contact/submissions.server";
+import {
+  deleteContactSubmission,
+  markContactSubmissionRead,
+} from "@/lib/contact/submissions.server";
 import {
   assertDashboardSession,
   checkDashboardPassword,
@@ -138,5 +141,16 @@ export async function markMessageReadAction(
       : { error: "Could not update the message." };
   } catch (error) {
     return { error: errorMessage(error, "Could not update the message.") };
+  }
+}
+
+export async function deleteMessageAction(id: string): Promise<{ ok?: true; error?: string }> {
+  try {
+    await assertDashboardSession();
+    return (await deleteContactSubmission(id))
+      ? { ok: true }
+      : { error: "Could not delete the message." };
+  } catch (error) {
+    return { error: errorMessage(error, "Could not delete the message.") };
   }
 }

@@ -96,7 +96,8 @@
   margin-right: auto;
 }
 
-.db-link--danger {
+.db-link--danger,
+.db-link--danger-only {
   color: var(--db-red) !important;
 }
 
