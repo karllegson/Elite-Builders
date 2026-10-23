@@ -83,7 +83,7 @@ const TV_LOGOS: Record<string, string> = {
 const SHOW_EXTRA_SLIDES = false;
 
 /** Table rows that fit on one bids / active-jobs slide before paging. */
-const BOARD_ROWS_PER_SLIDE = 8;
+const BOARD_ROWS_PER_SLIDE = 6;
 
 /** Job chips that fit in one calendar day box before collapsing to "+N more". */
 const CALENDAR_CHIPS_PER_DAY = 2;
@@ -871,6 +871,9 @@ const MAP_LANDMARKS: [string, "left" | "right"][] = [
 
 const MAP_HQ_CITY = "Modesto";
 
+/** Active cities listed beside the map before "+N more". */
+const MAP_CITY_ROWS = 8;
+
 /** Full-state map space is 600 wide × 680 tall (see CA_MAP_VIEWBOX). */
 const MAP_FULL_WIDTH = 600;
 const MAP_FULL_SIZE = 680;
@@ -977,7 +980,7 @@ function MapSlide({ projects }: { projects: ShowcaseProject[] }) {
             const [x, y] = CA_CITY_POINTS[city];
 
             return (
-              <g key={city} className="tv-map-landmark" style={{ fontSize: 10 * k }}>
+              <g key={city} className="tv-map-landmark" style={{ fontSize: 13 * k }}>
                 <circle cx={x} cy={y} r={1.6 * k} />
                 <text
                   x={side === "left" ? x - 14 * k : x + 7 * k}
@@ -989,7 +992,7 @@ function MapSlide({ projects }: { projects: ShowcaseProject[] }) {
               </g>
             );
           })}
-          <g className="tv-map-hq" style={{ fontSize: 10 * k }}>
+          <g className="tv-map-hq" style={{ fontSize: 13 * k }}>
             <rect
               x={hq[0] - 4 * k}
               y={hq[1] - 4 * k}
@@ -1047,15 +1050,15 @@ function MapSlide({ projects }: { projects: ShowcaseProject[] }) {
         </ul>
 
         <ol className="tv-map-cities">
-          {activeCities.slice(0, 8).map((place, index) => (
+          {activeCities.slice(0, MAP_CITY_ROWS).map((place, index) => (
             <li key={place.city} className="tv-rise" style={rise(index + 2)}>
               <span>{place.city}</span>
               <span className="tv-map-city-count">{place.active}</span>
             </li>
           ))}
-          {activeCities.length > 8 ? (
-            <li className="tv-map-more tv-rise" style={rise(10)}>
-              +{activeCities.length - 8} more cities
+          {activeCities.length > MAP_CITY_ROWS ? (
+            <li className="tv-map-more tv-rise" style={rise(MAP_CITY_ROWS + 2)}>
+              +{activeCities.length - MAP_CITY_ROWS} more cities
             </li>
           ) : null}
         </ol>
