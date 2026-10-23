@@ -393,7 +393,7 @@ function IntroSlide({
     <section className="tv-slide tv-intro">
       <div className="tv-intro-body">
         <p className="tv-eyebrow tv-eyebrow--light tv-rise" style={rise(0)}>
-          Now framing across Northern California
+          Welcome to {business.displayName}
         </p>
         <h1 className="tv-intro-title tv-rise" style={rise(1)}>
           Framing the Bay Area
