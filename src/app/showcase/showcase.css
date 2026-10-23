@@ -797,6 +797,163 @@ body {
   color: var(--tv-text-2);
 }
 
+/* ── Bids & active-jobs boards ───────────────────────── */
+
+.tv-board-table {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--tv-line-strong);
+}
+
+.tv-board-row {
+  display: grid;
+  align-items: center;
+  gap: calc(var(--u) * 3);
+  /* 8 rows (BOARD_ROWS_PER_SLIDE) fit between the header and footer */
+  min-height: calc(var(--u) * 5.6);
+  padding: calc(var(--u) * 1) 0;
+  border-bottom: 1px solid var(--tv-line);
+  font-size: calc(var(--u) * 2.4);
+  font-weight: 600;
+}
+
+.tv-board-table--bids .tv-board-row {
+  grid-template-columns: minmax(0, 2.4fr) minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1.5fr);
+}
+
+.tv-board-table--jobs .tv-board-row {
+  grid-template-columns: minmax(0, 2.4fr) minmax(0, 1.4fr) minmax(0, 1.9fr) minmax(0, 0.8fr);
+}
+
+.tv-board-table--no-target .tv-board-row {
+  grid-template-columns: minmax(0, 2.4fr) minmax(0, 1.4fr) minmax(0, 2.2fr);
+}
+
+.tv-board-row--head {
+  min-height: 0;
+  padding: calc(var(--u) * 1.3) 0;
+  font-size: calc(var(--u) * 1.3);
+  font-stretch: 112%;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--tv-text-3);
+}
+
+.tv-board-row--muted {
+  color: var(--tv-text-3);
+}
+
+.tv-board-job {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--u) * 0.3);
+  min-width: 0;
+  letter-spacing: -0.01em;
+}
+
+.tv-board-city,
+.tv-board-countdown {
+  font-size: calc(var(--u) * 1.6);
+  font-weight: 500;
+  letter-spacing: 0;
+  color: var(--tv-text-3);
+}
+
+.tv-board-dev {
+  color: var(--tv-text-2);
+}
+
+.tv-board-date {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--u) * 0.3);
+}
+
+.tv-board-countdown {
+  color: var(--tv-sky);
+}
+
+.tv-steps {
+  display: flex;
+  gap: calc(var(--u) * 2.4);
+}
+
+.tv-step {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--u) * 1);
+  font-size: calc(var(--u) * 1.9);
+  color: var(--tv-text-3);
+}
+
+.tv-step-box {
+  display: grid;
+  place-items: center;
+  width: calc(var(--u) * 2.6);
+  height: calc(var(--u) * 2.6);
+  border: 2px solid var(--tv-line-strong);
+  border-radius: calc(var(--u) * 0.5);
+  font-size: calc(var(--u) * 1.8);
+  line-height: 1;
+}
+
+.tv-step--done {
+  color: var(--tv-text);
+}
+
+.tv-step--done .tv-step-box {
+  border-color: #3ccf7a;
+  background: #3ccf7a;
+  color: var(--tv-ink);
+}
+
+.tv-pill {
+  display: inline-block;
+  padding: calc(var(--u) * 0.6) calc(var(--u) * 1.6);
+  border-radius: 999px;
+  font-size: calc(var(--u) * 1.6);
+  font-weight: 700;
+  font-stretch: 112%;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.tv-pill--won {
+  background: rgb(60 207 122 / 0.16);
+  color: #5fe096;
+}
+
+.tv-pill--lost {
+  background: rgb(227 27 35 / 0.16);
+  color: #ff7a7f;
+}
+
+.tv-stage-track {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--u) * 0.9);
+}
+
+.tv-stage-bar {
+  display: flex;
+  gap: calc(var(--u) * 0.5);
+}
+
+.tv-stage-seg {
+  flex: 1;
+  height: calc(var(--u) * 0.7);
+  border-radius: 999px;
+  background: var(--tv-line);
+}
+
+.tv-stage-seg--done {
+  background: var(--tv-sky);
+}
+
+.tv-stage-seg--now {
+  background: var(--tv-red);
+}
+
 /* ── Roster slide ────────────────────────────────────── */
 
 .tv-roster-grid {

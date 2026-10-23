@@ -1,5 +1,5 @@
 import { homeImages } from "@/lib/site/images";
-import type { ProjectStatus, ProjectType } from "@/lib/site/projects";
+import type { ProjectType } from "@/lib/site/projects";
 import { currentProjects } from "@/lib/site/projects";
 
 export type ShowcaseProjectImage = {
@@ -8,15 +8,44 @@ export type ShowcaseProjectImage = {
   title: string;
 };
 
+/**
+ * One list of jobs, mirroring the office whiteboard:
+ * bidding (takeoff → sent) → current (awarded, with a work stage) → completed,
+ * or a bid ends as lost (declined).
+ */
+export type ShowcaseStatus = "bidding" | "current" | "completed" | "lost";
+
+/** Framing stages for an active job, in order. Edit this list to change the dropdown. */
+export const JOB_STAGES = [
+  "Starting",
+  "Layout",
+  "Walls",
+  "Floors",
+  "Roof",
+  "Sheathing",
+  "Punch list",
+] as const;
+
+/** How long an awarded or declined bid stays on the TV bids board. */
+export const BID_RESULT_VISIBLE_DAYS = 14;
+
 export type ShowcaseProject = {
   id: string;
   name: string;
   location: string;
   builder: string;
   type: ProjectType;
-  status: ProjectStatus;
-  /** ISO date YYYY-MM-DD */
+  status: ShowcaseStatus;
+  /** Target completion, ISO date YYYY-MM-DD */
   dueDate: string | null;
+  /** Date the bid has to be sent, ISO date YYYY-MM-DD */
+  bidDueDate: string | null;
+  takeoffDone: boolean;
+  bidSent: boolean;
+  /** When the bid was awarded or declined — null for jobs that never went through bidding here. */
+  bidResultAt: string | null;
+  /** Current framing stage for an active job (one of JOB_STAGES, or free text) */
+  stage: string;
   blurb: string;
   /** Extra detail shown on the lobby TV project slide */
   details: string;
@@ -45,8 +74,13 @@ export type UpsertShowcaseProjectInput = {
   location: string;
   builder: string;
   type: ProjectType;
-  status: ProjectStatus;
+  status: ShowcaseStatus;
   dueDate: string | null;
+  bidDueDate?: string | null;
+  takeoffDone?: boolean;
+  bidSent?: boolean;
+  bidResultAt?: string | null;
+  stage?: string;
   blurb: string;
   details: string;
   featuredImage: ShowcaseProjectImage | null;
@@ -85,6 +119,11 @@ export function createDefaultShowcaseStore(): ShowcaseStore {
     type: project.type,
     status: project.status,
     dueDate: addDaysIso(14 + index * 21),
+    bidDueDate: null,
+    takeoffDone: false,
+    bidSent: false,
+    bidResultAt: null,
+    stage: "",
     blurb: project.blurb,
     details: project.blurb,
     featuredImage: SAMPLE_PROJECT_IMAGES[index % SAMPLE_PROJECT_IMAGES.length],
@@ -157,6 +196,11 @@ function normalizeShowcaseProject(
     type: project.type ?? "Custom Homes",
     status: project.status ?? "current",
     dueDate: project.dueDate ?? null,
+    bidDueDate: project.bidDueDate ?? null,
+    takeoffDone: project.takeoffDone ?? false,
+    bidSent: project.bidSent ?? false,
+    bidResultAt: project.bidResultAt ?? null,
+    stage: project.stage?.trim() || "",
     blurb: project.blurb?.trim() || "",
     details: project.details?.trim() || project.blurb?.trim() || "",
     featuredImage: normalizeShowcaseImage(project.featuredImage),
@@ -165,6 +209,33 @@ function normalizeShowcaseProject(
     createdAt: project.createdAt ?? now,
     updatedAt: project.updatedAt ?? now,
   };
+}
+
+/** Days since an ISO timestamp — Infinity when missing. */
+function daysSince(value: string | null): number {
+  if (!value) {
+    return Infinity;
+  }
+
+  const time = new Date(value).getTime();
+  return Number.isNaN(time) ? Infinity : (Date.now() - time) / 86_400_000;
+}
+
+/** Bids still open, plus bids awarded or declined recently enough to show the result. */
+export function isOnBidsBoard(project: ShowcaseProject): boolean {
+  if (project.status === "bidding") {
+    return true;
+  }
+
+  return (
+    (project.status === "current" || project.status === "lost") &&
+    daysSince(project.bidResultAt) <= BID_RESULT_VISIBLE_DAYS
+  );
+}
+
+/** Jobs that are won — the ones the showcase slides and active-jobs board are about. */
+export function isWonJob(project: ShowcaseProject): boolean {
+  return project.status === "current" || project.status === "completed";
 }
 
 export function sortShowcaseProjectsForDisplay(
