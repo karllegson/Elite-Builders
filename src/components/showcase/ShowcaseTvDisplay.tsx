@@ -70,6 +70,12 @@ const TV_LOGOS: Record<string, string> = {
   "/images/builders/thomas-james-homes.jpg": "/images/builders/tv/thomas-james-homes-white.png",
 };
 
+/**
+ * Calendar, client spotlights, job-site photos and the roster are switched off for
+ * now so the TV is just the intro, bids and active jobs. Set true to bring them back.
+ */
+const SHOW_EXTRA_SLIDES = false;
+
 /** Table rows that fit on one bids / active-jobs slide before paging. */
 const BOARD_ROWS_PER_SLIDE = 8;
 
@@ -202,25 +208,26 @@ function pageBoard(kind: "bids" | "jobs", rows: ShowcaseProject[]): Slide[] {
 }
 
 /**
- * Intro → bids board → active jobs board → calendar → client spotlights
- * interleaved with job-site photos → roster of smaller clients.
+ * Intro → bids board → active jobs board, then (when SHOW_EXTRA_SLIDES) calendar →
+ * client spotlights interleaved with job-site photos → roster of smaller clients.
  */
 function buildSlides(allProjects: ShowcaseProject[]): Slide[] {
-  const projects = allProjects.filter(isWonJob);
   const bids = allProjects.filter(isOnBidsBoard).sort(compareBidsBoard);
   const active = allProjects
     .filter((project) => project.status === "current")
     .sort(byDateField("dueDate"));
+  const slides: Slide[] = [{ kind: "intro" }, ...pageBoard("bids", bids), ...pageBoard("jobs", active)];
+
+  if (!SHOW_EXTRA_SLIDES) {
+    return slides;
+  }
+
+  const projects = allProjects.filter(isWonJob);
   const groups = groupByClient(projects);
   const spotlights = groups.filter((group) => group.projects.length >= SPOTLIGHT_MIN_JOBS);
   const rest = groups.filter((group) => group.projects.length < SPOTLIGHT_MIN_JOBS);
   const features = projects.filter((project) => project.featuredImage);
-  const slides: Slide[] = [
-    { kind: "intro" },
-    ...pageBoard("bids", bids),
-    ...pageBoard("jobs", active),
-    { kind: "calendar" },
-  ];
+  slides.push({ kind: "calendar" });
 
   for (let index = 0; index < Math.max(spotlights.length, features.length); index += 1) {
     if (spotlights[index]) {

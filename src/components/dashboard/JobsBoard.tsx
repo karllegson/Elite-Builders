@@ -10,14 +10,16 @@ import {
   updateJobAction,
   type NewJobInput,
 } from "@/app/dashboard/actions";
+import MessagesList from "@/components/dashboard/MessagesList";
 import type { ShowcaseJobPatch } from "@/lib/admin/showcase.server";
+import type { ContactSubmission } from "@/lib/contact/submissions.types";
 import {
   compareBidsBoard,
   isOnBidsBoard,
   type ShowcaseProject,
 } from "@/lib/admin/showcaseData";
 
-type Tab = "bids" | "active" | "done";
+type Tab = "bids" | "active" | "done" | "messages";
 
 function parseDate(value: string | null): Date | null {
   if (!value) {
@@ -75,10 +77,15 @@ const EMPTY_NEW_JOB: Omit<NewJobInput, "status"> = {
 export default function JobsBoard({
   initialJobs,
   initialStages,
+  initialMessages,
+  messagesUnavailable,
 }: {
   initialJobs: ShowcaseProject[];
   initialStages: string[];
+  initialMessages: ContactSubmission[];
+  messagesUnavailable: string | null;
 }) {
+  const [messages, setMessages] = useState(initialMessages);
   const [jobs, setJobs] = useState(initialJobs);
   const [stages, setStages] = useState(initialStages);
   const [editingStages, setEditingStages] = useState(false);
@@ -173,6 +180,11 @@ export default function JobsBoard({
     { key: "bids", label: "Bids", count: bids.filter((job) => job.status === "bidding").length },
     { key: "active", label: "Active jobs", count: active.length },
     { key: "done", label: "Done", count: done.length },
+    {
+      key: "messages",
+      label: "Messages",
+      count: messages.filter((message) => !message.isRead).length,
+    },
   ];
 
   const rowProps = {
@@ -230,7 +242,7 @@ export default function JobsBoard({
       ) : null}
 
       <main className="db-main">
-        {tab !== "done" && !adding && !editingStages ? (
+        {(tab === "bids" || tab === "active") && !adding && !editingStages ? (
           <div className="db-toolbar">
             <button type="button" className="db-btn db-btn--primary" onClick={() => setAdding(true)}>
               + {tab === "bids" ? "Add bid" : "Add active job"}
@@ -275,6 +287,13 @@ export default function JobsBoard({
               <ActiveRow key={job.id} job={job} stages={stages} {...rowProps} />
             ))}
           </JobList>
+        ) : tab === "messages" ? (
+          <MessagesList
+            messages={messages}
+            unavailable={messagesUnavailable}
+            onChange={setMessages}
+            onError={setError}
+          />
         ) : (
           <JobList empty="Nothing finished yet.">
             {done.map((job) => (

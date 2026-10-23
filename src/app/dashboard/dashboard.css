@@ -576,3 +576,53 @@
     grid-column: 1 / -1;
   }
 }
+
+/* ── Messages ────────────────────────── */
+
+.db-msg {
+  display: grid;
+  gap: 10px;
+  padding: 14px 16px;
+}
+
+.db-msg-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.db-msg-date {
+  font-size: 13px;
+  color: var(--db-text-2);
+  white-space: nowrap;
+}
+
+.db-dot {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  margin-right: 8px;
+  border-radius: 50%;
+  background: var(--db-red);
+  vertical-align: middle;
+}
+
+.db-msg-contact {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.db-msg-contact a {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.db-msg-body {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
