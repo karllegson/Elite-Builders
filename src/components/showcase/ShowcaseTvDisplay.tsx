@@ -4,7 +4,13 @@ import Image from "next/image";
 import { useCallback, useEffect, useMemo, useState, type CSSProperties } from "react";
 import { builders } from "@/lib/site/builders";
 import { business } from "@/lib/site/config";
-import type { ShowcaseProject, ShowcaseSettings } from "@/lib/admin/showcaseData";
+import {
+  JOB_STAGES,
+  isOnBidsBoard,
+  isWonJob,
+  type ShowcaseProject,
+  type ShowcaseSettings,
+} from "@/lib/admin/showcaseData";
 
 type ShowcaseTvDisplayProps = {
   settings: ShowcaseSettings;
@@ -22,6 +28,8 @@ type ClientGroup = {
 
 type Slide =
   | { kind: "intro" }
+  | { kind: "bids"; rows: ShowcaseProject[]; page: number; pages: number }
+  | { kind: "jobs"; rows: ShowcaseProject[]; page: number; pages: number }
   | { kind: "calendar" }
   | { kind: "spotlight"; group: ClientGroup }
   | { kind: "roster"; groups: ClientGroup[] }
@@ -61,6 +69,9 @@ const TV_LOGOS: Record<string, string> = {
     "/images/builders/tv/riviera-development-company-white.png",
   "/images/builders/thomas-james-homes.jpg": "/images/builders/tv/thomas-james-homes-white.png",
 };
+
+/** Table rows that fit on one bids / active-jobs slide before paging. */
+const BOARD_ROWS_PER_SLIDE = 8;
 
 /** Job chips that fit in one calendar day box before collapsing to "+N more". */
 const CALENDAR_CHIPS_PER_DAY = 2;
@@ -174,16 +185,49 @@ function groupByClient(projects: ShowcaseProject[]): ClientGroup[] {
   return [...groups.values()].sort((a, b) => b.projects.length - a.projects.length);
 }
 
+function byDateField(key: "bidDueDate" | "dueDate") {
+  return (a: ShowcaseProject, b: ShowcaseProject) =>
+    (a[key] ?? "9999").localeCompare(b[key] ?? "9999") || a.name.localeCompare(b.name);
+}
+
+function pageBoard(kind: "bids" | "jobs", rows: ShowcaseProject[]): Slide[] {
+  const pages = Math.ceil(rows.length / BOARD_ROWS_PER_SLIDE);
+
+  return Array.from({ length: pages }, (_, page) => ({
+    kind,
+    rows: rows.slice(page * BOARD_ROWS_PER_SLIDE, (page + 1) * BOARD_ROWS_PER_SLIDE),
+    page,
+    pages,
+  }));
+}
+
 /**
- * Intro → calendar → client spotlights interleaved with job-site photos →
- * roster of smaller clients. Big moments alternate with dense ones.
+ * Intro → bids board → active jobs board → calendar → client spotlights
+ * interleaved with job-site photos → roster of smaller clients.
  */
-function buildSlides(projects: ShowcaseProject[]): Slide[] {
+function buildSlides(allProjects: ShowcaseProject[]): Slide[] {
+  const projects = allProjects.filter(isWonJob);
+  // Open bids first by due date, then recent awards / declines.
+  const bids = allProjects
+    .filter(isOnBidsBoard)
+    .sort(
+      (a, b) =>
+        Number(a.status !== "bidding") - Number(b.status !== "bidding") ||
+        byDateField("bidDueDate")(a, b),
+    );
+  const active = allProjects
+    .filter((project) => project.status === "current")
+    .sort(byDateField("dueDate"));
   const groups = groupByClient(projects);
   const spotlights = groups.filter((group) => group.projects.length >= SPOTLIGHT_MIN_JOBS);
   const rest = groups.filter((group) => group.projects.length < SPOTLIGHT_MIN_JOBS);
   const features = projects.filter((project) => project.featuredImage);
-  const slides: Slide[] = [{ kind: "intro" }, { kind: "calendar" }];
+  const slides: Slide[] = [
+    { kind: "intro" },
+    ...pageBoard("bids", bids),
+    ...pageBoard("jobs", active),
+    { kind: "calendar" },
+  ];
 
   for (let index = 0; index < Math.max(spotlights.length, features.length); index += 1) {
     if (spotlights[index]) {
@@ -582,6 +626,218 @@ function RosterSlide({ groups, now }: { groups: ClientGroup[]; now: Date }) {
   );
 }
 
+function BoardHead({
+  eyebrow,
+  title,
+  count,
+  countLabel,
+  page,
+  pages,
+}: {
+  eyebrow: string;
+  title: string;
+  count: number;
+  countLabel: string;
+  page: number;
+  pages: number;
+}) {
+  return (
+    <header className="tv-panel-head tv-rise" style={rise(0)}>
+      <div>
+        <p className="tv-eyebrow">
+          {eyebrow}
+          {pages > 1 ? ` · ${page + 1} of ${pages}` : ""}
+        </p>
+        <h1 className="tv-panel-title">{title}</h1>
+      </div>
+      <p className="tv-panel-count">
+        <span className="tv-panel-count-num">{count}</span>
+        <span className="tv-panel-count-label">{countLabel}</span>
+      </p>
+    </header>
+  );
+}
+
+function BidStatus({ project }: { project: ShowcaseProject }) {
+  if (project.status === "lost") {
+    return <span className="tv-pill tv-pill--lost">Declined</span>;
+  }
+
+  if (project.status !== "bidding") {
+    return <span className="tv-pill tv-pill--won">Awarded</span>;
+  }
+
+  return (
+    <span className="tv-steps">
+      {[
+        { label: "Takeoff", done: project.takeoffDone },
+        { label: "Sent", done: project.bidSent },
+      ].map((step) => (
+        <span key={step.label} className={`tv-step${step.done ? " tv-step--done" : ""}`}>
+          <span className="tv-step-box" aria-hidden>
+            {step.done ? "✓" : ""}
+          </span>
+          {step.label}
+        </span>
+      ))}
+    </span>
+  );
+}
+
+function BidsSlide({
+  rows,
+  total,
+  page,
+  pages,
+  now,
+}: {
+  rows: ShowcaseProject[];
+  total: number;
+  page: number;
+  pages: number;
+  now: Date;
+}) {
+  return (
+    <section className="tv-slide tv-panel tv-board">
+      <BoardHead
+        eyebrow="Estimating"
+        title="Upcoming bids"
+        count={total}
+        countLabel={total === 1 ? "Open bid" : "Open bids"}
+        page={page}
+        pages={pages}
+      />
+
+      <div className="tv-board-table tv-board-table--bids" role="table">
+        <div className="tv-board-row tv-board-row--head tv-rise" style={rise(1)} role="row">
+          <span role="columnheader">Job</span>
+          <span role="columnheader">Developer</span>
+          <span role="columnheader">Bid due</span>
+          <span role="columnheader">Status</span>
+        </div>
+        {rows.map((project, index) => {
+          const due = formatShortDate(project.bidDueDate, now);
+          const countdown = project.status === "bidding" ? countdownLabel(project.bidDueDate) : null;
+
+          return (
+            <div
+              key={project.id}
+              className={`tv-board-row tv-rise${project.status === "lost" ? " tv-board-row--muted" : ""}`}
+              style={rise(index + 2)}
+              role="row"
+            >
+              <span className="tv-board-job" role="cell">
+                {project.name}
+                {project.location ? <span className="tv-board-city">{cityOf(project.location) || project.location}</span> : null}
+              </span>
+              <span className="tv-board-dev" role="cell">
+                {project.builder || "—"}
+              </span>
+              <span className="tv-board-date" role="cell">
+                {due ?? "—"}
+                {countdown ? <span className="tv-board-countdown">{countdown}</span> : null}
+              </span>
+              <span role="cell">
+                <BidStatus project={project} />
+              </span>
+            </div>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+function StageTrack({ stage }: { stage: string }) {
+  const index = JOB_STAGES.findIndex((item) => item === stage);
+
+  return (
+    <span className="tv-stage-track">
+      <span className="tv-stage-name">{stage || "—"}</span>
+      {index >= 0 ? (
+        <span className="tv-stage-bar" aria-hidden>
+          {JOB_STAGES.map((item, position) => (
+            <span
+              key={item}
+              className={`tv-stage-seg${position < index ? " tv-stage-seg--done" : ""}${
+                position === index ? " tv-stage-seg--now" : ""
+              }`}
+            />
+          ))}
+        </span>
+      ) : null}
+    </span>
+  );
+}
+
+function JobsSlide({
+  rows,
+  total,
+  page,
+  pages,
+  now,
+}: {
+  rows: ShowcaseProject[];
+  total: number;
+  page: number;
+  pages: number;
+  now: Date;
+}) {
+  const targetOf = (project: ShowcaseProject) => {
+    const daysLeft = daysUntil(project.dueDate);
+    return daysLeft !== null && daysLeft >= 0 ? formatShortDate(project.dueDate, now) : null;
+  };
+  const showTarget = rows.some((project) => targetOf(project));
+
+  return (
+    <section className="tv-slide tv-panel tv-board">
+      <BoardHead
+        eyebrow="In the field"
+        title="Active jobs"
+        count={total}
+        countLabel={total === 1 ? "Job framing" : "Jobs framing"}
+        page={page}
+        pages={pages}
+      />
+
+      <div
+        className={`tv-board-table tv-board-table--jobs${showTarget ? "" : " tv-board-table--no-target"}`}
+        role="table"
+      >
+        <div className="tv-board-row tv-board-row--head tv-rise" style={rise(1)} role="row">
+          <span role="columnheader">Job</span>
+          <span role="columnheader">Developer</span>
+          <span role="columnheader">Current stage</span>
+          {showTarget ? <span role="columnheader">Target</span> : null}
+        </div>
+        {rows.map((project, index) => {
+          const target = targetOf(project);
+
+          return (
+            <div key={project.id} className="tv-board-row tv-rise" style={rise(index + 2)} role="row">
+              <span className="tv-board-job" role="cell">
+                {project.name}
+                {project.location ? <span className="tv-board-city">{cityOf(project.location) || project.location}</span> : null}
+              </span>
+              <span className="tv-board-dev" role="cell">
+                {project.builder || "—"}
+              </span>
+              <span role="cell">
+                <StageTrack stage={project.stage} />
+              </span>
+              {showTarget ? (
+                <span className="tv-board-date" role="cell">
+                  {target ?? "—"}
+                </span>
+              ) : null}
+            </div>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
 function FeatureSlide({ project, durationMs }: { project: ShowcaseProject; durationMs: number }) {
   const photo = project.featuredImage;
   const completed = project.status === "completed";
@@ -647,6 +903,15 @@ export default function ShowcaseTvDisplay({
   initialSlide = 0,
 }: ShowcaseTvDisplayProps) {
   const slides = useMemo(() => buildSlides(projects), [projects]);
+  const wonProjects = useMemo(() => projects.filter(isWonJob), [projects]);
+  const openBids = useMemo(
+    () => projects.filter((project) => project.status === "bidding").length,
+    [projects],
+  );
+  const activeJobs = useMemo(
+    () => projects.filter((project) => project.status === "current").length,
+    [projects],
+  );
 
   const durationsMs = useMemo(
     () =>
@@ -744,9 +1009,13 @@ export default function ShowcaseTvDisplay({
 
       <main key={slideIndex} className={`tv-stage${visible ? " tv-stage--visible" : ""}`}>
         {slide?.kind === "intro" ? (
-          <IntroSlide projects={projects} />
+          <IntroSlide projects={wonProjects} />
+        ) : slide?.kind === "bids" ? (
+          <BidsSlide rows={slide.rows} total={openBids} page={slide.page} pages={slide.pages} now={now} />
+        ) : slide?.kind === "jobs" ? (
+          <JobsSlide rows={slide.rows} total={activeJobs} page={slide.page} pages={slide.pages} now={now} />
         ) : slide?.kind === "calendar" ? (
-          <CalendarSlide projects={projects} now={now} />
+          <CalendarSlide projects={wonProjects} now={now} />
         ) : slide?.kind === "spotlight" ? (
           <SpotlightSlide group={slide.group} now={now} />
         ) : slide?.kind === "roster" ? (

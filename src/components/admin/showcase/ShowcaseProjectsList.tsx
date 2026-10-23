@@ -8,7 +8,18 @@ import {
   saveShowcaseSettingsAction,
 } from "@/app/admin/(shell)/showcase/actions";
 import { useAdminToast } from "@/components/admin/toast/useAdminToast";
-import type { ShowcaseProject, ShowcaseSettings } from "@/lib/admin/showcaseData";
+import type {
+  ShowcaseProject,
+  ShowcaseSettings,
+  ShowcaseStatus,
+} from "@/lib/admin/showcaseData";
+
+const STATUS_LABELS: Record<ShowcaseStatus, string> = {
+  bidding: "Bidding",
+  current: "In Progress",
+  completed: "Completed",
+  lost: "Bid declined",
+};
 
 function formatDueDate(value: string | null): string {
   if (!value) {
@@ -207,7 +218,7 @@ export function ShowcaseProjectsList() {
                 </td>
                 <td>{project.builder}</td>
                 <td>{formatDueDate(project.dueDate)}</td>
-                <td>{project.status === "current" ? "In Progress" : "Completed"}</td>
+                <td>{STATUS_LABELS[project.status]}</td>
                 <td>{project.published ? "Yes" : "No"}</td>
               </tr>
             ))

@@ -11,8 +11,8 @@ import {
 import { FeaturedImageModal } from "@/components/admin/posts/FeaturedImageModal";
 import { useAdminToast } from "@/components/admin/toast/useAdminToast";
 import type { MediaAttachment } from "@/lib/admin/mediaLibrary";
-import type { ShowcaseProjectImage } from "@/lib/admin/showcaseData";
-import type { ProjectStatus, ProjectType } from "@/lib/site/projects";
+import type { ShowcaseProjectImage, ShowcaseStatus } from "@/lib/admin/showcaseData";
+import type { ProjectType } from "@/lib/site/projects";
 
 const PROJECT_TYPES: ProjectType[] = [
   "Apartments",
@@ -50,7 +50,7 @@ export function ShowcaseProjectEditor({ projectId }: ShowcaseProjectEditorProps)
   const [location, setLocation] = useState("");
   const [builder, setBuilder] = useState("");
   const [type, setType] = useState<ProjectType>("Custom Homes");
-  const [status, setStatus] = useState<ProjectStatus>("current");
+  const [status, setStatus] = useState<ShowcaseStatus>("current");
   const [dueDate, setDueDate] = useState("");
   const [blurb, setBlurb] = useState("");
   const [details, setDetails] = useState("");
@@ -187,10 +187,12 @@ export function ShowcaseProjectEditor({ projectId }: ShowcaseProjectEditorProps)
             <span>Status</span>
             <select
               value={status}
-              onChange={(event) => setStatus(event.target.value as ProjectStatus)}
+              onChange={(event) => setStatus(event.target.value as ShowcaseStatus)}
             >
+              <option value="bidding">Bidding</option>
               <option value="current">In Progress</option>
               <option value="completed">Completed</option>
+              <option value="lost">Bid declined</option>
             </select>
           </label>
           <label className="admin-showcase-field">

@@ -196,6 +196,12 @@ export async function upsertShowcaseProject(
     type: input.type,
     status: input.status,
     dueDate: input.dueDate,
+    bidDueDate: input.bidDueDate !== undefined ? input.bidDueDate : (existing?.bidDueDate ?? null),
+    takeoffDone: input.takeoffDone ?? existing?.takeoffDone ?? false,
+    bidSent: input.bidSent ?? existing?.bidSent ?? false,
+    bidResultAt:
+      input.bidResultAt !== undefined ? input.bidResultAt : (existing?.bidResultAt ?? null),
+    stage: (input.stage ?? existing?.stage ?? "").trim(),
     blurb: input.blurb.trim(),
     details: input.details.trim() || input.blurb.trim(),
     featuredImage: input.featuredImage ?? null,
@@ -211,6 +217,58 @@ export async function upsertShowcaseProject(
 
   await saveShowcaseStore({ ...store, projects });
   return project;
+}
+
+export type ShowcaseJobPatch = Partial<
+  Pick<
+    ShowcaseProject,
+    | "name"
+    | "location"
+    | "builder"
+    | "type"
+    | "status"
+    | "dueDate"
+    | "bidDueDate"
+    | "takeoffDone"
+    | "bidSent"
+    | "stage"
+    | "published"
+  >
+>;
+
+/**
+ * Applies a small edit from the office dashboard. Moving a bid to awarded (current)
+ * or declined (lost) stamps bidResultAt so the TV can show the result for a while.
+ */
+export async function patchShowcaseProject(
+  id: string,
+  patch: ShowcaseJobPatch,
+): Promise<ShowcaseProject> {
+  const store = await loadShowcaseStore();
+  const existing = store.projects.find((project) => project.id === id);
+
+  if (!existing) {
+    throw new Error("That job no longer exists.");
+  }
+
+  const now = new Date().toISOString();
+  const next: ShowcaseProject = { ...existing, ...patch, updatedAt: now };
+
+  if (patch.status && patch.status !== existing.status) {
+    if (existing.status === "bidding" && (patch.status === "current" || patch.status === "lost")) {
+      next.bidResultAt = now;
+    } else if (patch.status === "bidding") {
+      next.bidResultAt = null;
+    }
+
+    if (patch.status === "current" && !next.stage) {
+      next.stage = "Starting";
+    }
+  }
+
+  const projects = store.projects.map((project) => (project.id === id ? next : project));
+  const saved = await saveShowcaseStore({ ...store, projects });
+  return saved.projects.find((project) => project.id === id) ?? next;
 }
 
 export async function deleteShowcaseProjects(ids: string[]): Promise<void> {

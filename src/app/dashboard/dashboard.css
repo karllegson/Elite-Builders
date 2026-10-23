@@ -1,0 +1,510 @@
+/* Office jobs board — /dashboard. Light, dense, works on a phone. */
+
+.db-root {
+  --db-bg: #f3f5f8;
+  --db-surface: #ffffff;
+  --db-ink: #0b1f3a;
+  --db-text: #1c2533;
+  --db-text-2: #5a6578;
+  --db-line: #dde2ea;
+  --db-brand: #0b1f3a;
+  --db-red: #c8161d;
+  --db-green: #17803d;
+  --db-green-bg: #e5f4ea;
+  --db-red-bg: #fbe7e8;
+  --db-amber: #a35a00;
+
+  min-height: 100vh;
+  background: var(--db-bg);
+  color: var(--db-text);
+  font-family: var(--font-archivo), system-ui, -apple-system, sans-serif;
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.db-root *,
+.db-root *::before,
+.db-root *::after {
+  box-sizing: border-box;
+}
+
+.db-root button,
+.db-root input,
+.db-root select {
+  font: inherit;
+  color: inherit;
+}
+
+/* ── Buttons ─────────────────────────── */
+
+.db-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 0 14px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  background: none;
+  color: var(--db-ink);
+}
+
+.db-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.db-btn--primary {
+  background: var(--db-brand);
+  color: #fff !important;
+}
+
+.db-btn--ghost {
+  border-color: var(--db-line);
+  background: var(--db-surface);
+}
+
+.db-btn--won {
+  border-color: #b9dfc6;
+  background: var(--db-green-bg);
+  color: var(--db-green) !important;
+}
+
+.db-btn--lost {
+  border-color: #f0c3c5;
+  background: var(--db-red-bg);
+  color: var(--db-red) !important;
+}
+
+.db-link {
+  padding: 4px 2px;
+  border: 0;
+  background: none;
+  font-weight: 600;
+  color: var(--db-text-2) !important;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.db-link--danger {
+  margin-right: auto;
+  color: var(--db-red) !important;
+}
+
+.db-error {
+  margin: 0;
+  color: var(--db-red);
+  font-weight: 600;
+}
+
+/* ── Login ───────────────────────────── */
+
+.db-login {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+  padding: 16px;
+}
+
+.db-login-card {
+  width: 100%;
+  max-width: 360px;
+  padding: 32px 24px;
+  border: 1px solid var(--db-line);
+  border-radius: 16px;
+  background: var(--db-surface);
+  text-align: center;
+}
+
+.db-login-card h1 {
+  margin: 12px 0 0;
+  font-size: 24px;
+  color: var(--db-ink);
+}
+
+.db-login-card > p {
+  margin: 4px 0 20px;
+  color: var(--db-text-2);
+}
+
+.db-login-form {
+  display: grid;
+  gap: 12px;
+  text-align: left;
+}
+
+/* ── Shell ───────────────────────────── */
+
+.db-shell {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 20px 16px 48px;
+}
+
+.db-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.db-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.db-brand h1 {
+  margin: 0;
+  font-size: 22px;
+  color: var(--db-ink);
+}
+
+.db-brand p {
+  margin: 2px 0 0;
+  font-size: 13px;
+  color: var(--db-text-2);
+}
+
+.db-header-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.db-header-actions form {
+  margin: 0;
+}
+
+.db-tabs {
+  display: flex;
+  gap: 4px;
+  margin: 20px 0 16px;
+  border-bottom: 1px solid var(--db-line);
+  overflow-x: auto;
+}
+
+.db-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  background: none;
+  font-weight: 600;
+  color: var(--db-text-2) !important;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.db-tab--active {
+  border-bottom-color: var(--db-red);
+  color: var(--db-ink) !important;
+}
+
+.db-tab-count {
+  min-width: 22px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--db-line);
+  font-size: 12px;
+  text-align: center;
+}
+
+.db-banner {
+  margin-bottom: 12px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: var(--db-red-bg);
+}
+
+.db-add {
+  margin-bottom: 12px;
+}
+
+/* ── Rows ────────────────────────────── */
+
+.db-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.db-empty {
+  padding: 32px 16px;
+  border: 1px dashed var(--db-line);
+  border-radius: 12px;
+  text-align: center;
+  color: var(--db-text-2);
+}
+
+.db-row {
+  border: 1px solid var(--db-line);
+  border-radius: 12px;
+  background: var(--db-surface);
+}
+
+.db-row--resolved {
+  background: #fafbfc;
+}
+
+.db-row-main {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) 120px minmax(0, 2fr) auto;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 16px;
+}
+
+.db-job-title {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.db-job-title strong {
+  font-size: 16px;
+  color: var(--db-ink);
+  overflow-wrap: anywhere;
+}
+
+.db-job-title span {
+  font-size: 13px;
+  color: var(--db-text-2);
+}
+
+.db-due {
+  display: flex;
+  flex-direction: column;
+  font-size: 13px;
+}
+
+.db-due-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--db-text-2);
+}
+
+.db-due-date {
+  font-weight: 600;
+  color: var(--db-ink);
+}
+
+.db-due-rel {
+  color: var(--db-text-2);
+}
+
+.db-due-rel--soon {
+  font-weight: 600;
+  color: var(--db-amber);
+}
+
+.db-due-rel--late {
+  font-weight: 600;
+  color: var(--db-red);
+}
+
+.db-row-steps {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.db-row-result {
+  display: inline-flex;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.db-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 0 12px 0 8px;
+  border: 1px solid var(--db-line);
+  border-radius: 8px;
+  background: var(--db-surface);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.db-check-box {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #9aa5b5;
+  border-radius: 4px;
+  font-size: 13px;
+  line-height: 1;
+}
+
+.db-check--on {
+  border-color: #b9dfc6;
+  background: var(--db-green-bg);
+}
+
+.db-check--on .db-check-box {
+  border-color: var(--db-green);
+  background: var(--db-green);
+  color: #fff;
+}
+
+.db-badge {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.db-badge--won {
+  background: var(--db-green-bg);
+  color: var(--db-green);
+}
+
+.db-badge--lost {
+  background: var(--db-red-bg);
+  color: var(--db-red);
+}
+
+.db-stage {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--db-text-2);
+}
+
+.db-stage select {
+  min-height: 36px;
+  padding: 0 10px;
+  border: 1px solid var(--db-line);
+  border-radius: 8px;
+  background: var(--db-surface);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--db-ink);
+}
+
+.db-edit-toggle {
+  min-width: 64px;
+}
+
+/* ── Editor / new job ────────────────── */
+
+.db-editor {
+  display: grid;
+  gap: 12px;
+  padding: 14px 16px 16px;
+  border-top: 1px solid var(--db-line);
+}
+
+.db-editor--new {
+  margin-bottom: 12px;
+  border: 1px solid var(--db-line);
+  border-radius: 12px;
+  background: var(--db-surface);
+}
+
+.db-editor--new h2 {
+  margin: 0;
+  font-size: 17px;
+  color: var(--db-ink);
+}
+
+.db-fields {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 12px;
+}
+
+.db-field {
+  display: grid;
+  gap: 4px;
+}
+
+.db-field span {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--db-text-2);
+}
+
+.db-field input {
+  min-height: 40px;
+  padding: 0 10px;
+  border: 1px solid var(--db-line);
+  border-radius: 8px;
+  background: var(--db-surface);
+  font-size: 16px;
+}
+
+.db-field input:focus,
+.db-stage select:focus {
+  outline: 2px solid var(--db-brand);
+  outline-offset: 1px;
+}
+
+.db-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+}
+
+.db-editor-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* ── Phone ───────────────────────────── */
+
+@media (max-width: 760px) {
+  .db-row-main {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 10px 12px;
+  }
+
+  .db-row-steps {
+    grid-column: 1 / -1;
+  }
+
+  .db-edit-toggle {
+    grid-row: 1;
+    grid-column: 2;
+  }
+
+  .db-due {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    gap: 8px;
+  }
+
+  .db-row-result {
+    margin-left: 0;
+  }
+
+  .db-fields {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .db-field--wide {
+    grid-column: 1 / -1;
+  }
+}
