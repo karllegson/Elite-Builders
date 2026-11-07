@@ -807,6 +807,22 @@ function stripUnrenderedShortcodes(html: string): string {
     .replace(/<p[^>]*>\s*<\/p>/gi, "");
 }
 
+const EMPTY_LINK_FOLLOWED_BY_TEXT_PATTERN =
+  /(<a\b[^>]*\bhref\s*=[^>]*>)\s*<\/a>(\s*)([^<]*[^<\s])(\s*)(?=<)/gi;
+
+/**
+ * Editors that auto-close tags turn `<a href="...">Title` into
+ * `<a href="..."></a>Title`, leaving an empty, unclickable link next to its
+ * label. Move the text that directly follows an empty link back inside it.
+ */
+export function repairEmptyLinks(html: string): string {
+  return html.replace(
+    EMPTY_LINK_FOLLOWED_BY_TEXT_PATTERN,
+    (_match, openTag: string, leading: string, text: string, trailing: string) =>
+      `${leading}${openTag}${text}</a>${trailing}`,
+  );
+}
+
 export type PrepareServiceAreaHtmlOptions = {
   ctaButton?: ServiceAreaCtaButtonConfig;
 };
@@ -816,7 +832,7 @@ export function prepareServiceAreaHtml(
   fullContentForLinks = html,
   options: PrepareServiceAreaHtmlOptions = {},
 ): string {
-  let result = normalizeQuickSummaryMarkup(html);
+  let result = normalizeQuickSummaryMarkup(repairEmptyLinks(html));
   result = upgradeLegacyQuickSummary(result);
   result = unwrapQuickSummaryContainers(result);
   const hasQuickLinksShortcode = /\[quick_links\]/i.test(result);
