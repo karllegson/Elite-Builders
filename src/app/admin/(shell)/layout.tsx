@@ -9,6 +9,7 @@ import {
   isDevBypassSessionActive,
 } from "@/lib/admin/auth";
 import { siteConfig } from "@/lib/admin/config";
+import { isSuperAdminEmail } from "@/lib/admin/usersData";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function AdminShellLayout({
@@ -27,7 +28,7 @@ export default async function AdminShellLayout({
   } = supabase ? await supabase.auth.getUser() : { data: { user: null } };
 
   let displayName: string | null = bypass ? bypassAdminUser.displayName : null;
-  let userEmail: string | null | undefined = bypass
+  const userEmail: string | null | undefined = bypass
     ? bypassAdminUser.email
     : user?.email;
 
@@ -43,18 +44,20 @@ export default async function AdminShellLayout({
     }
   }
 
+  const canManageUsers = bypass || isSuperAdminEmail(userEmail);
+
   return (
     <AdminShellProviders>
       <div className="admin-shell">
         <AdminToolbar
           userEmail={userEmail}
           displayName={displayName}
-          userRole={siteConfig.defaultUserRole}
+          userRole={canManageUsers ? "Super Admin" : siteConfig.defaultUserRole}
           authBypass={bypass}
         />
-        <AdminSidebar />
+        <AdminSidebar canManageUsers={canManageUsers} />
         <main className="admin-main">
-          <AdminContentHeader />
+          <AdminContentHeader canManageUsers={canManageUsers} />
           <div className="admin-content">{children}</div>
         </main>
       </div>

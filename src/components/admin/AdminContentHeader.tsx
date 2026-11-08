@@ -25,6 +25,7 @@ const pageActions: Record<string, PageAction[]> = {
   "/admin/faqs": [{ href: "/admin/faqs/new", label: "Add New FAQ" }],
   "/admin/showcase": [{ href: "/admin/showcase/new", label: "Add Project" }],
   "/admin/reviews": [{ href: "/admin/reviews/new", label: "Add New Review" }],
+  "/admin/users": [{ href: "/admin/users/new", label: "Add New User" }],
   "/admin/forms": [
     {
       type: "trigger",
@@ -34,7 +35,15 @@ const pageActions: Record<string, PageAction[]> = {
   ],
 };
 
+function isUserEditPath(pathname: string): boolean {
+  return /^\/admin\/users\/[^/]+$/.test(pathname) && pathname !== "/admin/users/new";
+}
+
 function resolvePageTitle(pathname: string): string {
+  if (isUserEditPath(pathname)) {
+    return "Edit User";
+  }
+
   if (pathname.startsWith("/admin/service-areas/") && pathname !== "/admin/service-areas/new") {
     const segment = pathname.split("/").pop();
 
@@ -46,7 +55,15 @@ function resolvePageTitle(pathname: string): string {
   return adminPageTitles[pathname] ?? "Administration";
 }
 
-function resolvePageAction(pathname: string): PageAction[] | undefined {
+function resolvePageAction(pathname: string, canManageUsers: boolean): PageAction[] | undefined {
+  if (pathname.startsWith("/admin/users") && !canManageUsers) {
+    return undefined;
+  }
+
+  if (isUserEditPath(pathname)) {
+    return pageActions["/admin/users"];
+  }
+
   if (pathname.startsWith("/admin/service-areas/") && pathname !== "/admin/service-areas/new") {
     const segment = pathname.split("/").pop();
 
@@ -62,7 +79,7 @@ function isLinkAction(action: PageAction): action is PageActionLink {
   return action.type !== "trigger";
 }
 
-export function AdminContentHeader() {
+export function AdminContentHeader({ canManageUsers }: { canManageUsers: boolean }) {
   const pathname = usePathname();
   const faqEditId = useMemo(() => {
     const match = pathname.match(/^\/admin\/faqs\/([^/]+)$/);
@@ -95,7 +112,7 @@ export function AdminContentHeader() {
     faqEditId && editFaqMeta?.id === faqEditId
       ? `Edit FAQ: ${editFaqMeta.title}`
       : resolvePageTitle(pathname);
-  const action = resolvePageAction(pathname);
+  const action = resolvePageAction(pathname, canManageUsers);
 
   if (
     pathname === "/admin/forms/entries" ||

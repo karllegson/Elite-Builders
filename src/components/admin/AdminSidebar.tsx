@@ -73,7 +73,8 @@ function isSubNavItemActive(href: string, currentPath: string) {
     href === "/admin/pages" ||
     href === "/admin/faqs" ||
     href === "/admin/reviews" ||
-    href === "/admin/forms"
+    href === "/admin/forms" ||
+    href === "/admin/users"
   ) {
     return currentPath === href;
   }
@@ -189,13 +190,20 @@ function NavLink({ item, currentPath }: { item: AdminNavItem; currentPath: strin
   );
 }
 
-export function AdminSidebar() {
+export function AdminSidebar({ canManageUsers }: { canManageUsers: boolean }) {
   const currentPath = usePathname();
+  const navItems = canManageUsers
+    ? adminNavItems
+    : adminNavItems.map((item) =>
+        item.href === "/admin/users"
+          ? { ...item, children: item.children?.filter((child) => child.href !== "/admin/users/new") }
+          : item,
+      );
 
   return (
     <aside className="admin-sidebar">
       <ul className="admin-sidebar-nav">
-        {adminNavItems.map((item) => (
+        {navItems.map((item) => (
           <NavLink key={item.href} item={item} currentPath={currentPath} />
         ))}
         <li className="admin-sidebar-separator" aria-hidden />

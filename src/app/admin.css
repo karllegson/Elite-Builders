@@ -8721,3 +8721,70 @@ a.admin-form-entries-settings-item {
   color: var(--admin-text-muted);
 }
 
+/* -------------------------------------------------------------------------- */
+/* Users                                                                      */
+/* -------------------------------------------------------------------------- */
+.admin-users-table tbody tr:hover .admin-categories-row-actions,
+.admin-users-table tbody tr:focus-within .admin-categories-row-actions {
+  visibility: visible;
+}
+
+.admin-users-col-name {
+  width: 32%;
+  min-width: 220px;
+}
+
+.admin-users-col-nowrap {
+  white-space: nowrap;
+}
+
+.admin-users-name {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.admin-users-avatar {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #dcdcde;
+  color: var(--admin-text);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.admin-user-form {
+  max-width: 960px;
+  padding: 4px 16px 16px;
+  background: #fff;
+  border: 1px solid var(--admin-border);
+}
+
+.admin-user-form-intro {
+  margin: 12px 0;
+  font-size: 13px;
+  color: var(--admin-text);
+}
+
+.admin-user-required {
+  font-weight: 400;
+  color: var(--admin-text-muted);
+}
+
+.admin-user-password {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.admin-user-password .admin-site-config-input {
+  width: min(320px, 100%);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
