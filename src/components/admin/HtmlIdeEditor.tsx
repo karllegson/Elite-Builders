@@ -7,8 +7,12 @@ import { InsertLinkModal } from "@/components/admin/posts/InsertLinkModal";
 import { countWords } from "@/lib/admin/postEditor";
 import { buildLinkSnippet, type LinkInsertOptions } from "@/lib/admin/postEditor";
 import {
+  insertAtEditorCursor,
   insertEditorH2WithId,
   insertEditorHighlightBox,
+  insertEditorImage,
+  insertEditorList,
+  insertEditorRelatedPosts,
   insertEditorQuickSummary,
   insertEditorHr,
   insertEditorShortHr,
@@ -46,6 +50,15 @@ const toolbarButtons: ToolbarButton[] = [
   { label: "u", action: (ed) => wrapEditorSelection(ed, "u") },
   { label: "i", action: (ed) => wrapEditorSelection(ed, "em") },
   { label: "/b > i", action: wrapEditorStrongEm },
+  { label: "b-quote", action: (ed) => wrapEditorSelection(ed, "blockquote") },
+  { label: "EN—Dash", action: (ed) => insertAtEditorCursor(ed, "&ndash;") },
+  { label: "EM—Dash", action: (ed) => insertAtEditorCursor(ed, "&mdash;") },
+  { label: "img", action: insertEditorImage },
+  { label: "ul ✓", action: (ed) => insertEditorList(ed, "ul") },
+  { label: "ul ✗", action: (ed) => insertEditorList(ed, "ul", { class: "x-list" }) },
+  { label: "ol", action: (ed) => insertEditorList(ed, "ol") },
+  { label: "li", action: (ed) => wrapEditorSelection(ed, "li") },
+  { label: "Related Posts", action: insertEditorRelatedPosts },
 ];
 
 type HtmlIdeEditorProps = {
