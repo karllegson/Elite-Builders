@@ -2,6 +2,8 @@ export const siteConfig = {
   name: "Elite Builders IX",
   shortName: "Elite Builders IX",
   supportEmail: "marketing@elitebuildersco.com",
+  /** The only account that can add, edit or delete users. */
+  superAdminEmail: "marketing@elitebuildersco.com",
   defaultUserRole: "Administrator",
 } as const;
 
@@ -105,7 +107,16 @@ export const adminNavItems: AdminNavItem[] = [
   { label: "Site Config", href: "/admin/site-config", icon: "sliders-horizontal", phase: 3 },
   { label: "Appearance", href: "/admin/appearance", icon: "palette", phase: 3 },
   { label: "Plugins", href: "/admin/plugins", icon: "plug", phase: 3 },
-  { label: "Users", href: "/admin/users", icon: "users", phase: 3 },
+  {
+    label: "Users",
+    href: "/admin/users",
+    icon: "users",
+    phase: 1,
+    children: [
+      { label: "All Users", href: "/admin/users" },
+      { label: "Add New User", href: "/admin/users/new" },
+    ],
+  },
   { label: "Tools", href: "/admin/tools", icon: "wrench", phase: 3 },
 ];
 
@@ -154,6 +165,7 @@ export const adminPageTitles: Record<string, string> = {
   "/admin/appearance": "Appearance",
   "/admin/plugins": "Plugins",
   "/admin/users": "Users",
+  "/admin/users/new": "Add New User",
   "/admin/tools": "Tools",
   "/admin/settings": "Settings",
 };

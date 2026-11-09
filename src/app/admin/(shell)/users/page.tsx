@@ -1,5 +1,5 @@
-import { ComingSoon } from "@/components/admin/ComingSoon";
+import { UsersList } from "@/components/admin/users/UsersList";
 
 export default function AdminUsersPage() {
-  return <ComingSoon phase={3} />;
+  return <UsersList />;
 }
