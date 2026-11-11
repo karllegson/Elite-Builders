@@ -4,17 +4,18 @@ import PageHero from "@/components/site/PageHero";
 import { notFound } from "next/navigation";
 import {
   fetchFeaturedImageForPost,
-  fetchPublicPostBySlug,
   fetchRecentPostsForSite,
 } from "@/app/admin/(shell)/posts/actions";
 import { PasswordProtectedPost } from "@/components/site/BlogPostPasswordGate";
 import { BlogPostBody } from "@/components/site/blog/BlogPostBody";
+import { BlogPostPreviewNotice } from "@/components/site/blog/BlogPostPreviewNotice";
 import { ViewAllBlogPostsLink } from "@/components/site/blog/ViewAllBlogPostsLink";
 import { ServiceAreaSidebar } from "@/components/site/ServiceAreaSidebar";
 import {
   blogEstimateDescription,
   mapPostsToSidebarItems,
 } from "@/lib/site/blogSidebar";
+import { getBlogPostView } from "@/lib/site/blogPostView";
 import { formatBlogDateLong } from "@/lib/site/formatBlogDate";
 import { buildPageMetadata } from "@/lib/site/seo";
 
@@ -26,9 +27,9 @@ export async function generateMetadata({
   params,
 }: BlogPostPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const post = await fetchPublicPostBySlug(slug);
+  const view = await getBlogPostView(slug);
 
-  if (!post) {
+  if (!view) {
     return buildPageMetadata({
       title: "Post Not Found",
       description: "The requested blog post could not be found.",
@@ -37,6 +38,7 @@ export async function generateMetadata({
     });
   }
 
+  const { post, previewReason } = view;
   const title = post.seoTitle?.trim() || post.title;
   const description =
     post.metaDescription?.trim() ||
@@ -47,28 +49,35 @@ export async function generateMetadata({
     title,
     description,
     path: `/blog/${slug}`,
+    // Admin-only previews (drafts, scheduled, private) must never be indexed.
+    noIndex: previewReason !== null,
   });
 }
 
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
   const { slug } = await params;
-  const [post, recentPosts] = await Promise.all([
-    fetchPublicPostBySlug(slug),
+  const [view, recentPosts] = await Promise.all([
+    getBlogPostView(slug),
     fetchRecentPostsForSite({ limit: 3, excludeSlug: slug }),
   ]);
 
-  if (!post) {
+  if (!view) {
     notFound();
   }
 
+  const { post, previewReason } = view;
   const featuredImage = await fetchFeaturedImageForPost(post.featuredImageId);
-
-  if (post.visibility === "private") {
-    notFound();
-  }
 
   const pageTitle = post.seoTitle?.trim() || post.title;
   const sidebarPosts = mapPostsToSidebarItems(recentPosts);
+
+  const previewNotice = previewReason ? (
+    <BlogPostPreviewNotice
+      postId={post.id}
+      reason={previewReason}
+      publishedAt={post.publishedAt}
+    />
+  ) : null;
 
   const article = (
     <>
@@ -110,11 +119,19 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
   if (post.visibility === "password") {
     return (
-      <PasswordProtectedPost slug={post.slug} title={post.title}>
-        {article}
-      </PasswordProtectedPost>
+      <>
+        {previewNotice}
+        <PasswordProtectedPost slug={post.slug} title={post.title}>
+          {article}
+        </PasswordProtectedPost>
+      </>
     );
   }
 
-  return article;
+  return (
+    <>
+      {previewNotice}
+      {article}
+    </>
+  );
 }
