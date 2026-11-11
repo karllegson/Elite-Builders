@@ -14,7 +14,6 @@ import {
   deleteTags,
   getPostById,
   getPostBySlug,
-  getPublicPostBySlug,
   listCategories,
   listPosts,
   listPublishedPublicPosts,
@@ -289,15 +288,6 @@ export async function fetchRecentPostsForSite(options?: {
       .map(toPostDTO);
   } catch {
     return [];
-  }
-}
-
-export async function fetchPublicPostBySlug(slug: string) {
-  try {
-    const post = await getPublicPostBySlug(slug);
-    return post ? toPostDTO(post) : null;
-  } catch {
-    return null;
   }
 }
 

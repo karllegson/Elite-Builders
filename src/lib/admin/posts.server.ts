@@ -918,22 +918,34 @@ export async function listPublishedPublicPosts(): Promise<PostRecord[]> {
     });
 }
 
-export async function getPublicPostBySlug(slug: string): Promise<PostRecord | null> {
-  const post = await getPostBySlug(slug);
+/** Why a post is hidden from public visitors (admins can still preview it). */
+export type PostPreviewReason = "draft" | "scheduled" | "private";
 
-  if (!post || post.status === "trash" || post.status === "draft") {
-    return null;
+/**
+ * Returns why a non-trashed post is hidden from the public, or null when anyone
+ * may view it. Trashed posts are never viewable — callers must exclude them first.
+ */
+export function getPostPreviewReason(
+  post: PostRecord,
+  now: number = Date.now(),
+): PostPreviewReason | null {
+  if (post.status === "draft") {
+    return "draft";
   }
 
   if (post.status === "scheduled") {
     const publishTime = post.publishedAt ? new Date(post.publishedAt).getTime() : 0;
 
-    if (publishTime > Date.now()) {
-      return null;
+    if (publishTime > now) {
+      return "scheduled";
     }
   }
 
-  return post;
+  if (post.visibility === "private") {
+    return "private";
+  }
+
+  return null;
 }
 
 export function countCategoryPosts(
