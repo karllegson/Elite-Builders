@@ -180,14 +180,9 @@ export function PublishMetabox({
   };
 
   const handlePublish = () => {
-    const next: PublishSettings = {
-      ...settings,
-      status: "published",
-      publishDate:
-        settings.publishDate.getTime() <= Date.now()
-          ? settings.publishDate
-          : new Date(),
-    };
+    // Keep the chosen date: a future date is saved as "scheduled" and goes live
+    // automatically once that time passes.
+    const next: PublishSettings = { ...settings, status: "published" };
 
     publishSettingsRef && (publishSettingsRef.current = next);
     updateSettings(() => next);
