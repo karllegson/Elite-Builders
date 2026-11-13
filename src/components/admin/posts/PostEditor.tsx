@@ -129,7 +129,9 @@ export function PostEditor({ postId }: PostEditorProps) {
       metaDescription: post.metaDescription,
     });
     snippetEditedRef.current = {
-      seoTitle: true,
+      // Only treat the SEO title as customized when it differs from the post title,
+      // so editing the title keeps an un-customized SEO title in sync.
+      seoTitle: Boolean(post.seoTitle && post.seoTitle.trim() !== post.title.trim()),
       permalink: true,
       metaDescription: Boolean(post.metaDescription),
     };
