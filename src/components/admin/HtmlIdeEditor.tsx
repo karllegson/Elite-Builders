@@ -8,12 +8,18 @@ import { countWords } from "@/lib/admin/postEditor";
 import { buildLinkSnippet, type LinkInsertOptions } from "@/lib/admin/postEditor";
 import {
   insertAtEditorCursor,
+  insertEditorCtaButton,
+  insertEditorFaqs,
   insertEditorH2WithId,
   insertEditorHighlightBox,
+  insertEditorHorizontalImageCard,
   insertEditorImage,
   insertEditorList,
+  insertEditorQuickLinks,
   insertEditorRelatedPosts,
+  insertEditorReviews,
   insertEditorQuickSummary,
+  insertEditorTabbedContents,
   insertEditorHr,
   insertEditorShortHr,
   insertHtmlAtEditorRange,
@@ -46,6 +52,7 @@ const toolbarButtons: ToolbarButton[] = [
   { label: "Short HR", action: insertEditorShortHr },
   { label: "Highlight Box", action: insertEditorHighlightBox },
   { label: "Quick Summary", action: insertEditorQuickSummary },
+  { label: "Quick Links", action: insertEditorQuickLinks },
   { label: "b", action: (ed) => wrapEditorSelection(ed, "strong") },
   { label: "u", action: (ed) => wrapEditorSelection(ed, "u") },
   { label: "i", action: (ed) => wrapEditorSelection(ed, "em") },
@@ -59,6 +66,11 @@ const toolbarButtons: ToolbarButton[] = [
   { label: "ol", action: (ed) => insertEditorList(ed, "ol") },
   { label: "li", action: (ed) => wrapEditorSelection(ed, "li") },
   { label: "Related Posts", action: insertEditorRelatedPosts },
+  { label: "Horizontal Image Card", action: insertEditorHorizontalImageCard },
+  { label: "FAQs", action: insertEditorFaqs },
+  { label: "CTA Button", action: insertEditorCtaButton },
+  { label: "Tabbed Contents", action: insertEditorTabbedContents },
+  { label: "Reviews", action: insertEditorReviews },
 ];
 
 type HtmlIdeEditorProps = {
