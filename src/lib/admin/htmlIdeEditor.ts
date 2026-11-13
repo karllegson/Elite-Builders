@@ -211,20 +211,149 @@ const RELATED_POSTS_SNIPPET = [
   `</div> <!--End Related Posts-->`,
 ].join("\n");
 
+/** Replaces the current selection with `snippet` and selects `selectText` within it. */
+function insertSnippetSelecting(
+  editorInstance: editor.IStandaloneCodeEditor,
+  snippet: string,
+  selectText: string,
+  selectOffset: number,
+) {
+  const { start, end } = getEditorSelectionOffsets(editorInstance);
+
+  return applyEditorEdit(editorInstance, start, end, snippet, selectOffset, selectText.length);
+}
+
 /** Inserts the Related Posts block and selects the first `link` placeholder. */
 export function insertEditorRelatedPosts(editorInstance: editor.IStandaloneCodeEditor) {
-  const { start, end } = getEditorSelectionOffsets(editorInstance);
-  const placeholderOffset =
-    RELATED_POSTS_SNIPPET.indexOf(`"${RELATED_POSTS_LINK_PLACEHOLDER}"`) + 1;
-
-  return applyEditorEdit(
+  return insertSnippetSelecting(
     editorInstance,
-    start,
-    end,
     RELATED_POSTS_SNIPPET,
-    placeholderOffset,
-    RELATED_POSTS_LINK_PLACEHOLDER.length,
+    RELATED_POSTS_LINK_PLACEHOLDER,
+    RELATED_POSTS_SNIPPET.indexOf(`"${RELATED_POSTS_LINK_PLACEHOLDER}"`) + 1,
   );
+}
+
+const QUICK_LINKS = [
+  { id: "intro", label: "Intro" },
+  { id: "services", label: "Services" },
+  { id: "why-us", label: "Why Us" },
+  { id: "reviews", label: "Reviews" },
+  { id: "faq", label: "FAQ" },
+  { id: "get-started", label: "Get Started" },
+];
+const QUICK_LINKS_SNIPPET = [
+  `<div class="quick-links" id="quick-links" data-sticky-active-offset=""> <!--Start Quick Links-->`,
+  ``,
+  `  <div class="title">Quick Links</div>`,
+  ``,
+  `  <div class="links">`,
+  ``,
+  ...QUICK_LINKS.map(
+    ({ id, label }) => `    <a href="#${id}" data-sticky-label="">${label}</a>`,
+  ),
+  ``,
+  `  </div>`,
+  ``,
+  `</div> <!--End Quick Links-->`,
+].join("\n");
+
+/**
+ * Inserts the Quick Links block and selects the first anchor id (`intro`) so it
+ * can be renamed to match the target `<h2 id="...">`.
+ */
+export function insertEditorQuickLinks(editorInstance: editor.IStandaloneCodeEditor) {
+  const firstId = QUICK_LINKS[0].id;
+
+  return insertSnippetSelecting(
+    editorInstance,
+    QUICK_LINKS_SNIPPET,
+    firstId,
+    QUICK_LINKS_SNIPPET.indexOf(`"#${firstId}"`) + 2,
+  );
+}
+
+const HORIZONTAL_IMAGE_CARD_SNIPPET = [
+  `<div class="image-card single horizontal"> <!-- Start Image Card -->`,
+  `  <div class="image-card--image">`,
+  `    <img src="" alt="" title="">`,
+  `  </div>`,
+  `  <div class="image-card--content">`,
+  `    <h3 class="title">Title</h3>`,
+  `    <p>Body</p>`,
+  `    <div class="site-btn"><a href="/">CTA</a></div>`,
+  `  </div>`,
+  `</div> <!-- End Image Card -->`,
+].join("\n");
+
+/** Inserts a Horizontal Image Card with the cursor inside the image `src`. */
+export function insertEditorHorizontalImageCard(editorInstance: editor.IStandaloneCodeEditor) {
+  return insertAtEditorCursor(
+    editorInstance,
+    HORIZONTAL_IMAGE_CARD_SNIPPET,
+    HORIZONTAL_IMAGE_CARD_SNIPPET.indexOf(`src="`) + `src="`.length,
+  );
+}
+
+const TABBED_CONTENTS_TABS = ["Tab 1", "Tab 2"];
+const TABBED_CONTENTS_SNIPPET = [
+  `<div class="site-tabs">`,
+  `  <div class="tabs" role="tablist">`,
+  ...TABBED_CONTENTS_TABS.map((label, index) =>
+    index === 0
+      ? `    <div class="tab active" tabindex="0" role="tab">${label}</div>`
+      : `    <div class="tab" role="tab">${label}</div>`,
+  ),
+  `    <!-- Add/remove tabs as needed -->`,
+  `  </div>`,
+  ``,
+  `  <div class="tab-contents">`,
+  ...TABBED_CONTENTS_TABS.flatMap(() => [
+    `    <div class="content" role="tabpanel">`,
+    `      <h4>Heading</h4>`,
+    `      <p>Paragraph</p>`,
+    `      <ul>`,
+    `        <li>List item</li>`,
+    `        <li>List item</li>`,
+    `        <li>List item</li>`,
+    `      </ul>`,
+    `      <p>Paragraph</p>`,
+    `      <a href="#" class="button">Button Text</a>`,
+    `    </div>`,
+    ``,
+  ]),
+  `    <!-- Add/remove .content blocks for more/fewer tabs -->`,
+  `  </div>`,
+  `</div>`,
+].join("\n");
+
+/** Inserts a two-tab Tabbed Contents block and selects the first tab label. */
+export function insertEditorTabbedContents(editorInstance: editor.IStandaloneCodeEditor) {
+  const firstLabel = TABBED_CONTENTS_TABS[0];
+
+  return insertSnippetSelecting(
+    editorInstance,
+    TABBED_CONTENTS_SNIPPET,
+    firstLabel,
+    TABBED_CONTENTS_SNIPPET.indexOf(`>${firstLabel}<`) + 1,
+  );
+}
+
+/** Inserts the FAQs shortcode with the cursor inside `category` (slug or name). */
+export function insertEditorFaqs(editorInstance: editor.IStandaloneCodeEditor) {
+  return insertAtEditorCursor(editorInstance, `[faqs category=""]`, `[faqs category="`.length);
+}
+
+/** Inserts the Reviews shortcode with the cursor inside `amount` (defaults to 3 if empty). */
+export function insertEditorReviews(editorInstance: editor.IStandaloneCodeEditor) {
+  return insertAtEditorCursor(
+    editorInstance,
+    `[reviews amount="" category=""]`,
+    `[reviews amount="`.length,
+  );
+}
+
+export function insertEditorCtaButton(editorInstance: editor.IStandaloneCodeEditor) {
+  return insertAtEditorCursor(editorInstance, `[cta-btn]`);
 }
 
 export function wrapEditorStrongEm(editorInstance: editor.IStandaloneCodeEditor) {
