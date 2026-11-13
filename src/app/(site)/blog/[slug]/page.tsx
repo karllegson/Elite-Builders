@@ -68,7 +68,6 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   const { post, previewReason } = view;
   const featuredImage = await fetchFeaturedImageForPost(post.featuredImageId);
 
-  const pageTitle = post.seoTitle?.trim() || post.title;
   const sidebarPosts = mapPostsToSidebarItems(recentPosts);
 
   const previewNotice = previewReason ? (
@@ -84,7 +83,8 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
       <PageHero
         size="compact"
         eyebrow={formatBlogDateLong(post.publishedAt) || "Blog"}
-        title={pageTitle}
+        // The on-page heading is the post title; the SEO title only feeds <title>/meta.
+        title={post.title}
         breadcrumbs={[
           { label: "Home", href: "/" },
           { label: "Blog", href: "/blog" },
