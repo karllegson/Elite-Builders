@@ -4,6 +4,7 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState, useTransition } 
 import { fetchPublishedFaqsForCategoryRefAction } from "@/app/admin/(shell)/faqs/actions";
 import { useServiceAreaQuickLinkNavigation } from "@/hooks/useServiceAreaQuickLinkNavigation";
 import { initServiceAreaQuickLinksBar } from "@/lib/site/serviceAreaQuickLinksBar";
+import { initSiteTabs } from "@/lib/site/siteTabs";
 import { ServiceAreaFaqAccordion } from "@/components/site/ServiceAreaFaqAccordion";
 import { ServiceAreaFaqEmpty } from "@/components/site/ServiceAreaFaqEmpty";
 import { ServiceAreaHtmlContent } from "@/components/site/ServiceAreaHtmlContent";
@@ -64,8 +65,10 @@ export function ServiceAreaContentPanel({
     });
 
     const cleanup = initServiceAreaQuickLinksBar(panel, content);
+    const cleanupTabs = initSiteTabs(panel);
     return () => {
       cleanup?.();
+      cleanupTabs();
     };
   }, [content, contentRenderKey, ctaButton]);
 
