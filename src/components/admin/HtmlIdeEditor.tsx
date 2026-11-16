@@ -9,6 +9,15 @@ import { buildLinkSnippet, type LinkInsertOptions } from "@/lib/admin/postEditor
 import {
   insertAtEditorCursor,
   insertEditorCtaButton,
+  insertEditorEbButton,
+  insertEditorEbCard,
+  insertEditorEbEstimateButton,
+  insertEditorEbMap,
+  insertEditorEbPageTemplate,
+  insertEditorEbSection,
+  insertEditorEbShort,
+  insertEditorEbStats,
+  insertEditorEbTiles,
   insertEditorFaqs,
   insertEditorH2WithId,
   insertEditorHighlightBox,
@@ -26,6 +35,7 @@ import {
   wrapEditorSelection,
   wrapEditorStrongEm,
 } from "@/lib/admin/htmlIdeEditor";
+import { EB_SECTIONS } from "@/lib/site/ebContent";
 
 const MonacoEditor = dynamic(() => import("@monaco-editor/react"), {
   ssr: false,
@@ -73,11 +83,41 @@ const toolbarButtons: ToolbarButton[] = [
   { label: "Reviews", action: insertEditorReviews },
 ];
 
+/** City & service pages: Elite format blocks, no Level 10-era blocks. */
+const eliteToolbarButtons: ToolbarButton[] = [
+  { label: "New page template", action: insertEditorEbPageTemplate },
+  { label: "H1", action: (ed) => wrapEditorSelection(ed, "h1") },
+  { label: "H3", action: (ed) => wrapEditorSelection(ed, "h3") },
+  { label: "H4", action: (ed) => wrapEditorSelection(ed, "h4") },
+  { label: "p", action: (ed) => wrapEditorSelection(ed, "p") },
+  { label: "Short Version", action: insertEditorEbShort },
+  { label: "Service Card", action: insertEditorEbCard },
+  { label: "Tiles List", action: insertEditorEbTiles },
+  { label: "Button", action: insertEditorEbButton },
+  { label: "Estimate Button", action: insertEditorEbEstimateButton },
+  { label: "Stats", action: insertEditorEbStats },
+  { label: "Reviews", action: insertEditorReviews },
+  { label: "FAQs", action: insertEditorFaqs },
+  { label: "Map", action: insertEditorEbMap },
+  { label: "b", action: (ed) => wrapEditorSelection(ed, "strong") },
+  { label: "u", action: (ed) => wrapEditorSelection(ed, "u") },
+  { label: "i", action: (ed) => wrapEditorSelection(ed, "em") },
+  { label: "b-quote", action: (ed) => wrapEditorSelection(ed, "blockquote") },
+  { label: "EN—Dash", action: (ed) => insertAtEditorCursor(ed, "&ndash;") },
+  { label: "EM—Dash", action: (ed) => insertAtEditorCursor(ed, "&mdash;") },
+  { label: "img", action: insertEditorImage },
+  { label: "ul", action: (ed) => insertEditorList(ed, "ul") },
+  { label: "ol", action: (ed) => insertEditorList(ed, "ol") },
+  { label: "li", action: (ed) => wrapEditorSelection(ed, "li") },
+];
+
 type HtmlIdeEditorProps = {
   id?: string;
   value: string;
   onChange: (value: string) => void;
   ariaLabel?: string;
+  /** "elite" shows the city & service page blocks instead of the general set. */
+  toolbar?: "default" | "elite";
 };
 
 export function HtmlIdeEditor({
@@ -85,7 +125,9 @@ export function HtmlIdeEditor({
   value,
   onChange,
   ariaLabel = "HTML content editor",
+  toolbar = "default",
 }: HtmlIdeEditorProps) {
+  const buttons = toolbar === "elite" ? eliteToolbarButtons : toolbarButtons;
   const surfaceRef = useRef<HTMLDivElement>(null);
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
   const [editorReady, setEditorReady] = useState(false);
@@ -175,7 +217,27 @@ export function HtmlIdeEditor({
   return (
     <div className="admin-html-ide">
       <div className="admin-post-toolbar admin-html-ide-toolbar">
-        {toolbarButtons.map((button) => (
+        {toolbar === "elite" ? (
+          <select
+            className="admin-post-toolbar-btn"
+            aria-label="Insert section heading"
+            value=""
+            onChange={(event) => {
+              const sectionId = event.target.value;
+              if (sectionId) {
+                runToolbarAction((ed) => insertEditorEbSection(ed, sectionId));
+              }
+            }}
+          >
+            <option value="">Section H2…</option>
+            {EB_SECTIONS.map((section) => (
+              <option key={section.id} value={section.id}>
+                {section.label} (#{section.id})
+              </option>
+            ))}
+          </select>
+        ) : null}
+        {buttons.map((button) => (
           <button
             key={button.label}
             type="button"

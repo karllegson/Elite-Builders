@@ -16,6 +16,8 @@ type PageHeroProps = {
   image?: { src: string; alt: string; objectPosition?: string };
   /** Compact variant for content pages (blog posts, service-area pages). */
   size?: "default" | "compact";
+  /** Extra class on the outer section (e.g. `page-hero--eb` for Elite-format pages). */
+  className?: string;
   children?: ReactNode;
 };
 
@@ -27,12 +29,13 @@ export default function PageHero({
   breadcrumbs,
   image,
   size = "default",
+  className,
   children,
 }: PageHeroProps) {
   const compact = size === "compact";
 
   return (
-    <section className="bg-ink relative isolate overflow-hidden">
+    <section className={`bg-ink relative isolate overflow-hidden${className ? ` ${className}` : ""}`}>
       {image ? (
         <>
           <Image

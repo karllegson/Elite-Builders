@@ -5,10 +5,12 @@ import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import CtaBand from "@/components/site/CtaBand";
 import PageHero from "@/components/site/PageHero";
+import { EbContentPanel } from "@/components/site/EbContentPanel";
 import { ServiceAreaContentPanel } from "@/components/site/ServiceAreaContentPanel";
 import { ServiceAreaFeaturedImage } from "@/components/site/ServiceAreaFeaturedImage";
 import { ServiceAreaSidebar } from "@/components/site/ServiceAreaSidebar";
 import { usePublicServiceAreaSubPage } from "@/hooks/usePublicServiceAreas";
+import { buildEbJumpLinks, extractEbH1, isEbContent } from "@/lib/site/ebContent";
 
 type ServiceAreaSubPageViewProps = {
   parentSlug: string;
@@ -32,13 +34,17 @@ export function ServiceAreaSubPageView({
   // On-page heading drops the " | Elite Builders IX" brand suffix used in the browser title.
   const pageTitle = (page.seoTitle || page.title).replace(/\s+\|\s+[^|]+$/, "");
   const parentLabel = page.parent.title;
+  // Elite-format pages: the content's <h1> becomes the header title (one H1 per page).
+  const isEb = page.content.trim().length > 0 && isEbContent(page.content);
+  const heroTitle = (isEb && extractEbH1(page.content)) || pageTitle;
 
   return (
     <>
       <PageHero
         size="compact"
         eyebrow={parentLabel}
-        title={pageTitle}
+        title={heroTitle}
+        className={isEb ? "page-hero--eb" : undefined}
         breadcrumbs={[
           { label: "Home", href: "/" },
           { label: "Service Areas", href: "/service-areas" },
@@ -51,18 +57,20 @@ export function ServiceAreaSubPageView({
         <div className="site-container">
           <div className="grid grid-cols-1 items-start gap-10 lg:grid-cols-[minmax(0,1fr)_340px] lg:gap-14">
             <div className="min-w-0">
-              <div className="service-area-featured-intro">
+              <div className={`service-area-featured-intro${isEb ? " eb-page" : ""}`}>
                 {page.featuredImage ? (
                   <>
                     <ServiceAreaFeaturedImage
                       src={page.featuredImage.src}
                       alt={page.featuredImage.alt || `${pageTitle} featured image`}
                     />
-                    <hr className="service-area-featured-divider" />
+                    {isEb ? null : <hr className="service-area-featured-divider" />}
                   </>
                 ) : null}
 
-                {page.content.trim() ? (
+                {isEb ? (
+                  <EbContentPanel content={page.content} mapEmbed={page.mapEmbed} />
+                ) : page.content.trim() ? (
                   <ServiceAreaContentPanel content={page.content} mapEmbed={page.mapEmbed} />
                 ) : (
                   <div className="service-area-html-content service-area-default-intro">
@@ -72,7 +80,10 @@ export function ServiceAreaSubPageView({
               </div>
             </div>
 
-            <ServiceAreaSidebar city={page.parent.city} />
+            <ServiceAreaSidebar
+              city={page.parent.city}
+              jumpLinks={isEb ? buildEbJumpLinks(page.content) : undefined}
+            />
           </div>
         </div>
       </section>

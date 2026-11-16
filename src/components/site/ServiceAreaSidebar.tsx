@@ -3,17 +3,24 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, ChevronRight, Phone, Star } from "lucide-react";
+import { EbJumpList } from "@/components/site/EbJumpList";
 import EstimateCtaLink from "@/components/site/EstimateCtaLink";
 import {
   getServiceAreaSidebarPosts,
   getServiceAreaSidebarReview,
 } from "@/lib/site/serviceAreaSidebar";
 import { business } from "@/lib/site/config";
+import { EB_ESTIMATE_LABEL, type EbJumpLink } from "@/lib/site/ebContent";
 
 type ServiceAreaSidebarProps = {
   city?: string;
   estimateDescription?: string;
   recentPosts?: ReturnType<typeof getServiceAreaSidebarPosts>;
+  /**
+   * Elite-format pages: shows the "On This Page" list on top and keeps the
+   * sidebar to that list plus the estimate card so it fits while sticky.
+   */
+  jumpLinks?: EbJumpLink[];
 };
 
 function StarRating({ rating }: { rating: number }) {
@@ -37,7 +44,9 @@ export function ServiceAreaSidebar({
   city,
   estimateDescription,
   recentPosts,
+  jumpLinks,
 }: ServiceAreaSidebarProps) {
+  const isEb = jumpLinks !== undefined;
   const posts = recentPosts ?? getServiceAreaSidebarPosts();
   const review = getServiceAreaSidebarReview();
   const estimateCopy =
@@ -48,16 +57,20 @@ export function ServiceAreaSidebar({
 
   return (
     <aside
-      className="flex w-full flex-col gap-5 lg:sticky lg:top-28 lg:self-start"
+      className={`flex w-full flex-col gap-5 lg:sticky lg:top-28 lg:self-start${isEb ? " eb-sidebar" : ""}`}
       aria-label="Service area sidebar"
     >
-      <div className="bg-ink bg-blueprint overflow-hidden rounded-3xl p-6 sm:p-7">
+      {isEb ? <EbJumpList links={jumpLinks} /> : null}
+
+      <div className="eb-sidebar__estimate bg-ink bg-blueprint overflow-hidden rounded-3xl p-6 sm:p-7">
         <p className="eyebrow eyebrow-light">Free Estimate</p>
-        <h2 className="mt-3 font-display text-xl font-bold text-white">Request a Free Estimate</h2>
+        <h2 className="mt-3 font-display text-xl font-bold text-white">
+          {isEb ? "Book An Estimate" : "Request a Free Estimate"}
+        </h2>
         <p className="mt-3 text-[0.9375rem] leading-relaxed text-white/70">{estimateCopy}</p>
         <div className="mt-6 grid gap-2.5">
           <EstimateCtaLink href="/#estimate" className="btn btn-primary w-full">
-            Request a Free Estimate
+            {isEb ? EB_ESTIMATE_LABEL : "Request a Free Estimate"}
             <ArrowRight size={16} aria-hidden className="btn-arrow" />
           </EstimateCtaLink>
           <a href={business.phoneHref} className="btn btn-glass w-full">
@@ -67,7 +80,7 @@ export function ServiceAreaSidebar({
         </div>
       </div>
 
-      {posts.length > 0 ? (
+      {!isEb && posts.length > 0 ? (
         <div className="overflow-hidden rounded-3xl border border-solid border-site-line bg-white">
           <h3 className="px-6 pb-2 pt-6 font-display text-lg font-semibold">Recent Posts</h3>
           <ul className="px-3 pb-3">
@@ -101,27 +114,29 @@ export function ServiceAreaSidebar({
         </div>
       ) : null}
 
-      <figure className="rounded-3xl border border-solid border-site-line bg-site-surface p-6">
-        <StarRating rating={review.rating} />
-        <blockquote className="mt-4 text-[0.9375rem] leading-relaxed text-site-text-dark">
-          &ldquo;{review.excerpt}&rdquo;
-        </blockquote>
-        <figcaption className="mt-5 flex items-center gap-3">
-          <span
-            className="inline-flex size-10 shrink-0 items-center justify-center rounded-full bg-brand-navy font-display font-semibold text-white"
-            aria-hidden
-          >
-            {review.reviewerName.charAt(0)}
-          </span>
-          <span className="min-w-0 flex-1 font-display font-semibold text-brand-ink">
-            {review.reviewerName}
-          </span>
-          <Link href={review.href} className="link-arrow text-sm">
-            Reviews
-            <ArrowRight size={14} aria-hidden />
-          </Link>
-        </figcaption>
-      </figure>
+      {isEb ? null : (
+        <figure className="rounded-3xl border border-solid border-site-line bg-site-surface p-6">
+          <StarRating rating={review.rating} />
+          <blockquote className="mt-4 text-[0.9375rem] leading-relaxed text-site-text-dark">
+            &ldquo;{review.excerpt}&rdquo;
+          </blockquote>
+          <figcaption className="mt-5 flex items-center gap-3">
+            <span
+              className="inline-flex size-10 shrink-0 items-center justify-center rounded-full bg-brand-navy font-display font-semibold text-white"
+              aria-hidden
+            >
+              {review.reviewerName.charAt(0)}
+            </span>
+            <span className="min-w-0 flex-1 font-display font-semibold text-brand-ink">
+              {review.reviewerName}
+            </span>
+            <Link href={review.href} className="link-arrow text-sm">
+              Reviews
+              <ArrowRight size={14} aria-hidden />
+            </Link>
+          </figcaption>
+        </figure>
+      )}
     </aside>
   );
 }

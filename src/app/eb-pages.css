@@ -1,0 +1,565 @@
+/*
+ * Elite-format city & service pages ("Job-site" look).
+ * Applies only when the page content uses the eb-* format; older pages and
+ * blog posts keep the .service-area-html-content styles in globals.css.
+ * Left unlayered on purpose so it wins over Tailwind utilities on shared
+ * components (featured image frame, FAQ accordion, map embed).
+ */
+
+/* ---------- Header band ---------- */
+.site .page-hero--eb {
+  background: var(--color-brand-navy);
+}
+
+.site .page-hero--eb > [aria-hidden] {
+  display: none;
+}
+
+.site .page-hero--eb .eyebrow {
+  padding: 0.35rem 0.6rem;
+  background: var(--color-brand-red);
+  color: #fff;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+.site .page-hero--eb .eyebrow::before {
+  content: none;
+}
+
+.site .page-hero--eb h1 {
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0;
+}
+
+.site .page-hero--eb h1::after {
+  content: "";
+  display: block;
+  width: 5.5rem;
+  height: 0.45rem;
+  margin-top: 1.1rem;
+  background: var(--color-brand-red);
+}
+
+/* ---------- Featured image ---------- */
+.site .eb-page .service-area-featured-frame {
+  margin-bottom: 2.5rem;
+  border: 2px solid var(--color-brand-navy);
+  border-radius: 0;
+  box-shadow: 8px 8px 0 var(--color-brand-navy);
+}
+
+/* ---------- Body copy ---------- */
+.site .eb-content {
+  color: var(--color-site-text);
+}
+
+.site .eb-content p {
+  margin: 0 0 1rem;
+  line-height: 1.75;
+}
+
+.site .eb-content a:not(.eb-btn) {
+  color: var(--color-brand-blue);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+
+.site .eb-content strong {
+  color: var(--color-site-text-dark);
+}
+
+.site .eb-content img {
+  max-width: 100%;
+  height: auto;
+}
+
+.site .eb-content ul:not(.eb-tiles),
+.site .eb-content ol {
+  margin: 0 0 1.25rem;
+}
+
+.site .eb-content ul:not(.eb-tiles) > li,
+.site .eb-content ol > li {
+  position: relative;
+  margin: 0 0 0.6rem;
+  padding-left: 1.4rem;
+  line-height: 1.65;
+}
+
+.site .eb-content ul:not(.eb-tiles) > li::before {
+  content: "";
+  position: absolute;
+  left: 0.15rem;
+  top: 0.62em;
+  width: 0.45rem;
+  height: 0.45rem;
+  background: var(--color-brand-red);
+}
+
+.site .eb-content ol {
+  counter-reset: eb-ol;
+}
+
+.site .eb-content ol > li {
+  counter-increment: eb-ol;
+}
+
+.site .eb-content ol > li::before {
+  content: counter(eb-ol) ".";
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-weight: 800;
+  color: var(--color-brand-navy);
+}
+
+/* ---------- Section headings ---------- */
+.site .eb-rule {
+  height: 3px;
+  margin: 3rem 0;
+  border: 0;
+  background: var(--color-brand-navy);
+}
+
+.site .eb-label {
+  display: inline-block;
+  margin: 0 0 0.75rem;
+  padding: 0.35rem 0.55rem;
+  background: var(--color-brand-red);
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.site .eb-content h2 {
+  margin: 0 0 0.75rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 2.6vw, 2.05rem);
+  font-weight: 900;
+  line-height: 1.1;
+  text-transform: uppercase;
+  text-wrap: balance;
+  color: var(--color-brand-navy);
+}
+
+.site .eb-content h2[id] {
+  scroll-margin-top: calc(7rem + var(--site-admin-bar-height, 0px));
+}
+
+/* Subhead directly under a section heading */
+.site .eb-content h2 + h3 {
+  margin: 0 0 1.25rem;
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 800;
+  line-height: 1.35;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-brand-red);
+}
+
+/* Red bar under the subhead, or under the heading when there is no subhead */
+.site .eb-content h2 + h3::after,
+.site .eb-content h2:not(:has(+ h3))::after {
+  content: "";
+  display: block;
+  width: 3.75rem;
+  height: 0.3rem;
+  margin-top: 1rem;
+  background: var(--color-brand-red);
+}
+
+.site .eb-content h3,
+.site .eb-content h4 {
+  margin: 1.5rem 0 0.75rem;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 800;
+  line-height: 1.3;
+  color: var(--color-brand-navy);
+}
+
+/* ---------- The Short Version ---------- */
+.site .eb-short {
+  position: relative;
+  margin: 0 0 2.5rem;
+  padding: 1.1rem 1.25rem 1.1rem 2.4rem;
+  background: #ffc629;
+  color: #1d1a10;
+}
+
+.site .eb-short::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 1rem;
+  background: repeating-linear-gradient(-45deg, #1d1a10 0 7px, #ffc629 7px 14px);
+}
+
+.site .eb-short__label {
+  margin: 0 0 0.4rem;
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.site .eb-short__body p {
+  margin: 0;
+  color: #1d1a10;
+  font-weight: 500;
+  line-height: 1.65;
+}
+
+.site .eb-short__body p + p {
+  margin-top: 0.6rem;
+}
+
+/* ---------- Buttons ---------- */
+.site .eb-action {
+  margin: 1.25rem 0 0.5rem;
+}
+
+.site .eb-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.85rem 1.2rem;
+  background: var(--color-brand-red);
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: background-color 0.15s ease, transform 0.15s ease;
+}
+
+.site .eb-btn:hover {
+  background: var(--color-brand-red-dark);
+}
+
+.site .eb-btn:focus-visible {
+  outline: 3px solid var(--color-brand-navy);
+  outline-offset: 3px;
+}
+
+/* ---------- Service cards ---------- */
+.site .eb-cards {
+  display: grid;
+  gap: 1.5rem;
+  margin: 1.75rem 0 1rem;
+}
+
+@media (min-width: 640px) {
+  .site .eb-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.site .eb-card {
+  display: flex;
+  flex-direction: column;
+  border: 2px solid var(--color-brand-navy);
+  background: #fff;
+  box-shadow: 6px 6px 0 var(--color-brand-navy);
+}
+
+.site .eb-card__media img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+}
+
+.site .eb-card__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 1.15rem 1.15rem 1.3rem;
+}
+
+.site .eb-card__body h3 {
+  margin: 0 0 0.6rem;
+  font-size: 1.2rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.site .eb-card__body p {
+  font-size: 0.95rem;
+}
+
+.site .eb-card__body .eb-action {
+  margin: auto 0 0;
+  padding-top: 0.5rem;
+}
+
+/* A lone last card (1, 3, 5 cards) spans the full row, image beside the text. */
+@media (min-width: 640px) {
+  .site .eb-cards > .eb-card:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+    flex-direction: row;
+  }
+
+  .site .eb-cards > .eb-card:last-child:nth-child(odd) .eb-card__media {
+    flex: 0 0 45%;
+  }
+
+  .site .eb-cards > .eb-card:last-child:nth-child(odd) .eb-card__media img {
+    height: 100%;
+    aspect-ratio: auto;
+    min-height: 16rem;
+  }
+}
+
+/* Photos placed on their own between sections */
+.site .eb-content > img,
+.site .eb-content > p > img:only-child {
+  display: block;
+  width: 100%;
+  margin: 1.75rem 0;
+  border: 2px solid var(--color-brand-navy);
+  box-shadow: 6px 6px 0 var(--color-brand-navy);
+}
+
+/* ---------- Tiles (The Elite Difference) ---------- */
+.site .eb-tiles {
+  display: grid;
+  gap: 0.85rem;
+  margin: 0 0 1.25rem;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 640px) {
+  .site .eb-tiles {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.site .eb-tiles > li {
+  margin: 0;
+  padding: 1.1rem;
+  border: 2px solid var(--color-brand-navy);
+  background: #fff;
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+
+.site .eb-tiles > li > strong:first-child {
+  display: block;
+  margin-bottom: 0.3rem;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--color-brand-navy);
+}
+
+.site .eb-tiles > li > strong:first-child::before {
+  content: "";
+  display: block;
+  width: 1.6rem;
+  height: 0.25rem;
+  margin-bottom: 0.7rem;
+  background: var(--color-brand-red);
+}
+
+/* ---------- Stats row ---------- */
+.site .eb-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2px;
+  margin: 0.25rem 0 1.5rem;
+  border: 2px solid var(--color-brand-navy);
+  background: var(--color-brand-navy);
+}
+
+@media (min-width: 640px) {
+  .site .eb-stats {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.site .eb-stats__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.9rem 0.5rem;
+  background: #fff;
+  text-align: center;
+}
+
+.site .eb-stats__value {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 900;
+  line-height: 1.1;
+  color: var(--color-brand-navy);
+  font-variant-numeric: tabular-nums;
+}
+
+.site .eb-stats__label {
+  font-size: 0.78rem;
+  line-height: 1.3;
+  color: var(--color-site-text-muted);
+}
+
+/* ---------- Reviews, FAQ, map inside Elite pages ---------- */
+.site .eb-page .service-area-reviews {
+  margin: 1.25rem 0 0;
+}
+
+.site .eb-page .service-area-reviews__card {
+  border: 2px solid var(--color-brand-navy);
+  border-radius: 0;
+  background: #fff;
+}
+
+.site .eb-page .eb-panel > section[data-quick-link-id="faq"] {
+  margin-top: 1.25rem;
+  padding-top: 0;
+  border-top: 0;
+}
+
+.site .eb-page .eb-panel > section article {
+  border: 2px solid var(--color-brand-navy);
+  border-radius: 0;
+}
+
+.site .eb-page .service-area-map-embed {
+  margin-top: 1.25rem;
+  border: 2px solid var(--color-brand-navy);
+  border-radius: 0;
+}
+
+.site .eb-loading {
+  margin: 1.25rem 0;
+  font-size: 0.9rem;
+  color: var(--color-site-text-muted);
+}
+
+/* ---------- On This Page: phones ---------- */
+.site .eb-jump-mobile {
+  margin: 2.25rem 0 0;
+  border: 2px solid var(--color-brand-navy);
+  background: var(--color-site-surface);
+}
+
+.site .eb-jump-mobile summary {
+  padding: 0.85rem 1rem;
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-brand-navy);
+}
+
+.site .eb-content .eb-jump-mobile ol {
+  margin: 0;
+  padding: 0 1rem 0.85rem;
+  list-style: none;
+}
+
+.site .eb-content .eb-jump-mobile ol > li {
+  margin: 0;
+  padding: 0;
+}
+
+.site .eb-content .eb-jump-mobile ol > li::before {
+  content: none;
+}
+
+.site .eb-content .eb-jump-mobile a {
+  display: block;
+  padding: 0.45rem 0;
+  border-top: 1px solid var(--color-site-line);
+  color: var(--color-brand-navy);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+@media (min-width: 1024px) {
+  .site .eb-jump-mobile {
+    display: none;
+  }
+}
+
+/* ---------- On This Page: sidebar ---------- */
+.site .eb-jump {
+  display: none;
+  padding: 1.1rem 1.1rem 1rem;
+  border: 2px solid var(--color-brand-navy);
+  background: #fff;
+}
+
+@media (min-width: 1024px) {
+  .site .eb-jump {
+    display: block;
+  }
+}
+
+.site .eb-jump__title {
+  margin: 0 0 0.6rem;
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-brand-navy);
+}
+
+.site .eb-jump ol {
+  display: grid;
+  gap: 0.15rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.site .eb-jump a {
+  display: block;
+  padding: 0.45rem 0.7rem;
+  border-left: 2px solid var(--color-site-line);
+  color: var(--color-site-text);
+  font-size: 0.9rem;
+  line-height: 1.35;
+  text-decoration: none;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.site .eb-jump a:hover {
+  color: var(--color-brand-navy);
+}
+
+.site .eb-jump a.is-active {
+  border-left-color: var(--color-brand-red);
+  background: #fff4c2;
+  color: var(--color-brand-navy);
+  font-weight: 700;
+}
+
+.site .eb-sidebar .eb-sidebar__estimate {
+  border-radius: 0;
+  box-shadow: 6px 6px 0 var(--color-brand-red);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site .eb-btn,
+  .site .eb-jump a {
+    transition: none;
+  }
+}

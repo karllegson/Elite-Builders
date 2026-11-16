@@ -8,12 +8,14 @@ import EstimateCtaLink from "@/components/site/EstimateCtaLink";
 import PageHero from "@/components/site/PageHero";
 import ProjectCard from "@/components/site/ProjectCard";
 import SectionIntro from "@/components/site/SectionIntro";
+import { EbContentPanel } from "@/components/site/EbContentPanel";
 import { ServiceAreaContentPanel } from "@/components/site/ServiceAreaContentPanel";
 import { ServiceAreaFeaturedImage } from "@/components/site/ServiceAreaFeaturedImage";
 import { ServiceAreaMapEmbed } from "@/components/site/ServiceAreaMapEmbed";
 import { ServiceAreaSidebar } from "@/components/site/ServiceAreaSidebar";
 import { usePublicServiceArea } from "@/hooks/usePublicServiceAreas";
 import { business } from "@/lib/site/config";
+import { buildEbJumpLinks, extractEbH1, isEbContent } from "@/lib/site/ebContent";
 import { projectsForCity } from "@/lib/site/projects";
 
 type ServiceAreaCityViewProps = {
@@ -37,6 +39,9 @@ export function ServiceAreaCityView({ citySlug }: ServiceAreaCityViewProps) {
   // On-page heading drops the " | Elite Builders IX" brand suffix used in the browser title.
   const pageTitle = (area.seoTitle || cityLabel).replace(/\s+\|\s+[^|]+$/, "");
   const hasCustomContent = area.content.trim().length > 0;
+  // Elite-format pages: the content's <h1> becomes the header title (one H1 per page).
+  const isEb = hasCustomContent && isEbContent(area.content);
+  const heroTitle = (isEb && extractEbH1(area.content)) || pageTitle;
   const localProjects = projectsForCity(area.projectSlug);
 
   return (
@@ -44,7 +49,8 @@ export function ServiceAreaCityView({ citySlug }: ServiceAreaCityViewProps) {
       <PageHero
         size="compact"
         eyebrow={isServicePage ? "Our Services" : "Service Area"}
-        title={pageTitle}
+        title={heroTitle}
+        className={isEb ? "page-hero--eb" : undefined}
         breadcrumbs={[
           { label: "Home", href: "/" },
           isServicePage
@@ -58,18 +64,20 @@ export function ServiceAreaCityView({ citySlug }: ServiceAreaCityViewProps) {
         <div className="site-container">
           <div className="grid grid-cols-1 items-start gap-10 lg:grid-cols-[minmax(0,1fr)_340px] lg:gap-14">
             <div className="min-w-0">
-              <div className="service-area-featured-intro">
+              <div className={`service-area-featured-intro${isEb ? " eb-page" : ""}`}>
                 {area.featuredImage ? (
                   <>
                     <ServiceAreaFeaturedImage
                       src={area.featuredImage.src}
                       alt={area.featuredImage.alt || `${pageTitle} featured image`}
                     />
-                    <hr className="service-area-featured-divider" />
+                    {isEb ? null : <hr className="service-area-featured-divider" />}
                   </>
                 ) : null}
 
-                {hasCustomContent ? (
+                {isEb ? (
+                  <EbContentPanel content={area.content} mapEmbed={area.mapEmbed} />
+                ) : hasCustomContent ? (
                   <ServiceAreaContentPanel content={area.content} mapEmbed={area.mapEmbed} />
                 ) : (
                   <div className="service-area-html-content service-area-default-intro">
@@ -97,7 +105,10 @@ export function ServiceAreaCityView({ citySlug }: ServiceAreaCityViewProps) {
               </div>
             </div>
 
-            <ServiceAreaSidebar city={isServicePage ? undefined : area.city} />
+            <ServiceAreaSidebar
+              city={isServicePage ? undefined : area.city}
+              jumpLinks={isEb ? buildEbJumpLinks(area.content) : undefined}
+            />
           </div>
         </div>
       </section>

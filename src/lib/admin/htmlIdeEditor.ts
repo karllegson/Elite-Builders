@@ -368,3 +368,149 @@ export function wrapEditorStrongEm(editorInstance: editor.IStandaloneCodeEditor)
 
   return applyEditorEdit(editorInstance, start, end, snippet, cursorOffset);
 }
+
+/* ---------- Elite page format (city & service pages) ---------- */
+
+/** Inserts `<h2 id="…"></h2>` for one of the standard Elite section ids. */
+export function insertEditorEbSection(editorInstance: editor.IStandaloneCodeEditor, id: string) {
+  const openTag = `<h2 id="${id}">`;
+  return insertAtEditorCursor(editorInstance, `${openTag}</h2>`, openTag.length);
+}
+
+const EB_SHORT_SNIPPET = [`<div class="eb-short">`, `  <p></p>`, `</div>`].join("\n");
+
+/** Inserts The Short Version box with the cursor inside its paragraph. */
+export function insertEditorEbShort(editorInstance: editor.IStandaloneCodeEditor) {
+  return insertAtEditorCursor(
+    editorInstance,
+    EB_SHORT_SNIPPET,
+    EB_SHORT_SNIPPET.indexOf("<p>") + "<p>".length,
+  );
+}
+
+const EB_CARD_SNIPPET = [
+  `<div class="eb-card">`,
+  `  <img src="" alt="" title="">`,
+  `  <h3>Title</h3>`,
+  `  <p>Body</p>`,
+  `  [button href="/"]More on …[/button]`,
+  `</div>`,
+].join("\n");
+
+/** Inserts a Service Card with the cursor inside the image `src`. */
+export function insertEditorEbCard(editorInstance: editor.IStandaloneCodeEditor) {
+  return insertAtEditorCursor(
+    editorInstance,
+    EB_CARD_SNIPPET,
+    EB_CARD_SNIPPET.indexOf(`src="`) + `src="`.length,
+  );
+}
+
+const EB_TILES_SNIPPET = [
+  `<ul class="eb-tiles">`,
+  `  <li><strong>Title</strong> Text</li>`,
+  `  <li><strong>Title</strong> Text</li>`,
+  `  <li><strong>Title</strong> Text</li>`,
+  `  <li><strong>Title</strong> Text</li>`,
+  `</ul>`,
+].join("\n");
+
+/** Inserts a Tiles List and selects the first tile title. */
+export function insertEditorEbTiles(editorInstance: editor.IStandaloneCodeEditor) {
+  return insertSnippetSelecting(
+    editorInstance,
+    EB_TILES_SNIPPET,
+    "Title",
+    EB_TILES_SNIPPET.indexOf("Title"),
+  );
+}
+
+/** Inserts a `[button]`, using the selected text as its label. */
+export function insertEditorEbButton(editorInstance: editor.IStandaloneCodeEditor) {
+  const { start, end, value } = getEditorSelectionOffsets(editorInstance);
+  const openTag = `[button href="`;
+  const snippet = `${openTag}"]${value.slice(start, end)}[/button]`;
+  return applyEditorEdit(editorInstance, start, end, snippet, openTag.length);
+}
+
+export function insertEditorEbEstimateButton(editorInstance: editor.IStandaloneCodeEditor) {
+  return insertAtEditorCursor(editorInstance, `[estimate_button]`);
+}
+
+export function insertEditorEbStats(editorInstance: editor.IStandaloneCodeEditor) {
+  return insertAtEditorCursor(editorInstance, `[stats]`);
+}
+
+export function insertEditorEbMap(editorInstance: editor.IStandaloneCodeEditor) {
+  return insertAtEditorCursor(editorInstance, `[map]`);
+}
+
+const EB_PAGE_TEMPLATE = [
+  `<div class="eb-short">`,
+  `  <p>One or two sentences: who you are, what you do, and where.</p>`,
+  `</div>`,
+  ``,
+  `<h1>Framing Contractor In City, CA</h1>`,
+  ``,
+  `<h2 id="the-basics"></h2>`,
+  ``,
+  `<p></p>`,
+  ``,
+  `[estimate_button]`,
+  ``,
+  `<h2 id="our-services"></h2>`,
+  `<h3></h3>`,
+  ``,
+  `<p></p>`,
+  ``,
+  EB_CARD_SNIPPET,
+  ``,
+  EB_CARD_SNIPPET,
+  ``,
+  `<h2 id="the-elite-difference"></h2>`,
+  `<h3></h3>`,
+  ``,
+  `[stats]`,
+  ``,
+  EB_TILES_SNIPPET,
+  ``,
+  `<h2 id="what-clients-say"></h2>`,
+  `<h3></h3>`,
+  ``,
+  `[reviews amount="3"]`,
+  ``,
+  `<h2 id="our-process"></h2>`,
+  `<h3></h3>`,
+  ``,
+  `<ul>`,
+  `  <li></li>`,
+  `</ul>`,
+  ``,
+  `<h2 id="questions"></h2>`,
+  ``,
+  `[faqs category=""]`,
+  ``,
+  `<h2 id="where-we-work"></h2>`,
+  ``,
+  `<p></p>`,
+  ``,
+  `[map]`,
+  ``,
+  `<h2 id="book-an-estimate"></h2>`,
+  `<h3></h3>`,
+  ``,
+  `<p></p>`,
+  ``,
+  `[estimate_button]`,
+].join("\n");
+
+/** Inserts the full Elite page skeleton and selects the summary placeholder. */
+export function insertEditorEbPageTemplate(editorInstance: editor.IStandaloneCodeEditor) {
+  const placeholder = "One or two sentences: who you are, what you do, and where.";
+  return insertSnippetSelecting(
+    editorInstance,
+    EB_PAGE_TEMPLATE,
+    placeholder,
+    EB_PAGE_TEMPLATE.indexOf(placeholder),
+  );
+}

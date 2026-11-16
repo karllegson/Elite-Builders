@@ -80,7 +80,7 @@ export type ParsedServiceAreaContent = {
   faqCategoryRef: string | null;
 };
 
-function parseReviewsShortcode(shortcode: string): ServiceAreaReviewsBlockConfig {
+export function parseReviewsShortcode(shortcode: string): ServiceAreaReviewsBlockConfig {
   const amountMatch = shortcode.match(/\bamount\s*=\s*["']?(\d+)["']?/i);
   const categoryMatch =
     shortcode.match(/\bcategory\s*=\s*["']([^"']*)["']/i) ??

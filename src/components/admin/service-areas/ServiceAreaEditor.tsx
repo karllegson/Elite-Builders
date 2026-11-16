@@ -350,6 +350,7 @@ export function ServiceAreaEditor({
           value={content}
           onChange={setContent}
           ariaLabel="Service area HTML content"
+          toolbar="elite"
         />
 
         <PostEditorSeo

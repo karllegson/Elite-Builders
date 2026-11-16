@@ -9,6 +9,7 @@
 @import "tailwindcss/utilities.css" layer(utilities);
 
 @import "./admin.css";
+@import "./eb-pages.css";
 
 @theme {
   --color-brand-navy: #00205b;
