@@ -9,7 +9,7 @@ import { homeImages } from "@/lib/site/images";
 import { buildPageMetadata } from "@/lib/site/seo";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Financing",
+  title: "Construction & Remodel Financing",
   description:
     "Finance your remodel or addition with Elite Builders IX through RenoFi — renovation loans based on your home's after-renovation value, with terms up to 20 years.",
   path: "/financing",

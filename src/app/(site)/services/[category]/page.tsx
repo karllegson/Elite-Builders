@@ -65,6 +65,7 @@ export default async function ServiceCategoryPage({ params }: ServiceCategoryPag
     <ServicePageTemplate
       detail={detail}
       subPages={getServiceSubPagesForCategory(category)}
+      path={`/services/${category}`}
     />
   );
 }

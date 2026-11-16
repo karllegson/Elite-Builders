@@ -15,7 +15,7 @@ import {
 import { buildPageMetadata } from "@/lib/site/seo";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Blog",
+  title: "Framing & Construction Blog",
   description:
     "Framing, home building, and construction tips for homeowners and builders across the Bay Area and Northern California from Elite Builders.",
   path: "/blog",

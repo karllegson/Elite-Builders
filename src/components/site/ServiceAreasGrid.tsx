@@ -51,8 +51,8 @@ function ServiceAreaCard({ area }: { area: PublicServiceArea }) {
   );
 }
 
-export function ServiceAreasGrid() {
-  const { areas, ready } = usePublicServiceAreas();
+export function ServiceAreasGrid({ initialAreas }: { initialAreas?: PublicServiceArea[] }) {
+  const { areas, ready } = usePublicServiceAreas(initialAreas);
   // Service landing pages live in the same store but aren't cities.
   const grouped = groupPublicServiceAreasByRegion(areas.filter((area) => !area.isServicePage));
 

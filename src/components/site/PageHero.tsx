@@ -18,6 +18,8 @@ type PageHeroProps = {
   size?: "default" | "compact";
   /** Extra class on the outer section (e.g. `page-hero--eb` for Elite-format pages). */
   className?: string;
+  /** Use "p" when the page body already has its own H1 (one H1 per page). */
+  titleAs?: "h1" | "p";
   children?: ReactNode;
 };
 
@@ -30,9 +32,11 @@ export default function PageHero({
   image,
   size = "default",
   className,
+  titleAs = "h1",
   children,
 }: PageHeroProps) {
   const compact = size === "compact";
+  const TitleTag = titleAs;
 
   return (
     <section className={`bg-ink relative isolate overflow-hidden${className ? ` ${className}` : ""}`}>
@@ -97,7 +101,7 @@ export default function PageHero({
 
         <div className={breadcrumbs?.length ? "mt-8 sm:mt-10" : ""}>
           {eyebrow ? <p className="eyebrow eyebrow-light">{eyebrow}</p> : null}
-          <h1
+          <TitleTag
             className={`max-w-4xl font-display font-bold text-white ${
               eyebrow ? "mt-4" : ""
             } ${
@@ -107,7 +111,7 @@ export default function PageHero({
             }`}
           >
             {title}
-          </h1>
+          </TitleTag>
           {lede ? (
             <div className="mt-6 max-w-2xl space-y-4 text-base leading-relaxed text-white/75 sm:text-lg">
               {lede}

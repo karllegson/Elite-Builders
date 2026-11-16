@@ -68,6 +68,8 @@ async function getServiceAreaSitemapEntries(): Promise<{
         sitemapUrl(getServiceAreaPublicHref(area, store.areas), {
           changeFrequency: "monthly",
           priority: isServiceAreaSubPage(area) ? 0.65 : 0.7,
+          // Records without a saved date default to 1970; leave those to "now".
+          lastModified: area.updatedAt && !area.updatedAt.startsWith("1970") ? new Date(area.updatedAt) : undefined,
         }),
       );
     }

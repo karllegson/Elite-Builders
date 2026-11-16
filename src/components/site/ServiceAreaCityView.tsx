@@ -17,13 +17,23 @@ import { usePublicServiceArea } from "@/hooks/usePublicServiceAreas";
 import { business } from "@/lib/site/config";
 import { buildEbJumpLinks, extractEbH1, isEbContent } from "@/lib/site/ebContent";
 import { projectsForCity } from "@/lib/site/projects";
+import type { PublicFaqItem } from "@/lib/site/faqsPublic";
+import type { PublicServiceArea } from "@/lib/site/serviceAreasPublic";
 
 type ServiceAreaCityViewProps = {
   citySlug: string;
+  /** Server-loaded page; leave undefined to load it in the browser. */
+  initialArea?: PublicServiceArea | null;
+  /** FAQs for the page's [faqs] block, loaded on the server. */
+  initialFaqItems?: PublicFaqItem[];
 };
 
-export function ServiceAreaCityView({ citySlug }: ServiceAreaCityViewProps) {
-  const { area, ready } = usePublicServiceArea(citySlug);
+export function ServiceAreaCityView({
+  citySlug,
+  initialArea,
+  initialFaqItems,
+}: ServiceAreaCityViewProps) {
+  const { area, ready } = usePublicServiceArea(citySlug, initialArea);
 
   if (!ready) {
     return <p className="site-container py-24 text-sm text-site-text-muted">Loading service area…</p>;
@@ -76,9 +86,17 @@ export function ServiceAreaCityView({ citySlug }: ServiceAreaCityViewProps) {
                 ) : null}
 
                 {isEb ? (
-                  <EbContentPanel content={area.content} mapEmbed={area.mapEmbed} />
+                  <EbContentPanel
+                    content={area.content}
+                    mapEmbed={area.mapEmbed}
+                    initialFaqItems={initialFaqItems}
+                  />
                 ) : hasCustomContent ? (
-                  <ServiceAreaContentPanel content={area.content} mapEmbed={area.mapEmbed} />
+                  <ServiceAreaContentPanel
+                    content={area.content}
+                    mapEmbed={area.mapEmbed}
+                    faqItems={initialFaqItems}
+                  />
                 ) : (
                   <div className="service-area-html-content service-area-default-intro">
                     <p>{area.blurb}</p>
@@ -89,7 +107,14 @@ export function ServiceAreaCityView({ citySlug }: ServiceAreaCityViewProps) {
                   </div>
                 )}
 
-                {!hasCustomContent ? <ServiceAreaMapEmbed html={area.mapEmbed} /> : null}
+                {!hasCustomContent ? (
+                  <ServiceAreaMapEmbed
+                    html={area.mapEmbed}
+                    fallbackQuery={
+                      isServicePage ? undefined : isRegional ? "San Francisco Bay Area, CA" : cityLabel
+                    }
+                  />
+                ) : null}
 
                 {!hasCustomContent ? (
                   <div className="mt-10 flex flex-col gap-3 sm:flex-row lg:hidden">

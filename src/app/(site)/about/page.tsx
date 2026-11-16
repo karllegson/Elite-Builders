@@ -15,7 +15,7 @@ const BuilderPartnersSection = dynamic(
 const TeamSection = dynamic(() => import("@/components/site/TeamSection"));
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "About Us",
+  title: "About Our Modesto Framing Company",
   description:
     "Meet Elite Builders — family-owned framing-first specialists since 2012, serving the Bay Area, Central Valley, and Southern California with integrity and precision.",
   path: "/about",

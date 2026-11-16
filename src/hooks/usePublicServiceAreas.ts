@@ -43,9 +43,10 @@ async function loadPublicServiceAreas(): Promise<PublicServiceArea[]> {
   return getPublicServiceAreasFallback();
 }
 
-export function usePublicServiceAreas() {
-  const [areas, setAreas] = useState<PublicServiceArea[]>([]);
-  const [ready, setReady] = useState(false);
+/** All published areas. `initialAreas` is the server-loaded list, so links render in the first HTML. */
+export function usePublicServiceAreas(initialAreas?: PublicServiceArea[]) {
+  const [areas, setAreas] = useState<PublicServiceArea[]>(initialAreas ?? []);
+  const [ready, setReady] = useState(initialAreas !== undefined);
 
   const refresh = useCallback(() => {
     void loadPublicServiceAreas().then((nextAreas) => {
@@ -73,12 +74,21 @@ export function usePublicServiceAreas() {
   return { areas, ready };
 }
 
-export function usePublicServiceArea(slug: string) {
+/**
+ * One published city / service page. `initialArea` is the copy the server already
+ * loaded, so the page renders in the first HTML response (what search engines read).
+ */
+export function usePublicServiceArea(slug: string, initialArea?: PublicServiceArea | null) {
+  const hasInitial = initialArea !== undefined;
   const { areas, ready: listReady } = usePublicServiceAreas();
-  const [directArea, setDirectArea] = useState<PublicServiceArea | null>(null);
-  const [directReady, setDirectReady] = useState(false);
+  const [directArea, setDirectArea] = useState<PublicServiceArea | null>(initialArea ?? null);
+  const [directReady, setDirectReady] = useState(hasInitial);
 
   useEffect(() => {
+    if (hasInitial) {
+      return;
+    }
+
     let cancelled = false;
 
     void fetchPublicServiceAreaBySlugAction(slug).then((fromServer) => {
@@ -91,7 +101,7 @@ export function usePublicServiceArea(slug: string) {
     return () => {
       cancelled = true;
     };
-  }, [slug]);
+  }, [hasInitial, slug]);
 
   const area = useMemo(() => {
     if (directArea) {
@@ -108,9 +118,15 @@ export function usePublicServiceArea(slug: string) {
   return { area, ready: directReady || listReady };
 }
 
-export function usePublicServiceAreaSubPage(parentSlug: string, subPageSlug: string) {
-  const [page, setPage] = useState<PublicServiceAreaSubPage | null>(null);
-  const [ready, setReady] = useState(false);
+/** One published sub-page. `initialPage` is the server-loaded copy (see usePublicServiceArea). */
+export function usePublicServiceAreaSubPage(
+  parentSlug: string,
+  subPageSlug: string,
+  initialPage?: PublicServiceAreaSubPage | null,
+) {
+  const hasInitial = initialPage !== undefined;
+  const [page, setPage] = useState<PublicServiceAreaSubPage | null>(initialPage ?? null);
+  const [ready, setReady] = useState(hasInitial);
 
   const refresh = useCallback(() => {
     void fetchPublicServiceAreaSubPageAction(parentSlug, subPageSlug).then((fromServer) => {
@@ -131,7 +147,9 @@ export function usePublicServiceAreaSubPage(parentSlug: string, subPageSlug: str
   }, [parentSlug, subPageSlug]);
 
   useEffect(() => {
-    refresh();
+    if (!hasInitial) {
+      refresh();
+    }
 
     const handleChange = () => {
       refresh();
@@ -144,7 +162,7 @@ export function usePublicServiceAreaSubPage(parentSlug: string, subPageSlug: str
       window.removeEventListener(SERVICE_AREAS_CHANGED_EVENT, handleChange);
       window.removeEventListener("storage", handleChange);
     };
-  }, [refresh]);
+  }, [hasInitial, refresh]);
 
   return { page, ready };
 }

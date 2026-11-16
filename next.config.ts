@@ -196,6 +196,9 @@ const nextConfig: NextConfig = {
         destination: "/services/home-builder/new-home-construction",
         permanent: true,
       },
+      // City pages moved to "-ca" slugs; the old URLs were showing a not-found page
+      { source: "/service-areas/livermore", destination: "/service-areas/livermore-ca", permanent: true },
+      { source: "/service-areas/richmond", destination: "/service-areas/richmond-ca", permanent: true },
       // Dashboard page renamed to match the GBP service name
       {
         source: "/service-areas/home-addition-framing",

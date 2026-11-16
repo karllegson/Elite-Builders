@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import CtaBand from "@/components/site/CtaBand";
+import JsonLd from "@/components/site/JsonLd";
 import PageHero from "@/components/site/PageHero";
 import { notFound } from "next/navigation";
 import {
@@ -18,6 +19,7 @@ import {
 import { getBlogPostView } from "@/lib/site/blogPostView";
 import { formatBlogDateLong } from "@/lib/site/formatBlogDate";
 import { buildPageMetadata } from "@/lib/site/seo";
+import { blogPostingSchema, breadcrumbSchema } from "@/lib/site/structuredData";
 
 type BlogPostPageProps = {
   params: Promise<{ slug: string }>;
@@ -69,6 +71,12 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   const featuredImage = await fetchFeaturedImageForPost(post.featuredImageId);
 
   const sidebarPosts = mapPostsToSidebarItems(recentPosts);
+  // Posts written with their own <h1> keep it; the header title then isn't a second H1.
+  const contentHasH1 = /<h1\b/i.test(post.content);
+  const description =
+    post.metaDescription?.trim() ||
+    post.excerpt?.trim() ||
+    `${post.title} — construction and framing insights from Elite Builders.`;
 
   const previewNotice = previewReason ? (
     <BlogPostPreviewNotice
@@ -80,8 +88,28 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
   const article = (
     <>
+      {previewReason ? null : (
+        <JsonLd
+          data={[
+            breadcrumbSchema([
+              { name: "Home", path: "/" },
+              { name: "Blog", path: "/blog" },
+              { name: post.title, path: `/blog/${slug}` },
+            ]),
+            blogPostingSchema({
+              headline: post.seoTitle?.trim() || post.title,
+              path: `/blog/${slug}`,
+              description,
+              datePublished: post.publishedAt,
+              dateModified: post.updatedAt,
+              image: featuredImage?.src,
+            }),
+          ]}
+        />
+      )}
       <PageHero
         size="compact"
+        titleAs={contentHasH1 ? "p" : "h1"}
         eyebrow={formatBlogDateLong(post.publishedAt) || "Blog"}
         // The on-page heading is the post title; the SEO title only feeds <title>/meta.
         title={post.title}

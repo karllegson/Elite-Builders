@@ -69,6 +69,13 @@ export type ServiceArea = {
 
 export const serviceAreas: ServiceArea[] = [
   {
+    city: "Modesto",
+    slug: "modesto-ca",
+    href: "/service-areas/modesto-ca",
+    blurb: "Framing-first contractor headquartered in Modesto, serving homeowners and builders across Stanislaus County.",
+    region: "Central Valley",
+  },
+  {
     city: "Stockton",
     slug: "stockton",
     href: "/service-areas/stockton",
@@ -134,7 +141,7 @@ export const serviceAreas: ServiceArea[] = [
   {
     city: "Livermore",
     slug: "livermore",
-    href: "/service-areas/livermore",
+    href: "/service-areas/livermore-ca",
     blurb: "Residential and commercial framing throughout Livermore and the Tri-Valley.",
     region: "Bay Area",
   },
@@ -185,6 +192,13 @@ export const serviceAreas: ServiceArea[] = [
     slug: "bay-area",
     href: "/service-areas/bay-area",
     blurb: "Greater Bay Area coverage — from the Tri-Valley to the South Bay and beyond.",
+    region: "Bay Area",
+  },
+  {
+    city: "Richmond",
+    slug: "richmond-ca",
+    href: "/service-areas/richmond-ca",
+    blurb: "Residential, addition and earthquake-ready structural framing across Richmond and Contra Costa County.",
     region: "Bay Area",
   },
   {

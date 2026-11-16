@@ -128,6 +128,7 @@ export type PublicServiceAreaSubPage = {
   slug: string;
   href: string;
   seoTitle: string;
+  metaDescription: string;
   content: string;
   featuredImage: ServiceAreaFeaturedImage | null;
   mapEmbed: string;
@@ -168,6 +169,7 @@ export function toPublicServiceAreaSubPage(
     slug: record.slug,
     href: getServiceAreaPublicHref(record, areas),
     seoTitle: record.seoTitle || record.title,
+    metaDescription: record.metaDescription?.trim() ?? "",
     content: record.content,
     featuredImage: record.featuredImage,
     mapEmbed: record.mapEmbed ?? "",

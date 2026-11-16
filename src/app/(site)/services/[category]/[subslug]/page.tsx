@@ -64,6 +64,7 @@ export default async function ServiceSubPage({ params }: ServiceSubPageProps) {
       detail={detail}
       subPages={getServiceSubPagesForCategory(category)}
       activeSubPage={subslug}
+      path={`/services/${category}/${subslug}`}
     />
   );
 }

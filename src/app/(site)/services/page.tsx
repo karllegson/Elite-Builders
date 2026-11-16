@@ -12,7 +12,7 @@ import { getServiceSubPagesForCategory } from "@/lib/site/serviceSubPages";
 import { buildPageMetadata } from "@/lib/site/seo";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Construction Services — Framing Contractor, Home Builder & More",
+  title: "Framing & Home Building Services",
   description:
     "Framing contractor and home builder across the Bay Area, Central Valley, and Southern California. Residential, new construction, and custom home framing is our core specialty. CSLB #970551.",
   path: "/services",

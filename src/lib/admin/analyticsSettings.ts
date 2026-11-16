@@ -30,10 +30,20 @@ export const TRACKED_ANALYTICS_EVENTS = [
   },
 ] as const;
 
+/**
+ * Elite Builders' GA4 property. Used when NEXT_PUBLIC_GA_MEASUREMENT_ID isn't set
+ * in the deploy (measurement IDs are public; they ship in every page anyway).
+ */
+export const DEFAULT_GA_MEASUREMENT_ID = "G-8FD4J3P6E7";
+
+function envGaMeasurementId(): string {
+  return process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID?.trim() || DEFAULT_GA_MEASUREMENT_ID;
+}
+
 export function createDefaultAnalyticsSettings(): AnalyticsSettings {
   return {
-    ga4MeasurementId: process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID?.trim() ?? "",
-    ga4Enabled: Boolean(process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID?.trim()),
+    ga4MeasurementId: envGaMeasurementId(),
+    ga4Enabled: Boolean(envGaMeasurementId()),
     searchConsoleProperty: "https://www.elitebuildersco.com/",
     clarityProjectId: process.env.NEXT_PUBLIC_CLARITY_PROJECT_ID?.trim() ?? "",
     clarityEnabled: Boolean(process.env.NEXT_PUBLIC_CLARITY_PROJECT_ID?.trim()),
@@ -89,8 +99,7 @@ export function resolveGaMeasurementId(settings = readAnalyticsSettings()): stri
     return fromSettings;
   }
 
-  const fromEnv = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID?.trim();
-  return fromEnv || null;
+  return envGaMeasurementId() || null;
 }
 
 export function resolveClarityProjectId(settings = readAnalyticsSettings()): string | null {

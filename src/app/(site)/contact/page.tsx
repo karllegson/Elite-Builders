@@ -6,7 +6,7 @@ import { business } from "@/lib/site/config";
 import { buildPageMetadata } from "@/lib/site/seo";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Contact Us",
+  title: "Free Framing Estimate in Modesto, CA",
   description:
     "Contact Elite Builders for a free framing or home building estimate. Serving the Bay Area, Central Valley, and Southern California. CSLB #970551.",
   path: "/contact",

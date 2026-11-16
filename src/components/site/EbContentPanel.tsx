@@ -14,6 +14,8 @@ import { getCtaButtonConfig } from "@/lib/site/runtimeSiteConfig";
 type EbContentPanelProps = {
   content: string;
   mapEmbed?: string;
+  /** FAQs the server already loaded, so they're in the first HTML. */
+  initialFaqItems?: PublicFaqItem[];
 };
 
 const stats: EbStat[] = [
@@ -22,7 +24,7 @@ const stats: EbStat[] = [
 ];
 
 /** Renders city / service pages written in the Elite (`eb-*`) format. */
-export function EbContentPanel({ content, mapEmbed = "" }: EbContentPanelProps) {
+export function EbContentPanel({ content, mapEmbed = "", initialFaqItems }: EbContentPanelProps) {
   const estimateHref = useMemo(() => getCtaButtonConfig().href, []);
   const blocks = useMemo(
     () => splitEbBlocks(prepareEbHtml(content, { estimateHref, stats })),
@@ -33,11 +35,11 @@ export function EbContentPanel({ content, mapEmbed = "" }: EbContentPanelProps) 
       ?.categoryRef ?? null;
   const hasMapBlock = blocks.some((block) => block.type === "map");
 
-  const [faqItems, setFaqItems] = useState<PublicFaqItem[] | null>(null);
+  const [faqItems, setFaqItems] = useState<PublicFaqItem[] | null>(initialFaqItems ?? null);
   const [, startTransition] = useTransition();
 
   useEffect(() => {
-    if (!faqCategoryRef) {
+    if (!faqCategoryRef || initialFaqItems) {
       return;
     }
 
@@ -52,7 +54,7 @@ export function EbContentPanel({ content, mapEmbed = "" }: EbContentPanelProps) 
     return () => {
       cancelled = true;
     };
-  }, [faqCategoryRef]);
+  }, [faqCategoryRef, initialFaqItems]);
 
   return (
     <div className="eb-panel">

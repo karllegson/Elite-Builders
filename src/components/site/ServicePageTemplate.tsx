@@ -8,6 +8,8 @@ import SectionIntro from "@/components/site/SectionIntro";
 import { business } from "@/lib/site/config";
 import { homeImages } from "@/lib/site/images";
 import type { ServiceDetail } from "@/lib/site/scope";
+import JsonLd from "@/components/site/JsonLd";
+import { breadcrumbSchema, serviceSchema } from "@/lib/site/structuredData";
 
 type ServiceSubPageLink = {
   label: string;
@@ -19,12 +21,15 @@ type ServicePageTemplateProps = {
   detail: ServiceDetail;
   subPages?: ServiceSubPageLink[];
   activeSubPage?: string;
+  /** Public path of this page, for Service and BreadcrumbList schema. */
+  path?: string;
 };
 
 export default function ServicePageTemplate({
   detail,
   subPages = [],
   activeSubPage,
+  path,
 }: ServicePageTemplateProps) {
   const img = homeImages[detail.heroImage];
 
@@ -40,6 +45,18 @@ export default function ServicePageTemplate({
 
   return (
     <>
+      {path ? (
+        <JsonLd
+          data={[
+            breadcrumbSchema([
+              { name: "Home", path: "/" },
+              { name: "Services", path: "/services" },
+              { name: detail.name, path },
+            ]),
+            serviceSchema({ name: detail.name, path, description: detail.metaDescription }),
+          ]}
+        />
+      ) : null}
       {detail.faqs.length > 0 && (
         <script
           type="application/ld+json"

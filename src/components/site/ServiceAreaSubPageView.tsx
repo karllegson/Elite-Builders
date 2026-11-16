@@ -11,17 +11,25 @@ import { ServiceAreaFeaturedImage } from "@/components/site/ServiceAreaFeaturedI
 import { ServiceAreaSidebar } from "@/components/site/ServiceAreaSidebar";
 import { usePublicServiceAreaSubPage } from "@/hooks/usePublicServiceAreas";
 import { buildEbJumpLinks, extractEbH1, isEbContent } from "@/lib/site/ebContent";
+import type { PublicFaqItem } from "@/lib/site/faqsPublic";
+import type { PublicServiceAreaSubPage } from "@/lib/site/serviceAreasPublic";
 
 type ServiceAreaSubPageViewProps = {
   parentSlug: string;
   subPageSlug: string;
+  /** Server-loaded page; leave undefined to load it in the browser. */
+  initialPage?: PublicServiceAreaSubPage | null;
+  /** FAQs for the page's [faqs] block, loaded on the server. */
+  initialFaqItems?: PublicFaqItem[];
 };
 
 export function ServiceAreaSubPageView({
   parentSlug,
   subPageSlug,
+  initialPage,
+  initialFaqItems,
 }: ServiceAreaSubPageViewProps) {
-  const { page, ready } = usePublicServiceAreaSubPage(parentSlug, subPageSlug);
+  const { page, ready } = usePublicServiceAreaSubPage(parentSlug, subPageSlug, initialPage);
 
   if (!ready) {
     return <p className="site-container py-24 text-sm text-site-text-muted">Loading page…</p>;
@@ -69,9 +77,17 @@ export function ServiceAreaSubPageView({
                 ) : null}
 
                 {isEb ? (
-                  <EbContentPanel content={page.content} mapEmbed={page.mapEmbed} />
+                  <EbContentPanel
+                    content={page.content}
+                    mapEmbed={page.mapEmbed}
+                    initialFaqItems={initialFaqItems}
+                  />
                 ) : page.content.trim() ? (
-                  <ServiceAreaContentPanel content={page.content} mapEmbed={page.mapEmbed} />
+                  <ServiceAreaContentPanel
+                    content={page.content}
+                    mapEmbed={page.mapEmbed}
+                    faqItems={initialFaqItems}
+                  />
                 ) : (
                   <div className="service-area-html-content service-area-default-intro">
                     <p>Content for this landing page is coming soon.</p>

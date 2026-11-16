@@ -99,20 +99,12 @@ function resolveUrl(path: string) {
   return `${SITE_URL}${path.startsWith("/") ? path : `/${path}`}`;
 }
 
+/** A trailing brand typed into a dashboard title, with any separator (| │ – — -). */
+const TRAILING_BRAND_PATTERN = /\s*[|│–—-]\s*Elite Builders(?:\s+IX)?\s*$/i;
+
 function normalizeTitle(title: string) {
-  const trimmed = title.trim();
-  const brandSuffix = ` | ${SITE_BRAND}`;
-  const legalSuffix = ` | ${SITE_NAME}`;
-
-  if (trimmed.endsWith(brandSuffix)) {
-    return trimmed.slice(0, -brandSuffix.length);
-  }
-
-  if (trimmed.endsWith(legalSuffix)) {
-    return trimmed.slice(0, -legalSuffix.length);
-  }
-
-  return trimmed;
+  // The layout template adds " | Elite Builders IX", so drop any brand already typed in.
+  return title.trim().replace(TRAILING_BRAND_PATTERN, "").trim();
 }
 
 function fullTitle(title: string) {

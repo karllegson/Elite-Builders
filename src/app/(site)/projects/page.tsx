@@ -10,7 +10,7 @@ import { completedProjects, currentProjects } from "@/lib/site/projects";
 import { buildPageMetadata } from "@/lib/site/seo";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Our Projects",
+  title: "Framing Projects in Northern California",
   description:
     "View completed and in-progress framing projects by Elite Builders — custom homes, condominiums, apartments, and production communities across Northern California.",
   path: "/projects",
