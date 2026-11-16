@@ -14,9 +14,6 @@ export const business = {
   phoneHref: "tel:+12094842743",
   email: "estimating@elitebuildersco.com",
   foundedYear: 2012,
-  /** Shown in the [stats] row on city and service pages. */
-  projectsCompleted: "350+",
-  citiesServed: 19,
   address: {
     street: "450 Burney Street",
     city: "Modesto",

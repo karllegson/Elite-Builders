@@ -7,6 +7,8 @@
  *
  * Every run first saves a full backup to .backups/. --apply refuses to write if
  * the store changed since the run started (someone saved a page meanwhile).
+ * Close every /admin tab before --apply: the admin keeps a browser copy of the
+ * pages and syncs it back to the server when it loads.
  */
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { convertLegacyToEb } from "../src/lib/site/ebConvert";
@@ -60,6 +62,7 @@ async function main() {
   writeFileSync(backupPath, JSON.stringify([row], null, 2));
   console.log(`Backup saved: ${backupPath}`);
 
+  const runStartedAt = new Date().toISOString();
   const areas = row.payload.areas;
   const byId = new Map(areas.map((area) => [area.id, area]));
   const preview: Record<string, {
@@ -99,7 +102,9 @@ async function main() {
       mapEmbed: area.mapEmbed,
     };
     console.log(`  converted: ${label}  (${area.content.length} → ${after.length} chars)`);
-    return { ...area, content: after };
+    // Bump updatedAt so the admin's browser copy sees the server as newer and
+    // pulls these pages instead of pushing its old copy back.
+    return { ...area, content: after, updatedAt: runStartedAt };
   });
 
   const previewPath = `${ROOT}src/app/(site)/eb-preview/converted.json`;

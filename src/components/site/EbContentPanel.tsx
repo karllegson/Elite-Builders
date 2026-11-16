@@ -18,8 +18,6 @@ type EbContentPanelProps = {
 
 const stats: EbStat[] = [
   { value: String(business.foundedYear), label: "Family-owned since" },
-  { value: business.projectsCompleted, label: "Projects completed" },
-  { value: String(business.citiesServed), label: "Cities served" },
   { value: business.licenseNumber, label: "CSLB license" },
 ];
 
