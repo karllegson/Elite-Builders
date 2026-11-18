@@ -1,7 +1,7 @@
 /**
  * Brings every Elite-format city / service page up to the hand-typed layout:
  *   - <hr> before every section heading except the first (section lines)
- *   - the H1 above The Short Version box
+ *   - the H1 stacked on The Basics heading, with a line above (after The Short Version)
  *   - <hr class="short"> under the H1 and each section heading (red bars)
  * Lines and bars stopped being automatic in Nov 2026, so older pages need them typed in.
  *
@@ -18,11 +18,11 @@ import {
   addMissingHeadingBars,
   addMissingSectionRules,
   isEbContent,
-  moveH1AboveShortVersion,
+  stackH1OnFirstSection,
 } from "../src/lib/site/ebContent";
 
 function fixLayout(html: string): string {
-  return addMissingHeadingBars(addMissingSectionRules(moveH1AboveShortVersion(html)));
+  return addMissingHeadingBars(addMissingSectionRules(stackH1OnFirstSection(html)));
 }
 
 type Area = {
@@ -91,7 +91,7 @@ async function main() {
     const count = (html: string, pattern: RegExp) => (html.match(pattern) ?? []).length;
     const lines = count(next, /<hr>/g) - count(area.content, /<hr>/g);
     const bars = count(next, /<hr class="short">/g) - count(area.content, /<hr class="short">/g);
-    const moved = next.search(/<h1\b/i) < area.content.search(/<h1\b/i) ? "  H1 moved up" : "";
+    const moved = next.search(/<h1\b/i) !== area.content.search(/<h1\b/i) ? "  H1 stacked" : "";
     console.log(`  +${lines} lines  +${bars} bars${moved}  ${label}`);
     // Bump updatedAt so the admin's browser copy pulls these pages instead of pushing its old copy back.
     return { ...area, content: next, updatedAt: runStartedAt };

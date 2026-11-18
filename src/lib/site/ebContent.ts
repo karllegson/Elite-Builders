@@ -57,12 +57,14 @@ const H2_WITH_ID_PATTERN = /<h2\b([^>]*\bid=["']([^"']+)["'][^>]*)>([\s\S]*?)<\/
 const PLAIN_HR_AT_END = /<hr\s*\/?>$/i;
 const SHORT_HR = `<hr class="short">`;
 const SHORT_HR_PATTERN = /^\s*<hr\b[^>]*\bclass=["'][^"']*\bshort\b[^"']*["'][^>]*>/i;
-const EB_SHORT_BLOCK_PATTERN = /<div\s+class=["']eb-short["']\s*>[\s\S]*?<\/div>/i;
 /** A heading the short red bar goes under: the H1, or an H2 plus the H3 subhead right after it. */
-const BAR_HEADING_PATTERN = /<h1\b[^>]*>[\s\S]*?<\/h1>|<h2\b[^>]*>[\s\S]*?<\/h2>(?:\s*<h3\b[^>]*>[\s\S]*?<\/h3>)?/gi;
+const BAR_HEADING_PATTERN =
+  /<h1\b[^>]*>[\s\S]*?<\/h1>(?:\s*<h2\b[^>]*>[\s\S]*?<\/h2>)?(?:\s*<h3\b[^>]*>[\s\S]*?<\/h3>)?|<h2\b[^>]*>[\s\S]*?<\/h2>(?:\s*<h3\b[^>]*>[\s\S]*?<\/h3>)?/gi;
+/** An H1 sitting directly on top of what follows (only blank space after it). */
+const H1_AT_END = /<h1\b[^>]*>[\s\S]*?<\/h1>\s*$/i;
 
-/** A typed <hr> followed (after blank space) by a section H2. */
-const SECTION_RULE_PATTERN = /<hr\s*\/?>(\s*)(?=<h2\b[^>]*\bid=["'])/gi;
+/** A plain typed <hr> (not <hr class="short">): always a section line. */
+const PLAIN_HR_PATTERN = /<hr\s*\/?>/gi;
 const SHORT_PATTERN = /<div\s+class=["']eb-short["']\s*>([\s\S]*?)<\/div>/gi;
 const CARD_PATTERN = /<div\s+class=["']eb-card["']\s*>([\s\S]*?)<\/div>/gi;
 const CARD_RUN_PATTERN = /(?:\s*<div\s+class=["']eb-card["']\s*>[\s\S]*?<\/div>)+/gi;
@@ -186,22 +188,35 @@ export function prepareEbHtml(html: string, options: PrepareEbOptions): string {
   result = result.replace(STATS_PATTERN, () => buildStatsHtml(options.stats));
   result = result.replace(LEFTOVER_SHORTCODE_PATTERN, "");
 
-  // Divider lines are typed by hand: an <hr> right before a section H2 becomes the section rule.
-  result = result.replace(SECTION_RULE_PATTERN, `<hr class="eb-rule">`);
+  // Divider lines are typed by hand: every plain <hr> is a section line.
+  result = result.replace(PLAIN_HR_PATTERN, `<hr class="eb-rule">`);
 
-  result = result.replace(H2_WITH_ID_PATTERN, (match, _attrs: string, id: string) => {
-    const label = `<p class="eb-label">${escapeText(ebSectionLabel(id.trim()))}</p>`;
-    return `${label}${match}`;
-  });
+  // Section label goes above the heading stack: above the H1 when one sits right on the H2.
+  const inserts: Array<{ at: number; label: string }> = [];
+  for (const match of result.matchAll(H2_WITH_ID_PATTERN)) {
+    inserts.push({
+      at: sectionStackStart(result, match.index ?? 0),
+      label: `<p class="eb-label">${escapeText(ebSectionLabel(match[2].trim()))}</p>`,
+    });
+  }
+  for (const { at, label } of inserts.reverse()) {
+    result = `${result.slice(0, at)}${label}${result.slice(at)}`;
+  }
 
-  // Phone-only jump list, placed right before the second section.
+  // Phone-only jump list, placed right before the second section (and its line).
   const mobileJump = buildMobileJumpHtml(jumpLinks);
   if (mobileJump) {
-    const secondRule = result.indexOf(`<hr class="eb-rule">`);
-    result =
-      secondRule >= 0
-        ? `${result.slice(0, secondRule)}${mobileJump}${result.slice(secondRule)}`
-        : `${result}${mobileJump}`;
+    const labels = Array.from(result.matchAll(/<p class="eb-label">/g), (m) => m.index ?? 0);
+    let at = labels[1] ?? -1;
+    if (at >= 0) {
+      const before = result.slice(0, at).replace(/\s+$/, "");
+      if (before.endsWith(`<hr class="eb-rule">`)) {
+        at = before.length - `<hr class="eb-rule">`.length;
+      }
+      result = `${result.slice(0, at)}${mobileJump}${result.slice(at)}`;
+    } else {
+      result = `${result}${mobileJump}`;
+    }
   }
 
   return result.trim();
@@ -237,6 +252,19 @@ export function splitEbBlocks(html: string): EbBlock[] {
   return blocks;
 }
 
+/** Where a section's heading stack starts: the H1 right above the H2, if there is one. */
+function sectionStackStart(html: string, h2Index: number): number {
+  const before = html.slice(0, h2Index);
+  const h1 = before.match(H1_AT_END);
+  return h1 && h1.index !== undefined ? h1.index : h2Index;
+}
+
+/** True when a plain <hr> sits right above the section's heading stack. */
+function hasRuleAbove(html: string, h2Index: number): boolean {
+  const before = html.slice(0, sectionStackStart(html, h2Index)).replace(/(\s|<!--[\s\S]*?-->)*$/, "");
+  return PLAIN_HR_AT_END.test(before);
+}
+
 /**
  * Section H2s (with an id) that have no typed <hr> right before them, skipping the
  * first section, which never gets a line. Returns the heading texts.
@@ -245,40 +273,58 @@ export function findSectionsMissingRule(html: string): string[] {
   const missing: string[] = [];
   let index = 0;
   for (const match of html.matchAll(H2_WITH_ID_PATTERN)) {
-    if (index > 0) {
-      const before = html.slice(0, match.index).replace(/(\s|<!--[\s\S]*?-->)*$/, "");
-      if (!PLAIN_HR_AT_END.test(before)) {
-        missing.push(stripTags(match[3]) || match[2]);
-      }
+    if (index > 0 && !hasRuleAbove(html, match.index ?? 0)) {
+      missing.push(stripTags(match[3]) || match[2]);
     }
     index += 1;
   }
   return missing;
 }
 
-/** Adds a typed <hr> before every section H2 (except the first) that doesn't have one. */
+/** Adds a typed <hr> above every section (except the first) that doesn't have one. */
 export function addMissingSectionRules(html: string): string {
+  const starts: number[] = [];
   let index = 0;
-  return html.replace(H2_WITH_ID_PATTERN, (match, _attrs: string, _id: string, _text: string, offset: number) => {
-    const isFirst = index === 0;
-    index += 1;
-    if (isFirst) {
-      return match;
+  for (const match of html.matchAll(H2_WITH_ID_PATTERN)) {
+    if (index > 0 && !hasRuleAbove(html, match.index ?? 0)) {
+      starts.push(sectionStackStart(html, match.index ?? 0));
     }
-    const before = html.slice(0, offset).replace(/(\s|<!--[\s\S]*?-->)*$/, "");
-    return PLAIN_HR_AT_END.test(before) ? match : `<hr>\n\n${match}`;
-  });
+    index += 1;
+  }
+  let result = html;
+  for (const at of starts.reverse()) {
+    result = `${result.slice(0, at)}<hr>\n\n${result.slice(at)}`;
+  }
+  return result;
 }
 
-/** Moves the H1 above The Short Version box when it was written below it. */
-export function moveH1AboveShortVersion(html: string): string {
-  const short = html.match(EB_SHORT_BLOCK_PATTERN);
-  const h1 = html.match(H1_PATTERN);
-  if (!short || !h1 || short.index === undefined || h1.index === undefined || h1.index < short.index) {
+/**
+ * Stacks the H1 right on top of the first section heading (The Basics), with a
+ * section line above the stack: Short Version, <hr>, H1 + H2, red bar.
+ */
+export function stackH1OnFirstSection(html: string): string {
+  const firstSection = html.match(/<h2\b[^>]*\bid=["']/i);
+  const h1 = html.match(/<h1\b[^>]*>[\s\S]*?<\/h1>(\s*<hr\b[^>]*\bclass=["'][^"']*\bshort\b[^"']*["'][^>]*>)?/i);
+  if (!firstSection || !h1 || firstSection.index === undefined || h1.index === undefined) {
     return html;
   }
-  const withoutH1 = `${html.slice(0, h1.index).replace(/\s+$/, "")}\n\n${html.slice(h1.index + h1[0].length).replace(/^\s+/, "")}`;
-  return withoutH1.replace(EB_SHORT_BLOCK_PATTERN, (block) => `${h1[0]}\n\n${block}`);
+  const h1Tag = h1[0].replace(/\s*<hr\b[\s\S]*$/i, "");
+  const between = html.slice(h1.index + h1[0].length, firstSection.index);
+  let result = html;
+  if (h1.index > firstSection.index || between.trim() !== "" || h1[1]) {
+    const before = html.slice(0, h1.index).replace(/\s+$/, "");
+    const after = html.slice(h1.index + h1[0].length).replace(/^\s+/, "");
+    result = `${before}\n\n${after}`;
+    const sectionAt = result.search(/<h2\b[^>]*\bid=["']/i);
+    result = `${result.slice(0, sectionAt)}${h1Tag}\n${result.slice(sectionAt)}`;
+  }
+  // Section line above the stack when something (the Short Version box) comes before it.
+  const stackAt = result.search(/<h1\b/i);
+  const above = result.slice(0, stackAt).replace(/\s+$/, "");
+  if (above && !PLAIN_HR_AT_END.test(above)) {
+    result = `${above}\n\n<hr>\n\n${result.slice(stackAt)}`;
+  }
+  return result;
 }
 
 /** Headings (H1, H2 or H2 + H3 subhead) with no typed <hr class="short"> right after them. */

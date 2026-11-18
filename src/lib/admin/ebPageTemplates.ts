@@ -1,8 +1,8 @@
-import { addMissingHeadingBars, moveH1AboveShortVersion } from "@/lib/site/ebContent";
+import { addMissingHeadingBars, stackH1OnFirstSection } from "@/lib/site/ebContent";
 
-/** H1 first, then The Short Version; a short red bar under every heading. */
+/** Short Version, line, H1 stacked on The Basics; a short red bar under every heading. */
 function finishTemplate(html: string): string {
-  return addMissingHeadingBars(moveH1AboveShortVersion(html));
+  return addMissingHeadingBars(stackH1OnFirstSection(html));
 }
 
 /**

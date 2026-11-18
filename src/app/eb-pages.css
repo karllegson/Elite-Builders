@@ -591,3 +591,8 @@
     transition: none;
   }
 }
+
+/* H1 stacked right on a section heading reads as one block */
+.site .eb-content h1:has(+ h2) {
+  margin-bottom: 0.75rem;
+}

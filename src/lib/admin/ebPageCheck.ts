@@ -149,15 +149,16 @@ export function checkEbPage(input: EbPageCheckInput): EbCheckResult[] {
     dividerIssues.length ? `${dividerIssues.join(". ")}.` : "Every section after the first has its <hr>.",
   );
 
-  // H1 comes first, then The Short Version box.
-  const h1At = content.search(/<h1\b/i);
-  const shortAt = content.search(/class=["'][^"']*\beb-short\b/);
-  if (h1At >= 0 && shortAt >= 0) {
+  // The H1 sits right on top of The Basics heading (one stack, label above, bar below).
+  const stacked = /<h1\b[^>]*>[\s\S]*?<\/h1>\s*<h2\b[^>]*\bid=["']/i.test(content);
+  if (/<h1\b/i.test(content)) {
     add(
       "order",
-      "H1 before Short Version",
-      h1At < shortAt ? "pass" : "warn",
-      h1At < shortAt ? "H1 is at the top, then The Short Version." : "Move the H1 above The Short Version box.",
+      "H1 stacked on The Basics",
+      stacked ? "pass" : "warn",
+      stacked
+        ? "H1 sits right above the first section heading."
+        : "Put the H1 directly above <h2 id=\"the-basics\"> (nothing between them), after The Short Version.",
     );
   }
 
