@@ -42,7 +42,7 @@ export default function SiteFooter() {
           </div>
           <div className="flex flex-col gap-3 sm:flex-row">
             <EstimateCtaLink href="/#estimate" className="btn btn-primary">
-              Request a Free Estimate
+              Start My Estimate
               <ArrowRight size={16} aria-hidden className="btn-arrow" />
             </EstimateCtaLink>
             <a href={business.phoneHref} className="btn btn-glass">

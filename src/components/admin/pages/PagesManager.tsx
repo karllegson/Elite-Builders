@@ -16,6 +16,12 @@ import {
   Trash2,
 } from "lucide-react";
 import { PageQuickEdit } from "@/components/admin/pages/PageQuickEdit";
+import { PageHealthCodeNote, PageHealthSummary } from "@/components/admin/pages/PageHealthSummary";
+import {
+  buildServiceAreaHealth,
+  buildServicePageHealth,
+  type PageHealth,
+} from "@/lib/admin/pageHealth";
 import {
   getDefaultQuickEditValues,
   type PageQuickEditTab,
@@ -168,8 +174,10 @@ function PageRow({
   onCloseMoreMenu,
   onMoreMenuAction,
   onQuickEdit,
+  health,
 }: {
   row: FlatPageRow;
+  health?: PageHealth;
   isExpanded: boolean;
   isSelected: boolean;
   isMoreMenuOpen: boolean;
@@ -181,6 +189,8 @@ function PageRow({
   onMoreMenuAction: (row: FlatPageRow, action: PageRowMoreMenuAction) => void;
   onQuickEdit: () => void;
 }) {
+  const showCodeNote = !health && !row.adminHref && !row.hasChildren && Boolean(row.href);
+
   return (
     <div
       className={`admin-pages-row${isMoreMenuOpen ? " is-more-menu-open" : ""}${isQuickEditOpen ? " is-quick-edit-active" : ""}`}
@@ -224,6 +234,8 @@ function PageRow({
           ) : null}
         </div>
       </div>
+
+      {health ? <PageHealthSummary health={health} /> : showCodeNote ? <PageHealthCodeNote /> : null}
 
       <div className="admin-pages-row-actions">
         <div className="admin-pages-row-hover-actions admin-pages-row-hover-actions-end">
@@ -274,6 +286,7 @@ export function PagesManager({ initialView = "all" }: { initialView?: PageListVi
     null,
   );
 
+  const [health, setHealth] = useState<Map<string, PageHealth>>(new Map());
   const counts = useMemo(() => countPages(pages), [pages]);
 
   const flatRows = useMemo(
@@ -293,8 +306,15 @@ export function PagesManager({ initialView = "all" }: { initialView?: PageListVi
 
   useEffect(() => {
     const refreshPages = () => {
-      const nextPages = getSitePages(listAllServiceAreas(), listAllServicePages());
+      const areas = listAllServiceAreas();
+      const servicePages = listAllServicePages();
+      const nextPages = getSitePages(areas, servicePages);
       setPages(nextPages);
+      // Row ids: "sa-<id>" for city pages and sub-pages, the record id for Services pages.
+      const nextHealth = new Map<string, PageHealth>();
+      for (const [id, value] of buildServiceAreaHealth(areas)) nextHealth.set(`sa-${id}`, value);
+      for (const [id, value] of buildServicePageHealth(servicePages)) nextHealth.set(id, value);
+      setHealth(nextHealth);
       setExpandedIds((current) => {
         const next = new Set(current);
         next.add("service-areas");
@@ -523,6 +543,7 @@ export function PagesManager({ initialView = "all" }: { initialView?: PageListVi
               onCloseMoreMenu={() => setOpenMoreMenuId(null)}
               onMoreMenuAction={handleMoreMenuAction}
               onQuickEdit={() => openQuickEdit(row)}
+              health={health.get(row.id)}
             />
           ))
         )}

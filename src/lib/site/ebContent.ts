@@ -346,3 +346,51 @@ export function addMissingHeadingBars(html: string): string {
     return SHORT_HR_PATTERN.test(after) ? heading : `${heading}\n${SHORT_HR}`;
   });
 }
+
+/**
+ * A heading's own text for the sidebar: stops at the first block tag (so an unclosed
+ * heading can't swallow the section under it) and is capped at a readable length.
+ */
+function headingLabel(inner: string): string {
+  const own = inner.split(/<(?:h[1-6]|p|ul|ol|li|div|hr|figure|table|section|blockquote)\b/i)[0];
+  const text = stripTags(own).replace(/\s+/g, " ").trim();
+  if (text.length <= 90) {
+    return text;
+  }
+  return `${text.slice(0, 90).replace(/\s+\S*$/, "")}…`;
+}
+
+function slugifyHeading(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/&[a-z#0-9]+;/g, " ")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 60)
+    .replace(/-+$/g, "");
+}
+
+/** Gives every H2 without an id one made from its text, so the sidebar can link to it. */
+export function addHeadingIds(html: string): string {
+  const used = new Set(Array.from(html.matchAll(/\bid=["']([^"']+)["']/gi), (match) => match[1]));
+  return html.replace(/<h2\b([^>]*)>([\s\S]*?)<\/h2>/gi, (match, attrs: string, inner: string) => {
+    if (/\bid=["']/i.test(attrs)) {
+      return match;
+    }
+    const base = slugifyHeading(headingLabel(inner)) || "section";
+    let id = base;
+    for (let n = 2; used.has(id); n += 1) {
+      id = `${base}-${n}`;
+    }
+    used.add(id);
+    return `<h2${attrs} id="${id}">${inner}</h2>`;
+  });
+}
+
+/** "On This Page" links for any page: one per H2 with an id, labelled with the heading text. */
+export function buildHeadingJumpLinks(html: string): EbJumpLink[] {
+  return Array.from(html.matchAll(H2_WITH_ID_PATTERN), (match) => ({
+    href: `#${match[2].trim()}`,
+    label: headingLabel(match[3]),
+  })).filter((link) => link.href.length > 1 && link.label);
+}

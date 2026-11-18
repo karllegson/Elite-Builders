@@ -8873,3 +8873,140 @@ a.admin-form-entries-settings-item {
     grid-column: 1 / -1;
   }
 }
+
+/* ---------- Pages list: per-page health chips ---------- */
+.admin-page-health {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.admin-page-health-chip,
+.admin-page-health-state {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 8px;
+  border: 1px solid #dcdcde;
+  border-radius: 11px;
+  background: #fff;
+  color: #50575e;
+  font-size: 12px;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.admin-page-health-chip.is-muted {
+  border-style: dashed;
+  color: #8c8f94;
+}
+
+.admin-page-health-chip.is-good {
+  border-color: #00a32a;
+  background: #edfaef;
+  color: #005c12;
+}
+
+.admin-page-health-chip.is-warn {
+  border-color: #dba617;
+  background: #fcf9e8;
+  color: #6e4f00;
+}
+
+.admin-page-health-chip.is-bad {
+  border-color: #d63638;
+  background: #fcf0f1;
+  color: #8a2424;
+}
+
+.admin-page-health-state {
+  min-width: 64px;
+  justify-content: center;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.admin-page-health-state:disabled {
+  cursor: default;
+}
+
+.admin-page-health-state.is-ready {
+  border-color: #00a32a;
+  background: #edfaef;
+  color: #005c12;
+}
+
+.admin-page-health-state.is-check {
+  border-color: #dba617;
+  background: #fcf9e8;
+  color: #6e4f00;
+}
+
+.admin-page-health-state.is-fix,
+.admin-page-health-state.is-empty {
+  border-color: #d63638;
+  background: #fcf0f1;
+  color: #8a2424;
+}
+
+.admin-page-health-state.is-placeholder {
+  border-color: #8c8f94;
+  background: #f0f0f1;
+  color: #3c434a;
+}
+
+.admin-page-health-pop {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 20;
+  width: min(460px, 80vw);
+  max-height: 360px;
+  overflow: auto;
+  padding: 12px 14px;
+  border: 1px solid #c3c4c7;
+  border-radius: 4px;
+  background: #fff;
+  box-shadow: 0 6px 18px rgb(0 0 0 / 12%);
+  font-size: 13px;
+  line-height: 1.45;
+  text-align: left;
+}
+
+.admin-page-health-pop-title {
+  margin: 0 0 4px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.admin-page-health-pop-title.is-fix {
+  color: #b32d2e;
+}
+
+.admin-page-health-pop-title.is-check {
+  margin-top: 8px;
+  color: #996800;
+}
+
+.admin-page-health-pop ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.admin-page-health-pop li + li {
+  margin-top: 4px;
+}
+
+@media (max-width: 782px) {
+  .admin-page-health {
+    justify-content: flex-start;
+    margin-left: 0;
+    padding: 4px 12px 0;
+  }
+}

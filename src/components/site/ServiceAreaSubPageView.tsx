@@ -112,7 +112,8 @@ export function ServiceAreaSubPageView({
         </Link>
       </div>
 
-      <CtaBand />
+      {/* Elite pages end with their own Book An Estimate section, so skip the static band. */}
+      {isEb ? null : <CtaBand />}
     </>
   );
 }

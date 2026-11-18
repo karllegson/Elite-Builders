@@ -3,15 +3,9 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import CtaBand from "@/components/site/CtaBand";
 import PageHero from "@/components/site/PageHero";
-import {
-  fetchPublishedPostsForSite,
-  fetchRecentPostsForSite,
-} from "@/app/admin/(shell)/posts/actions";
+import { fetchPublishedPostsForSite } from "@/app/admin/(shell)/posts/actions";
 import { ServiceAreaSidebar } from "@/components/site/ServiceAreaSidebar";
-import {
-  blogEstimateDescription,
-  mapPostsToSidebarItems,
-} from "@/lib/site/blogSidebar";
+import { blogEstimateDescription } from "@/lib/site/blogSidebar";
 import { buildPageMetadata } from "@/lib/site/seo";
 
 export const metadata: Metadata = buildPageMetadata({
@@ -34,12 +28,7 @@ function formatBlogDate(value: string | null): string {
 }
 
 export default async function BlogPage() {
-  const [posts, recentPosts] = await Promise.all([
-    fetchPublishedPostsForSite(),
-    fetchRecentPostsForSite({ limit: 3 }),
-  ]);
-
-  const sidebarPosts = mapPostsToSidebarItems(recentPosts);
+  const posts = await fetchPublishedPostsForSite();
 
   return (
     <>
@@ -96,7 +85,6 @@ export default async function BlogPage() {
 
             <ServiceAreaSidebar
               estimateDescription={blogEstimateDescription}
-              recentPosts={sidebarPosts}
             />
           </div>
         </div>

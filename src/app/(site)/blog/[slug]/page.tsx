@@ -3,19 +3,14 @@ import CtaBand from "@/components/site/CtaBand";
 import JsonLd from "@/components/site/JsonLd";
 import PageHero from "@/components/site/PageHero";
 import { notFound } from "next/navigation";
-import {
-  fetchFeaturedImageForPost,
-  fetchRecentPostsForSite,
-} from "@/app/admin/(shell)/posts/actions";
+import { fetchFeaturedImageForPost } from "@/app/admin/(shell)/posts/actions";
 import { PasswordProtectedPost } from "@/components/site/BlogPostPasswordGate";
 import { BlogPostBody } from "@/components/site/blog/BlogPostBody";
 import { BlogPostPreviewNotice } from "@/components/site/blog/BlogPostPreviewNotice";
 import { ViewAllBlogPostsLink } from "@/components/site/blog/ViewAllBlogPostsLink";
 import { ServiceAreaSidebar } from "@/components/site/ServiceAreaSidebar";
-import {
-  blogEstimateDescription,
-  mapPostsToSidebarItems,
-} from "@/lib/site/blogSidebar";
+import { blogEstimateDescription } from "@/lib/site/blogSidebar";
+import { addHeadingIds, buildHeadingJumpLinks } from "@/lib/site/ebContent";
 import { getBlogPostView } from "@/lib/site/blogPostView";
 import { formatBlogDateLong } from "@/lib/site/formatBlogDate";
 import { buildPageMetadata } from "@/lib/site/seo";
@@ -58,10 +53,7 @@ export async function generateMetadata({
 
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
   const { slug } = await params;
-  const [view, recentPosts] = await Promise.all([
-    getBlogPostView(slug),
-    fetchRecentPostsForSite({ limit: 3, excludeSlug: slug }),
-  ]);
+  const view = await getBlogPostView(slug);
 
   if (!view) {
     notFound();
@@ -70,7 +62,9 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   const { post, previewReason } = view;
   const featuredImage = await fetchFeaturedImageForPost(post.featuredImageId);
 
-  const sidebarPosts = mapPostsToSidebarItems(recentPosts);
+  // Every H2 gets an id so the sidebar's "On This Page" list can link to it.
+  const content = addHeadingIds(post.content);
+  const jumpLinks = buildHeadingJumpLinks(content);
   // Posts written with their own <h1> keep it; the header title then isn't a second H1.
   const contentHasH1 = /<h1\b/i.test(post.content);
   const description =
@@ -125,7 +119,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           <div className="grid grid-cols-1 items-start gap-10 lg:grid-cols-[minmax(0,1fr)_340px] lg:gap-14">
             <div className="min-w-0">
               <BlogPostBody
-                content={post.content}
+                content={content}
                 excerpt={post.excerpt}
                 featuredImage={featuredImage}
               />
@@ -133,7 +127,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
             <ServiceAreaSidebar
               estimateDescription={blogEstimateDescription}
-              recentPosts={sidebarPosts}
+              jumpLinks={jumpLinks}
             />
           </div>
         </div>
