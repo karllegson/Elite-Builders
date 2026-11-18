@@ -25,9 +25,18 @@ function storeHasCustomEdits(store: ServiceAreasStore): boolean {
 }
 
 export function syncServiceAreasStoreToServer(store: ServiceAreasStore): void {
-  void syncServiceAreasStoreAction(store).catch(() => {
-    // Ignore sync failures (e.g. missing migration or offline dev).
-  });
+  void syncServiceAreasStoreAction(store)
+    .then(async (result) => {
+      // Keep this tab's copy in step with the merged server copy.
+      const { writeServiceAreasStore } = await import("@/lib/admin/serviceAreasData");
+      writeServiceAreasStore(
+        { ...result.store, syncedAt: new Date().toISOString() },
+        { skipSync: true },
+      );
+    })
+    .catch(() => {
+      // Ignore sync failures (e.g. missing migration or offline dev).
+    });
 }
 
 /** Pull live/remote store into localStorage, or push local edits up when remote is empty. */
@@ -45,7 +54,7 @@ export async function ensureServiceAreasStoreReady(): Promise<void> {
     const localHasEdits = storeHasCustomEdits(local);
 
     if (remoteIsNewer || (remoteHasEdits && !localHasEdits)) {
-      writeServiceAreasStore(remote, { skipSync: true });
+      writeServiceAreasStore({ ...remote, syncedAt: new Date().toISOString() }, { skipSync: true });
       return;
     }
   }

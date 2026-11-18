@@ -10,7 +10,7 @@ import { ServiceAreaContentPanel } from "@/components/site/ServiceAreaContentPan
 import { ServiceAreaFeaturedImage } from "@/components/site/ServiceAreaFeaturedImage";
 import { ServiceAreaSidebar } from "@/components/site/ServiceAreaSidebar";
 import { usePublicServiceAreaSubPage } from "@/hooks/usePublicServiceAreas";
-import { buildEbJumpLinks, extractEbH1, isEbContent } from "@/lib/site/ebContent";
+import { buildEbJumpLinks, isEbContent } from "@/lib/site/ebContent";
 import type { PublicFaqItem } from "@/lib/site/faqsPublic";
 import type { PublicServiceAreaSubPage } from "@/lib/site/serviceAreasPublic";
 
@@ -42,9 +42,9 @@ export function ServiceAreaSubPageView({
   // On-page heading drops the " | Elite Builders IX" brand suffix used in the browser title.
   const pageTitle = (page.seoTitle || page.title).replace(/\s+\|\s+[^|]+$/, "");
   const parentLabel = page.parent.title;
-  // Elite-format pages: the content's <h1> becomes the header title (one H1 per page).
+  // Elite-format pages keep their H1 in the content; the header band shows the page name.
   const isEb = page.content.trim().length > 0 && isEbContent(page.content);
-  const heroTitle = (isEb && extractEbH1(page.content)) || pageTitle;
+  const heroTitle = isEb ? page.title : pageTitle;
 
   return (
     <>
@@ -52,6 +52,7 @@ export function ServiceAreaSubPageView({
         size="compact"
         eyebrow={parentLabel}
         title={heroTitle}
+        titleAs={isEb ? "p" : "h1"}
         className={isEb ? "page-hero--eb" : undefined}
         breadcrumbs={[
           { label: "Home", href: "/" },

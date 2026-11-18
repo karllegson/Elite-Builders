@@ -56,6 +56,8 @@ export type ServiceAreasStore = {
   areas: ServiceAreaRecord[];
   sectionOrder: string[];
   customSections: ServiceAreaSortSection[];
+  /** Browser copy only: when it last loaded the pages from the server (used to merge saves). */
+  syncedAt?: string;
 };
 
 export const US_STATE_NAMES: Record<string, string> = {
@@ -342,6 +344,7 @@ export function readServiceAreasStore(): ServiceAreasStore {
       areas: parsed.areas.map(normalizeServiceAreaRecord),
       sectionOrder: parsed.sectionOrder ?? [],
       customSections: parsed.customSections ?? [],
+      ...(parsed.syncedAt ? { syncedAt: parsed.syncedAt } : {}),
     };
   } catch {
     return createDefaultStore();

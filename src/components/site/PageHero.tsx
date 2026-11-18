@@ -102,7 +102,7 @@ export default function PageHero({
         <div className={breadcrumbs?.length ? "mt-8 sm:mt-10" : ""}>
           {eyebrow ? <p className="eyebrow eyebrow-light">{eyebrow}</p> : null}
           <TitleTag
-            className={`max-w-4xl font-display font-bold text-white ${
+            className={`page-hero-title max-w-4xl font-display font-bold text-white ${
               eyebrow ? "mt-4" : ""
             } ${
               compact

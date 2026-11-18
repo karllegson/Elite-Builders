@@ -6,7 +6,7 @@
  *
  * Authoring format (what goes in the HTML editor):
  *   <div class="eb-short"><p>…</p></div>          summary box ("The Short Version")
- *   <h1>…</h1>                                   lifted into the page header band
+ *   <h1>…</h1>                                   the page's only H1, shown where it is written
  *   <hr>                                         divider line, typed before every section H2 but the first
  *   <h2 id="the-basics">…</h2> <h3>…</h3>        section heading + subhead
  *   <div class="eb-card"><img …><h3>…</h3><p>…</p>[button href="…"]…[/button]</div>
@@ -54,6 +54,13 @@ const EB_MARKER_PATTERN =
   /class=["'][^"']*\beb-(?:short|card|tiles)\b|\[(?:estimate_button|stats|map)\]|\[button\s/i;
 const H1_PATTERN = /<h1\b[^>]*>([\s\S]*?)<\/h1>/i;
 const H2_WITH_ID_PATTERN = /<h2\b([^>]*\bid=["']([^"']+)["'][^>]*)>([\s\S]*?)<\/h2>/gi;
+const PLAIN_HR_AT_END = /<hr\s*\/?>$/i;
+const SHORT_HR = `<hr class="short">`;
+const SHORT_HR_PATTERN = /^\s*<hr\b[^>]*\bclass=["'][^"']*\bshort\b[^"']*["'][^>]*>/i;
+const EB_SHORT_BLOCK_PATTERN = /<div\s+class=["']eb-short["']\s*>[\s\S]*?<\/div>/i;
+/** A heading the short red bar goes under: the H1, or an H2 plus the H3 subhead right after it. */
+const BAR_HEADING_PATTERN = /<h1\b[^>]*>[\s\S]*?<\/h1>|<h2\b[^>]*>[\s\S]*?<\/h2>(?:\s*<h3\b[^>]*>[\s\S]*?<\/h3>)?/gi;
+
 /** A typed <hr> followed (after blank space) by a section H2. */
 const SECTION_RULE_PATTERN = /<hr\s*\/?>(\s*)(?=<h2\b[^>]*\bid=["'])/gi;
 const SHORT_PATTERN = /<div\s+class=["']eb-short["']\s*>([\s\S]*?)<\/div>/gi;
@@ -158,9 +165,6 @@ export function prepareEbHtml(html: string, options: PrepareEbOptions): string {
   const jumpLinks = buildEbJumpLinks(html);
   let result = html.replace(/<!--[\s\S]*?-->/g, "");
 
-  // The H1 is shown in the page header band instead.
-  result = result.replace(H1_PATTERN, "");
-
   result = result.replace(
     SHORT_PATTERN,
     (_match, inner: string) =>
@@ -243,7 +247,7 @@ export function findSectionsMissingRule(html: string): string[] {
   for (const match of html.matchAll(H2_WITH_ID_PATTERN)) {
     if (index > 0) {
       const before = html.slice(0, match.index).replace(/(\s|<!--[\s\S]*?-->)*$/, "");
-      if (!/<hr\b[^>]*>$/i.test(before)) {
+      if (!PLAIN_HR_AT_END.test(before)) {
         missing.push(stripTags(match[3]) || match[2]);
       }
     }
@@ -262,6 +266,37 @@ export function addMissingSectionRules(html: string): string {
       return match;
     }
     const before = html.slice(0, offset).replace(/(\s|<!--[\s\S]*?-->)*$/, "");
-    return /<hr\b[^>]*>$/i.test(before) ? match : `<hr>\n\n${match}`;
+    return PLAIN_HR_AT_END.test(before) ? match : `<hr>\n\n${match}`;
+  });
+}
+
+/** Moves the H1 above The Short Version box when it was written below it. */
+export function moveH1AboveShortVersion(html: string): string {
+  const short = html.match(EB_SHORT_BLOCK_PATTERN);
+  const h1 = html.match(H1_PATTERN);
+  if (!short || !h1 || short.index === undefined || h1.index === undefined || h1.index < short.index) {
+    return html;
+  }
+  const withoutH1 = `${html.slice(0, h1.index).replace(/\s+$/, "")}\n\n${html.slice(h1.index + h1[0].length).replace(/^\s+/, "")}`;
+  return withoutH1.replace(EB_SHORT_BLOCK_PATTERN, (block) => `${h1[0]}\n\n${block}`);
+}
+
+/** Headings (H1, H2 or H2 + H3 subhead) with no typed <hr class="short"> right after them. */
+export function findHeadingsMissingBar(html: string): string[] {
+  const missing: string[] = [];
+  for (const match of html.matchAll(BAR_HEADING_PATTERN)) {
+    const after = html.slice((match.index ?? 0) + match[0].length);
+    if (!SHORT_HR_PATTERN.test(after)) {
+      missing.push(stripTags(match[0].replace(/<h3\b[\s\S]*$/i, "")));
+    }
+  }
+  return missing;
+}
+
+/** Adds <hr class="short"> after every heading that's missing its red bar. */
+export function addMissingHeadingBars(html: string): string {
+  return html.replace(BAR_HEADING_PATTERN, (heading: string, offset: number) => {
+    const after = html.slice(offset + heading.length);
+    return SHORT_HR_PATTERN.test(after) ? heading : `${heading}\n${SHORT_HR}`;
   });
 }

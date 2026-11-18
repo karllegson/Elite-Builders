@@ -92,6 +92,7 @@ const eliteToolbarButtons: ToolbarButton[] = [
   { label: "H4", action: (ed) => wrapEditorSelection(ed, "h4") },
   { label: "p", action: (ed) => wrapEditorSelection(ed, "p") },
   { label: "HR (section line)", action: insertEditorHr },
+  { label: "Short HR (red bar)", action: insertEditorShortHr },
   { label: "Short Version", action: insertEditorEbShort },
   { label: "Service Card", action: insertEditorEbCard },
   { label: "Tiles List", action: insertEditorEbTiles },

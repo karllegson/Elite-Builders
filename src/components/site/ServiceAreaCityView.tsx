@@ -15,7 +15,7 @@ import { ServiceAreaMapEmbed } from "@/components/site/ServiceAreaMapEmbed";
 import { ServiceAreaSidebar } from "@/components/site/ServiceAreaSidebar";
 import { usePublicServiceArea } from "@/hooks/usePublicServiceAreas";
 import { business } from "@/lib/site/config";
-import { buildEbJumpLinks, extractEbH1, isEbContent } from "@/lib/site/ebContent";
+import { buildEbJumpLinks, isEbContent } from "@/lib/site/ebContent";
 import { projectsForCity } from "@/lib/site/projects";
 import type { PublicFaqItem } from "@/lib/site/faqsPublic";
 import type { PublicServiceArea } from "@/lib/site/serviceAreasPublic";
@@ -49,9 +49,9 @@ export function ServiceAreaCityView({
   // On-page heading drops the " | Elite Builders IX" brand suffix used in the browser title.
   const pageTitle = (area.seoTitle || cityLabel).replace(/\s+\|\s+[^|]+$/, "");
   const hasCustomContent = area.content.trim().length > 0;
-  // Elite-format pages: the content's <h1> becomes the header title (one H1 per page).
+  // Elite-format pages keep their H1 in the content; the header band shows the page name.
   const isEb = hasCustomContent && isEbContent(area.content);
-  const heroTitle = (isEb && extractEbH1(area.content)) || pageTitle;
+  const heroTitle = isEb ? cityLabel : pageTitle;
   const localProjects = projectsForCity(area.projectSlug);
 
   return (
@@ -60,6 +60,7 @@ export function ServiceAreaCityView({
         size="compact"
         eyebrow={isServicePage ? "Our Services" : "Service Area"}
         title={heroTitle}
+        titleAs={isEb ? "p" : "h1"}
         className={isEb ? "page-hero--eb" : undefined}
         breadcrumbs={[
           { label: "Home", href: "/" },

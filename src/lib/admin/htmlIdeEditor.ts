@@ -372,11 +372,18 @@ export function wrapEditorStrongEm(editorInstance: editor.IStandaloneCodeEditor)
 /* ---------- Elite page format (city & service pages) ---------- */
 
 /** Inserts `<h2 id="…"></h2>` for one of the standard Elite section ids. */
-/** Inserts a section H2; every section after The Basics gets its divider <hr> first. */
+/**
+ * Inserts a section H2 with its short red bar under it; every section after
+ * The Basics also gets its divider <hr> first. The cursor lands inside the H2.
+ */
 export function insertEditorEbSection(editorInstance: editor.IStandaloneCodeEditor, id: string) {
   const rule = id === "the-basics" ? "" : "<hr>\n\n";
   const openTag = `${rule}<h2 id="${id}">`;
-  return insertAtEditorCursor(editorInstance, `${openTag}</h2>`, openTag.length);
+  return insertAtEditorCursor(
+    editorInstance,
+    `${openTag}</h2>\n<hr class="short">`,
+    openTag.length,
+  );
 }
 
 const EB_SHORT_SNIPPET = [`<div class="eb-short">`, `  <p></p>`, `</div>`].join("\n");

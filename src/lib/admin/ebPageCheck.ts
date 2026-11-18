@@ -1,4 +1,9 @@
-import { EB_SECTIONS, findSectionsMissingRule, isEbContent } from "@/lib/site/ebContent";
+import {
+  EB_SECTIONS,
+  findHeadingsMissingBar,
+  findSectionsMissingRule,
+  isEbContent,
+} from "@/lib/site/ebContent";
 import { EB_WRITE_PROMPT } from "@/lib/admin/ebPageTemplates";
 
 export type EbCheckStatus = "pass" | "warn" | "fail";
@@ -142,6 +147,29 @@ export function checkEbPage(input: EbPageCheckInput): EbCheckResult[] {
     "Section lines (<hr>)",
     missingRules.length ? "fail" : h2WithoutId.length ? "warn" : "pass",
     dividerIssues.length ? `${dividerIssues.join(". ")}.` : "Every section after the first has its <hr>.",
+  );
+
+  // H1 comes first, then The Short Version box.
+  const h1At = content.search(/<h1\b/i);
+  const shortAt = content.search(/class=["'][^"']*\beb-short\b/);
+  if (h1At >= 0 && shortAt >= 0) {
+    add(
+      "order",
+      "H1 before Short Version",
+      h1At < shortAt ? "pass" : "warn",
+      h1At < shortAt ? "H1 is at the top, then The Short Version." : "Move the H1 above The Short Version box.",
+    );
+  }
+
+  // Short red bars are typed by hand: <hr class="short"> under the H1 and each section heading.
+  const missingBars = findHeadingsMissingBar(content);
+  add(
+    "bars",
+    'Red bars (<hr class="short">)',
+    missingBars.length ? "warn" : "pass",
+    missingBars.length
+      ? `No red bar under: "${missingBars.join('", "')}". Click "Short HR (red bar)" right after each heading (after the subhead if there is one).`
+      : "Every heading has its red bar.",
   );
 
   // Short Version

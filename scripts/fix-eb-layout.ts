@@ -1,10 +1,12 @@
 /**
- * Adds a typed <hr> before every section heading (except the first) on all
- * Elite-format city / service pages. Section lines stopped being automatic on
- * 2026-11-17, so pages saved before then need the <hr> in their content.
+ * Brings every Elite-format city / service page up to the hand-typed layout:
+ *   - <hr> before every section heading except the first (section lines)
+ *   - the H1 above The Short Version box
+ *   - <hr class="short"> under the H1 and each section heading (red bars)
+ * Lines and bars stopped being automatic in Nov 2026, so older pages need them typed in.
  *
- *   npx tsx scripts/add-section-hr.ts            dry run: backup + list of changes only
- *   npx tsx scripts/add-section-hr.ts --apply    saves the pages
+ *   npx tsx scripts/fix-eb-layout.ts            dry run: backup + list of changes only
+ *   npx tsx scripts/fix-eb-layout.ts --apply    saves the pages
  *
  * Every run first saves a full backup to .backups/. --apply refuses to write if
  * the store changed since the run started. Close every /admin tab before --apply:
@@ -12,7 +14,16 @@
  * Safe to run twice: pages that already have their lines are left alone.
  */
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { addMissingSectionRules, findSectionsMissingRule, isEbContent } from "../src/lib/site/ebContent";
+import {
+  addMissingHeadingBars,
+  addMissingSectionRules,
+  isEbContent,
+  moveH1AboveShortVersion,
+} from "../src/lib/site/ebContent";
+
+function fixLayout(html: string): string {
+  return addMissingHeadingBars(addMissingSectionRules(moveH1AboveShortVersion(html)));
+}
 
 type Area = {
   id: string;
@@ -54,7 +65,7 @@ async function main() {
   const row = await loadRow();
   const stamp = new Date().toISOString().replace(/[:.]/g, "-");
   mkdirSync(`${ROOT}.backups`, { recursive: true });
-  const backupPath = `${ROOT}.backups/service_areas_store-${stamp}${apply ? "-before-hr" : ""}.json`;
+  const backupPath = `${ROOT}.backups/service_areas_store-${stamp}${apply ? "-before-layout" : ""}.json`;
   writeFileSync(backupPath, JSON.stringify([row], null, 2));
   console.log(`Backup saved: ${backupPath}`);
 
@@ -67,22 +78,26 @@ async function main() {
       return area;
     }
 
-    const missing = findSectionsMissingRule(area.content);
     const parent = area.parentId ? byId.get(area.parentId) : null;
     const label = `${parent ? `${parent.slug}/` : ""}${area.slug}${area.status !== "published" ? ` (${area.status})` : ""}`;
+    const next = fixLayout(area.content);
 
-    if (missing.length === 0) {
+    if (next === area.content) {
       console.log(`  ok        ${label}`);
       return area;
     }
 
     changed += 1;
-    console.log(`  + ${missing.length} <hr>  ${label}`);
+    const count = (html: string, pattern: RegExp) => (html.match(pattern) ?? []).length;
+    const lines = count(next, /<hr>/g) - count(area.content, /<hr>/g);
+    const bars = count(next, /<hr class="short">/g) - count(area.content, /<hr class="short">/g);
+    const moved = next.search(/<h1\b/i) < area.content.search(/<h1\b/i) ? "  H1 moved up" : "";
+    console.log(`  +${lines} lines  +${bars} bars${moved}  ${label}`);
     // Bump updatedAt so the admin's browser copy pulls these pages instead of pushing its old copy back.
-    return { ...area, content: addMissingSectionRules(area.content), updatedAt: runStartedAt };
+    return { ...area, content: next, updatedAt: runStartedAt };
   });
 
-  console.log(`\n${changed} page(s) need lines added.`);
+  console.log(`\n${changed} page(s) need layout fixes.`);
 
   if (!apply) {
     console.log("Dry run only. Nothing was saved. Re-run with --apply to save.");

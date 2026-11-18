@@ -1,5 +1,6 @@
 "use server";
 
+import { mergeServiceAreasStores } from "@/lib/admin/serviceAreasMerge";
 import {
   getPublishedPublicServiceAreaBySlug,
   getPublishedPublicServiceAreaSubPage,
@@ -15,13 +16,16 @@ import type {
 
 export async function syncServiceAreasStoreAction(
   store: ServiceAreasStore,
-): Promise<{ ok: true }> {
+): Promise<{ ok: true; store: ServiceAreasStore }> {
   if (store.version !== 1 || !Array.isArray(store.areas)) {
     throw new Error("Invalid service areas store payload.");
   }
 
-  await saveServiceAreasStore(store);
-  return { ok: true };
+  // Merge page by page so a stale admin tab can't overwrite newer saves.
+  const current = await loadServiceAreasStore().catch(() => null);
+  const merged = current ? mergeServiceAreasStores(current, store) : store;
+  await saveServiceAreasStore(merged);
+  return { ok: true, store: merged };
 }
 
 export async function fetchServiceAreasStoreAction(): Promise<ServiceAreasStore | null> {

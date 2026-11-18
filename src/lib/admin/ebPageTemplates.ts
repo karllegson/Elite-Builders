@@ -1,3 +1,10 @@
+import { addMissingHeadingBars, moveH1AboveShortVersion } from "@/lib/site/ebContent";
+
+/** H1 first, then The Short Version; a short red bar under every heading. */
+function finishTemplate(html: string): string {
+  return addMissingHeadingBars(moveH1AboveShortVersion(html));
+}
+
 /**
  * Starter content for Elite-format pages, filled in for one city (and service).
  * Every "WRITE:" line is a prompt for the writer; the Page check flags any left behind.
@@ -81,6 +88,10 @@ type CityTemplateInput = {
 
 /** Full city landing page in the Elite format, with all six service cards. */
 export function buildEbCityTemplate({ city, subPageHrefs = {} }: CityTemplateInput): string {
+  return finishTemplate(buildCityBody(city, subPageHrefs));
+}
+
+function buildCityBody(city: string, subPageHrefs: Record<string, string>): string {
   const place = cityLabel(city);
   const name = city.trim() || "City";
   const county = countyForCity(name) ?? "the county";
@@ -183,12 +194,11 @@ type SubPageTemplateInput = {
 };
 
 /** One service in one city (e.g. Residential Framing In Modesto, CA). Mirrors the Modesto sub-pages. */
-export function buildEbSubPageTemplate({
-  city,
-  service,
-  serviceHref,
-  cityHref,
-}: SubPageTemplateInput): string {
+export function buildEbSubPageTemplate(input: SubPageTemplateInput): string {
+  return finishTemplate(buildSubPageBody(input));
+}
+
+function buildSubPageBody({ city, service, serviceHref, cityHref }: SubPageTemplateInput): string {
   const place = cityLabel(city);
   const name = city.trim() || "City";
   const svc = service.trim() || "Service";
