@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { cache } from "react";
 import JsonLd from "@/components/site/JsonLd";
 import { ServiceAreaSubPageView } from "@/components/site/ServiceAreaSubPageView";
@@ -69,6 +69,10 @@ export default async function ServiceAreaSubPage(props: ServiceAreaSubPageProps)
   const page = await loadSubPage(city, subpage);
 
   if (page === null) {
+    // Parent city renamed to a "-ca" slug: send old sub-page links to the new address.
+    if (!city.endsWith("-ca") && (await loadSubPage(`${city}-ca`, subpage))) {
+      permanentRedirect(`/service-areas/${city}-ca/${subpage}`);
+    }
     notFound();
   }
 

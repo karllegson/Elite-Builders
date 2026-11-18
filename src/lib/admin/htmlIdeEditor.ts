@@ -372,8 +372,10 @@ export function wrapEditorStrongEm(editorInstance: editor.IStandaloneCodeEditor)
 /* ---------- Elite page format (city & service pages) ---------- */
 
 /** Inserts `<h2 id="…"></h2>` for one of the standard Elite section ids. */
+/** Inserts a section H2; every section after The Basics gets its divider <hr> first. */
 export function insertEditorEbSection(editorInstance: editor.IStandaloneCodeEditor, id: string) {
-  const openTag = `<h2 id="${id}">`;
+  const rule = id === "the-basics" ? "" : "<hr>\n\n";
+  const openTag = `${rule}<h2 id="${id}">`;
   return insertAtEditorCursor(editorInstance, `${openTag}</h2>`, openTag.length);
 }
 
@@ -512,5 +514,23 @@ export function insertEditorEbPageTemplate(editorInstance: editor.IStandaloneCod
     EB_PAGE_TEMPLATE,
     placeholder,
     EB_PAGE_TEMPLATE.indexOf(placeholder),
+  );
+}
+
+/**
+ * Inserts a full page template built for this page (city or sub-page) and selects
+ * the first "WRITE:" prompt so the writer can start typing.
+ */
+export function insertEditorBuiltTemplate(
+  editorInstance: editor.IStandaloneCodeEditor,
+  template: string,
+  selectText: string,
+) {
+  const offset = template.indexOf(selectText);
+  return insertSnippetSelecting(
+    editorInstance,
+    template,
+    offset >= 0 ? selectText : "",
+    Math.max(offset, 0),
   );
 }

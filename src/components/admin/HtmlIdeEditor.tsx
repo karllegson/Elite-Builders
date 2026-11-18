@@ -8,6 +8,7 @@ import { countWords } from "@/lib/admin/postEditor";
 import { buildLinkSnippet, type LinkInsertOptions } from "@/lib/admin/postEditor";
 import {
   insertAtEditorCursor,
+  insertEditorBuiltTemplate,
   insertEditorCtaButton,
   insertEditorEbButton,
   insertEditorEbCard,
@@ -90,6 +91,7 @@ const eliteToolbarButtons: ToolbarButton[] = [
   { label: "H3", action: (ed) => wrapEditorSelection(ed, "h3") },
   { label: "H4", action: (ed) => wrapEditorSelection(ed, "h4") },
   { label: "p", action: (ed) => wrapEditorSelection(ed, "p") },
+  { label: "HR (section line)", action: insertEditorHr },
   { label: "Short Version", action: insertEditorEbShort },
   { label: "Service Card", action: insertEditorEbCard },
   { label: "Tiles List", action: insertEditorEbTiles },
@@ -118,6 +120,11 @@ type HtmlIdeEditorProps = {
   ariaLabel?: string;
   /** "elite" shows the city & service page blocks instead of the general set. */
   toolbar?: "default" | "elite";
+  /**
+   * Elite toolbar only: replaces the generic "New page template" with one built for
+   * this page (its city, its service cards). `build` runs when the button is clicked.
+   */
+  pageTemplate?: { label: string; build: () => string; selectText: string };
 };
 
 export function HtmlIdeEditor({
@@ -126,8 +133,21 @@ export function HtmlIdeEditor({
   onChange,
   ariaLabel = "HTML content editor",
   toolbar = "default",
+  pageTemplate,
 }: HtmlIdeEditorProps) {
-  const buttons = toolbar === "elite" ? eliteToolbarButtons : toolbarButtons;
+  const buttons =
+    toolbar !== "elite"
+      ? toolbarButtons
+      : pageTemplate
+        ? [
+            {
+              label: pageTemplate.label,
+              action: (ed: editor.IStandaloneCodeEditor) =>
+                insertEditorBuiltTemplate(ed, pageTemplate.build(), pageTemplate.selectText),
+            },
+            ...eliteToolbarButtons.filter((button) => button.label !== "New page template"),
+          ]
+        : eliteToolbarButtons;
   const surfaceRef = useRef<HTMLDivElement>(null);
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
   const [editorReady, setEditorReady] = useState(false);

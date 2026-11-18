@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { cache } from "react";
 import JsonLd from "@/components/site/JsonLd";
 import { ServiceAreaCityView } from "@/components/site/ServiceAreaCityView";
@@ -77,6 +77,10 @@ export default async function ServiceAreaCityPage(
   const area = await loadArea(city);
 
   if (area === null) {
+    // City pages were renamed to "-ca" slugs (stockton -> stockton-ca); send old links there.
+    if (!city.endsWith("-ca") && (await loadArea(`${city}-ca`))) {
+      permanentRedirect(`/service-areas/${city}-ca`);
+    }
     notFound();
   }
 

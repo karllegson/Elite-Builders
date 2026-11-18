@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { HtmlIdeEditor } from "@/components/admin/HtmlIdeEditor";
+import { EbPageCheckPanel } from "@/components/admin/service-areas/EbPageCheckPanel";
 import { PostEditorSeo } from "@/components/admin/posts/PostEditorSeo";
 import { ServiceAreaExtraMetaboxes } from "@/components/admin/service-areas/ServiceAreaExtraMetaboxes";
 import { ServiceAreaEditorSidebar } from "@/components/admin/service-areas/ServiceAreaEditorSidebar";
@@ -29,9 +30,20 @@ import { useAdminToast } from "@/components/admin/toast/useAdminToast";
 import {
   deleteServiceArea,
   getServiceAreaById,
+  parseServiceAreaTitle,
+  readServiceAreasStore,
   upsertServiceArea,
   type ServiceAreaRecord,
 } from "@/lib/admin/serviceAreasData";
+import {
+  EB_FRAMING_SERVICES,
+  EB_WRITE_PROMPT,
+  buildEbCityTemplate,
+  buildEbSubPageTemplate,
+  serviceNameFromTitle,
+} from "@/lib/admin/ebPageTemplates";
+import type { EbPageKind } from "@/lib/admin/ebPageCheck";
+import { isServiceLandingSlug } from "@/lib/site/serviceLandingPages";
 import { getParentSlugForServiceArea } from "@/lib/site/serviceAreaUrls";
 import { ensureServiceAreasStoreReady } from "@/lib/admin/serviceAreasSync.client";
 
@@ -83,6 +95,70 @@ export function ServiceAreaEditor({
     () => getParentSlugForServiceArea(pageAttributes.parentId),
     [pageAttributes.parentId],
   );
+
+  // What kind of Elite page this is, and which city it's about (for the template and Page check).
+  const pageContext = useMemo(() => {
+    const parent = pageAttributes.parentId ? getServiceAreaById(pageAttributes.parentId) : null;
+    if (parent) {
+      const city = parseServiceAreaTitle(parent.title).city;
+      return {
+        kind: "subpage" as EbPageKind,
+        city,
+        service: serviceNameFromTitle(title, city),
+        cityHref: `/service-areas/${parent.slug}`,
+      };
+    }
+    if (isServiceLandingSlug(snippet.permalink)) {
+      return { kind: "service" as EbPageKind, city: "", service: title, cityHref: "" };
+    }
+    return {
+      kind: "city" as EbPageKind,
+      city: parseServiceAreaTitle(title).city,
+      service: "",
+      cityHref: snippet.permalink ? `/service-areas/${snippet.permalink}` : "",
+    };
+  }, [pageAttributes.parentId, snippet.permalink, title]);
+
+  const pageTemplate = useMemo(() => {
+    if (pageContext.kind === "service") {
+      return undefined;
+    }
+
+    if (pageContext.kind === "subpage") {
+      return {
+        label: "New sub-page template",
+        selectText: EB_WRITE_PROMPT,
+        build: () => {
+          const known = EB_FRAMING_SERVICES.find(
+            (item) => item.name.toLowerCase() === pageContext.service.toLowerCase(),
+          );
+          return buildEbSubPageTemplate({
+            city: pageContext.city,
+            service: pageContext.service,
+            serviceHref: known?.href,
+            cityHref: pageContext.cityHref,
+          });
+        },
+      };
+    }
+
+    return {
+      label: "New page template",
+      selectText: EB_WRITE_PROMPT,
+      build: () => {
+        // Link each service card to this city's own sub-page when it exists.
+        const subPageHrefs: Record<string, string> = {};
+        if (serviceAreaId) {
+          for (const area of readServiceAreasStore().areas) {
+            if (area.parentId === serviceAreaId && !area.unused) {
+              subPageHrefs[area.slug] = `/service-areas/${snippet.permalink}/${area.slug}`;
+            }
+          }
+        }
+        return buildEbCityTemplate({ city: pageContext.city, subPageHrefs });
+      },
+    };
+  }, [pageContext, serviceAreaId, snippet.permalink]);
 
   const applyLoadedRecord = useCallback((record: ServiceAreaRecord) => {
     snippetEditedRef.current = {
@@ -351,6 +427,15 @@ export function ServiceAreaEditor({
           onChange={setContent}
           ariaLabel="Service area HTML content"
           toolbar="elite"
+          pageTemplate={pageTemplate}
+        />
+
+        <EbPageCheckPanel
+          content={content}
+          kind={pageContext.kind}
+          city={pageContext.city}
+          seoTitle={snippet.seoTitle}
+          metaDescription={snippet.metaDescription}
         />
 
         <PostEditorSeo

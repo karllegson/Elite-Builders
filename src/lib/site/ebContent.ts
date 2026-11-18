@@ -7,6 +7,7 @@
  * Authoring format (what goes in the HTML editor):
  *   <div class="eb-short"><p>…</p></div>          summary box ("The Short Version")
  *   <h1>…</h1>                                   lifted into the page header band
+ *   <hr>                                         divider line, typed before every section H2 but the first
  *   <h2 id="the-basics">…</h2> <h3>…</h3>        section heading + subhead
  *   <div class="eb-card"><img …><h3>…</h3><p>…</p>[button href="…"]…[/button]</div>
  *   <ul class="eb-tiles"><li><strong>…</strong> …</li></ul>
@@ -53,6 +54,8 @@ const EB_MARKER_PATTERN =
   /class=["'][^"']*\beb-(?:short|card|tiles)\b|\[(?:estimate_button|stats|map)\]|\[button\s/i;
 const H1_PATTERN = /<h1\b[^>]*>([\s\S]*?)<\/h1>/i;
 const H2_WITH_ID_PATTERN = /<h2\b([^>]*\bid=["']([^"']+)["'][^>]*)>([\s\S]*?)<\/h2>/gi;
+/** A typed <hr> followed (after blank space) by a section H2. */
+const SECTION_RULE_PATTERN = /<hr\s*\/?>(\s*)(?=<h2\b[^>]*\bid=["'])/gi;
 const SHORT_PATTERN = /<div\s+class=["']eb-short["']\s*>([\s\S]*?)<\/div>/gi;
 const CARD_PATTERN = /<div\s+class=["']eb-card["']\s*>([\s\S]*?)<\/div>/gi;
 const CARD_RUN_PATTERN = /(?:\s*<div\s+class=["']eb-card["']\s*>[\s\S]*?<\/div>)+/gi;
@@ -179,12 +182,12 @@ export function prepareEbHtml(html: string, options: PrepareEbOptions): string {
   result = result.replace(STATS_PATTERN, () => buildStatsHtml(options.stats));
   result = result.replace(LEFTOVER_SHORTCODE_PATTERN, "");
 
-  let sectionIndex = 0;
+  // Divider lines are typed by hand: an <hr> right before a section H2 becomes the section rule.
+  result = result.replace(SECTION_RULE_PATTERN, `<hr class="eb-rule">`);
+
   result = result.replace(H2_WITH_ID_PATTERN, (match, _attrs: string, id: string) => {
     const label = `<p class="eb-label">${escapeText(ebSectionLabel(id.trim()))}</p>`;
-    const rule = sectionIndex > 0 ? `<hr class="eb-rule">` : "";
-    sectionIndex += 1;
-    return `${rule}${label}${match}`;
+    return `${label}${match}`;
   });
 
   // Phone-only jump list, placed right before the second section.
@@ -228,4 +231,37 @@ export function splitEbBlocks(html: string): EbBlock[] {
 
   pushHtml(html.slice(cursor));
   return blocks;
+}
+
+/**
+ * Section H2s (with an id) that have no typed <hr> right before them, skipping the
+ * first section, which never gets a line. Returns the heading texts.
+ */
+export function findSectionsMissingRule(html: string): string[] {
+  const missing: string[] = [];
+  let index = 0;
+  for (const match of html.matchAll(H2_WITH_ID_PATTERN)) {
+    if (index > 0) {
+      const before = html.slice(0, match.index).replace(/(\s|<!--[\s\S]*?-->)*$/, "");
+      if (!/<hr\b[^>]*>$/i.test(before)) {
+        missing.push(stripTags(match[3]) || match[2]);
+      }
+    }
+    index += 1;
+  }
+  return missing;
+}
+
+/** Adds a typed <hr> before every section H2 (except the first) that doesn't have one. */
+export function addMissingSectionRules(html: string): string {
+  let index = 0;
+  return html.replace(H2_WITH_ID_PATTERN, (match, _attrs: string, _id: string, _text: string, offset: number) => {
+    const isFirst = index === 0;
+    index += 1;
+    if (isFirst) {
+      return match;
+    }
+    const before = html.slice(0, offset).replace(/(\s|<!--[\s\S]*?-->)*$/, "");
+    return /<hr\b[^>]*>$/i.test(before) ? match : `<hr>\n\n${match}`;
+  });
 }
