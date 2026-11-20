@@ -70,8 +70,8 @@ const homeImages = {
     alt: "Framing contractor reviewing blueprints on a Modesto construction project",
   },
   customHomeFramingCrew: {
-    file: "modesto-custom-home-framing-crew.png",
-    alt: "Elite Builders framing crew building a custom home in Northern California",
+    file: "modesto-framing-crew-safety-harness.webp",
+    alt: "Elite Builders framer wearing a hard hat, safety vest and fall-protection harness on a wood-framed building in Northern California",
   },
   patioDoorsOutdoorLiving: {
     file: "modesto-patio-doors-outdoor-living.png",

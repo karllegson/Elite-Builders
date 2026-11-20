@@ -17,8 +17,8 @@ export const homeImages = {
     alt: "Framing contractor reviewing blueprints on a Northern California construction project",
   },
   customHomeFramingCrew: {
-    src: "/images/home/modesto-custom-home-framing-crew.png",
-    alt: "Elite Builders framing crew building a custom home in Northern California",
+    src: "/images/home/modesto-framing-crew-safety-harness.webp",
+    alt: "Elite Builders framer wearing a hard hat, safety vest and fall-protection harness on a wood-framed building in Northern California",
   },
   patioDoorsOutdoorLiving: {
     src: "/images/home/modesto-patio-doors-outdoor-living.png",
