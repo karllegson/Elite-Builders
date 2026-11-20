@@ -21,7 +21,7 @@ const SAMPLE_DIMENSIONS: Record<string, { width: number; height: number; fileSiz
     customKitchenRemodel: { width: 1400, height: 933, fileSize: 128000 },
     commercialRoofFramingAerial: { width: 1600, height: 900, fileSize: 156672 },
     framingContractorPlanning: { width: 1400, height: 933, fileSize: 131072 },
-    customHomeFramingCrew: { width: 1400, height: 929, fileSize: 139264 },
+    customHomeFramingCrew: { width: 1536, height: 1440, fileSize: 123048 },
     patioDoorsOutdoorLiving: { width: 1400, height: 933, fileSize: 124928 },
     residentialWindowInstallation: { width: 1400, height: 933, fileSize: 135168 },
     luxuryHomeInterior: { width: 1400, height: 933, fileSize: 147456 },
