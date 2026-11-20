@@ -4,6 +4,8 @@ export type PublicReviewItem = {
   rating: number;
   excerpt: string;
   href: string;
+  /** Optional platform label shown as “via {source}” on city review cards. */
+  source?: string;
 };
 
 export function findReviewCategoryByRef(_categoryRef: string): null {

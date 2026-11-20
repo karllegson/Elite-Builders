@@ -80,7 +80,7 @@ export function CityPageView({
   // The page's own "On this page" panel replaces the in-content Quick Links box + pinned dock.
   const hasCmsContent = Boolean(area?.content.trim());
   const cmsContent = hasCmsContent ? (
-    <ServiceAreaContentPanel content={area!.content} mapEmbed="" quickLinksBar={false} />
+    <ServiceAreaContentPanel content={area!.content} mapEmbed="" />
   ) : null;
   const toc = hasCmsContent
     ? {
