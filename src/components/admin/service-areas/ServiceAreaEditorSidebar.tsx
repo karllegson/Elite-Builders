@@ -27,6 +27,7 @@ type ServiceAreaEditorSidebarProps = {
   publishSettings?: PublishSettings;
   onPublish?: () => void;
   onSaveDraft?: () => void;
+  onPreview?: () => void;
   onMoveToTrash?: () => void;
   primaryActionLabel?: string;
 };
@@ -52,6 +53,7 @@ export function ServiceAreaEditorSidebar({
   publishSettings,
   onPublish,
   onSaveDraft,
+  onPreview,
   onMoveToTrash,
   primaryActionLabel = "Publish",
 }: ServiceAreaEditorSidebarProps) {
@@ -84,6 +86,7 @@ export function ServiceAreaEditorSidebar({
           seoSnippet={seoSnippet}
           hasFeaturedImage={featuredImage !== null}
           previewHref="/service-areas"
+          onPreview={onPreview}
           initialSettings={publishSettings}
           onPublish={onPublish}
           onSaveDraft={onSaveDraft}

@@ -118,11 +118,15 @@ export function usePublicServiceArea(slug: string, initialArea?: PublicServiceAr
   return { area, ready: directReady || listReady };
 }
 
-/** One published sub-page. `initialPage` is the server-loaded copy (see usePublicServiceArea). */
+/**
+ * One published sub-page. `initialPage` is the server-loaded copy (see usePublicServiceArea).
+ * `live: false` keeps `initialPage` as-is (editor previews of drafts the store won't return).
+ */
 export function usePublicServiceAreaSubPage(
   parentSlug: string,
   subPageSlug: string,
   initialPage?: PublicServiceAreaSubPage | null,
+  { live = true }: { live?: boolean } = {},
 ) {
   const hasInitial = initialPage !== undefined;
   const [page, setPage] = useState<PublicServiceAreaSubPage | null>(initialPage ?? null);
@@ -147,6 +151,10 @@ export function usePublicServiceAreaSubPage(
   }, [parentSlug, subPageSlug]);
 
   useEffect(() => {
+    if (!live) {
+      return;
+    }
+
     if (!hasInitial) {
       refresh();
     }
@@ -162,7 +170,7 @@ export function usePublicServiceAreaSubPage(
       window.removeEventListener(SERVICE_AREAS_CHANGED_EVENT, handleChange);
       window.removeEventListener("storage", handleChange);
     };
-  }, [hasInitial, refresh]);
+  }, [hasInitial, live, refresh]);
 
   return { page, ready };
 }
