@@ -30,11 +30,16 @@ import { useAdminToast } from "@/components/admin/toast/useAdminToast";
 import {
   deleteServiceArea,
   getServiceAreaById,
+  normalizeServiceAreaRecord,
   parseServiceAreaTitle,
   readServiceAreasStore,
   upsertServiceArea,
   type ServiceAreaRecord,
 } from "@/lib/admin/serviceAreasData";
+import {
+  SERVICE_AREA_PREVIEW_PATH,
+  writeServiceAreaPreview,
+} from "@/lib/admin/serviceAreaPreview";
 import {
   EB_FRAMING_SERVICES,
   EB_WRITE_PROMPT,
@@ -361,6 +366,44 @@ export function ServiceAreaEditor({
     window.location.assign(`/admin/service-areas/${saved.id}`);
   };
 
+  /** Opens what's in the editor now (saved or not) with the public page layout. */
+  const handlePreview = () => {
+    if (!title.trim()) {
+      toast.error("Add a title before previewing (e.g. Stockton, CA).");
+      return;
+    }
+
+    const saved = serviceAreaId ? getServiceAreaById(serviceAreaId) : null;
+    const parent = pageAttributes.parentId ? getServiceAreaById(pageAttributes.parentId) : null;
+    const record = normalizeServiceAreaRecord({
+      ...saved,
+      id: serviceAreaId ?? "preview",
+      title,
+      slug: snippet.permalink || slugifyServiceAreaPermalink(title),
+      sortOrder: pageAttributes.order,
+      status: saved?.status ?? "draft",
+      parentId: pageAttributes.parentId,
+      content,
+      seoTitle: snippet.seoTitle || title,
+      metaDescription: snippet.metaDescription,
+      seoSchema: schemas[0]?.type ?? "WebPage",
+      featuredImage,
+      archiveOnly: extraFields.archiveOnly,
+      unused: extraFields.archiveOnly,
+      mapEmbed: extraFields.mapEmbed,
+      breadcrumbsLinkInactive: extraFields.breadcrumbsLinkInactive,
+    });
+
+    try {
+      writeServiceAreaPreview({ record, parent, savedAt: new Date().toISOString() });
+    } catch {
+      toast.error("Unable to open the preview. Your browser storage may be full.");
+      return;
+    }
+
+    window.open(SERVICE_AREA_PREVIEW_PATH, "_blank", "noopener,noreferrer");
+  };
+
   const handleMoveToTrash = () => {
     if (!serviceAreaId) {
       toast.error("Save the service area before moving it to trash.");
@@ -472,6 +515,7 @@ export function ServiceAreaEditor({
         publishSettings={publishSettings}
         onPublish={() => persistServiceArea("published")}
         onSaveDraft={() => persistServiceArea("draft")}
+        onPreview={handlePreview}
         onMoveToTrash={handleMoveToTrash}
         primaryActionLabel={isEditing ? "Update" : "Publish"}
       />

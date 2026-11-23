@@ -48,15 +48,19 @@ function resolveStaticMeta(record: ServiceAreaRecord): ServiceArea | undefined {
   );
 }
 
+/** `preview` shows drafts and hidden pages too (the editor's Preview button). */
+export type PublicServiceAreaOptions = { preview?: boolean };
+
+function isLive(record: ServiceAreaRecord): boolean {
+  return record.status === "published" && !record.hidden && !record.unused;
+}
+
 export function toPublicServiceArea(
   record: ServiceAreaRecord,
   areas: ServiceAreaRecord[] = readServiceAreasStore().areas,
+  { preview = false }: PublicServiceAreaOptions = {},
 ): PublicServiceArea | null {
-  if (record.status !== "published") {
-    return null;
-  }
-
-  if (record.hidden || record.unused) {
+  if (!preview && !isLive(record)) {
     return null;
   }
 
@@ -147,12 +151,9 @@ export function toPublicServiceAreaSubPage(
   record: ServiceAreaRecord,
   parent: ServiceAreaRecord,
   areas: ServiceAreaRecord[] = readServiceAreasStore().areas,
+  { preview = false }: PublicServiceAreaOptions = {},
 ): PublicServiceAreaSubPage | null {
-  if (record.status !== "published") {
-    return null;
-  }
-
-  if (record.hidden || record.unused) {
+  if (!preview && !isLive(record)) {
     return null;
   }
 

@@ -27,6 +27,8 @@ type PublishMetaboxProps = {
   seoSnippet?: PostSeoSnippet;
   hasFeaturedImage?: boolean;
   previewHref?: string;
+  /** Replaces opening `previewHref` (e.g. to preview unsaved edits). */
+  onPreview?: () => void;
   initialSettings?: PublishSettings;
   publishSettingsRef?: MutableRefObject<PublishSettings | null>;
   onSettingsChange?: (settings: PublishSettings) => void;
@@ -60,6 +62,7 @@ export function PublishMetabox({
   seoSnippet = { seoTitle: "", permalink: "", metaDescription: "" },
   hasFeaturedImage = false,
   previewHref = "/blog",
+  onPreview,
   initialSettings,
   publishSettingsRef,
   onSettingsChange,
@@ -225,7 +228,9 @@ export function PublishMetabox({
             type="button"
             className="admin-btn-secondary"
             onClick={() =>
-              window.open(previewHref, "_blank", "noopener,noreferrer")
+              onPreview
+                ? onPreview()
+                : window.open(previewHref, "_blank", "noopener,noreferrer")
             }
           >
             Preview

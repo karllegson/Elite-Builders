@@ -21,6 +21,8 @@ type ServiceAreaSubPageViewProps = {
   initialPage?: PublicServiceAreaSubPage | null;
   /** FAQs for the page's [faqs] block, loaded on the server. */
   initialFaqItems?: PublicFaqItem[];
+  /** Editor preview: render `initialPage` (may be a draft) without reloading from the store. */
+  preview?: boolean;
 };
 
 export function ServiceAreaSubPageView({
@@ -28,8 +30,11 @@ export function ServiceAreaSubPageView({
   subPageSlug,
   initialPage,
   initialFaqItems,
+  preview = false,
 }: ServiceAreaSubPageViewProps) {
-  const { page, ready } = usePublicServiceAreaSubPage(parentSlug, subPageSlug, initialPage);
+  const { page, ready } = usePublicServiceAreaSubPage(parentSlug, subPageSlug, initialPage, {
+    live: !preview,
+  });
 
   if (!ready) {
     return <p className="site-container py-24 text-sm text-site-text-muted">Loading page…</p>;
