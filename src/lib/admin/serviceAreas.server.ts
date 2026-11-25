@@ -160,6 +160,35 @@ export async function getPublishedPublicServiceAreaSubPage(
 }
 
 /**
+ * Final URL for each built-in /services route: the dashboard-built page that replaces it
+ * when one is published, otherwise the route itself. Reads the store once for all routes.
+ */
+export async function resolveServiceRouteHrefs(routes: string[]): Promise<Record<string, string>> {
+  const hrefs: Record<string, string> = Object.fromEntries(routes.map((route) => [route, route]));
+
+  try {
+    const store = await loadServiceAreasStore();
+    for (const route of routes) {
+      const slug = serviceLandingSlugForRoute(route);
+      if (!slug) continue;
+      const record = store.areas.find(
+        (area) =>
+          area.slug === slug &&
+          isTopLevelServiceArea(area) &&
+          area.status === "published" &&
+          !area.hidden &&
+          !area.unused,
+      );
+      if (record) hrefs[route] = getServiceAreaPublicHref(record, store.areas);
+    }
+  } catch {
+    // Store unavailable: keep the built-in routes (they still redirect correctly).
+  }
+
+  return hrefs;
+}
+
+/**
  * Public URL of the dashboard-built page that replaces a built-in /services route,
  * or null when none is published (the built-in template page is used instead).
  */
