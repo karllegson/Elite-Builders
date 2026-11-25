@@ -148,7 +148,7 @@ export const serviceAreas: ServiceArea[] = [
   {
     city: "Fremont",
     slug: "fremont",
-    href: "/service-areas/fremont",
+    href: "/service-areas/fremont-ca",
     blurb: "Structural framing and remodeling across Fremont and the East Bay.",
     region: "Bay Area",
   },

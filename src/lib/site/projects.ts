@@ -84,7 +84,8 @@ export const currentProjects: Project[] = [
     builder: "Durkin Inc",
     type: "Custom Homes",
     status: "current",
-    image: "customHomeFramingInterior",
+    // Real photo from the Mammoth Lakes (Minaret Rd) job site.
+    image: "mammothRoofFramingSierraView",
     blurb:
       "Custom-home framing package built to architectural and structural specifications.",
   },

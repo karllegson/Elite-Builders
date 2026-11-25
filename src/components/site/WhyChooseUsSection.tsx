@@ -28,9 +28,10 @@ export default function WhyChooseUsSection({ items, lede }: WhyChooseUsSectionPr
           lede={lede ?? "Straight answers and real craftsmanship — not sales gimmicks or the cheapest bid."}
           align="left"
           tone="dark"
+          className="reveal-up"
         />
 
-        <div className="mt-12 grid gap-px overflow-hidden rounded-3xl border border-solid border-white/10 bg-white/10 sm:mt-16 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="reveal-up mt-12 grid gap-px overflow-hidden rounded-3xl border border-solid border-white/10 bg-white/10 sm:mt-16 sm:grid-cols-2 lg:grid-cols-4">
           {items.map(({ title, body }, index) => {
             const isFeatured = index === 0;
             return (
@@ -40,7 +41,7 @@ export default function WhyChooseUsSection({ items, lede }: WhyChooseUsSectionPr
                   isFeatured ? "bg-brand-ink-2" : "bg-brand-ink"
                 }`}
               >
-                <span className="font-display text-sm font-semibold tracking-[0.16em] text-[#ff6b70]">
+                <span className="font-display text-sm font-semibold tracking-[0.16em] text-brand-red-light">
                   {String(index + 1).padStart(2, "0")}
                 </span>
                 <h3
@@ -63,7 +64,7 @@ export default function WhyChooseUsSection({ items, lede }: WhyChooseUsSectionPr
             href="/#estimate"
             className="group flex flex-col justify-between bg-brand-red p-7 transition-colors hover:bg-brand-red-dark sm:p-8"
           >
-            <span className="font-display text-sm font-semibold uppercase tracking-[0.16em] text-white/80">
+            <span className="font-display text-sm font-semibold uppercase tracking-[0.16em] text-white">
               Free Estimate
             </span>
             <span className="mt-6 flex items-end justify-between gap-4">
