@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
-import { notFound, permanentRedirect } from "next/navigation";
+import { notFound } from "next/navigation";
+import ServiceLandingPage, {
+  buildServiceLandingMetadata,
+  loadServiceLandingArea,
+} from "@/components/site/ServiceLandingPage";
 import ServicePageTemplate from "@/components/site/ServicePageTemplate";
-import { findServiceLandingHrefForRoute } from "@/lib/admin/serviceAreas.server";
 import { listPublishedPublicServicePages } from "@/lib/admin/services.server";
 import { getPublicServicePagesFallback } from "@/lib/site/servicesPublic";
 import { buildPageMetadata } from "@/lib/site/seo";
@@ -23,6 +26,13 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: ServiceCategoryPageProps): Promise<Metadata> {
   const { category } = await params;
+  const path = `/services/${category}`;
+
+  const landing = await loadServiceLandingArea(path);
+  if (landing) {
+    return buildServiceLandingMetadata(landing, path);
+  }
+
   const pages = await listPublishedPublicServicePages();
   const detail =
     pages.find((page) => page.slug === category) ??
@@ -32,24 +42,25 @@ export async function generateMetadata({ params }: ServiceCategoryPageProps): Pr
     return buildPageMetadata({
       title: "Service",
       description: "Elite Builders construction services.",
-      path: `/services/${category}`,
+      path,
     });
   }
 
   return buildPageMetadata({
     title: detail.metaTitle,
     description: detail.metaDescription,
-    path: `/services/${category}`,
+    path,
   });
 }
 
 export default async function ServiceCategoryPage({ params }: ServiceCategoryPageProps) {
   const { category } = await params;
+  const path = `/services/${category}`;
 
-  // A dashboard-built page for this service takes over the URL.
-  const landingHref = await findServiceLandingHrefForRoute(`/services/${category}`);
-  if (landingHref) {
-    permanentRedirect(landingHref);
+  // A published dashboard-built page for this service is shown here in place of the template.
+  const landing = await loadServiceLandingArea(path);
+  if (landing) {
+    return <ServiceLandingPage area={landing} path={path} />;
   }
 
   const pages = await listPublishedPublicServicePages();
@@ -65,7 +76,7 @@ export default async function ServiceCategoryPage({ params }: ServiceCategoryPag
     <ServicePageTemplate
       detail={detail}
       subPages={getServiceSubPagesForCategory(category)}
-      path={`/services/${category}`}
+      path={path}
     />
   );
 }

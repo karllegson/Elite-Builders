@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
-import { notFound, permanentRedirect } from "next/navigation";
+import { notFound } from "next/navigation";
+import ServiceLandingPage, {
+  buildServiceLandingMetadata,
+  loadServiceLandingArea,
+} from "@/components/site/ServiceLandingPage";
 import ServicePageTemplate from "@/components/site/ServicePageTemplate";
-import { findServiceLandingHrefForRoute } from "@/lib/admin/serviceAreas.server";
 import { buildPageMetadata } from "@/lib/site/seo";
 import {
   buildServiceSubPageDetail,
@@ -24,20 +27,29 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: ServiceSubPageProps): Promise<Metadata> {
   const { category, subslug } = await params;
+  const path = serviceSubPageHref(category, subslug);
+
+  if (findServiceSubPage(category, subslug)) {
+    const landing = await loadServiceLandingArea(path);
+    if (landing) {
+      return buildServiceLandingMetadata(landing, path);
+    }
+  }
+
   const detail = buildServiceSubPageDetail(category, subslug);
 
   if (!detail) {
     return buildPageMetadata({
       title: "Service",
       description: "Elite Builders construction services.",
-      path: serviceSubPageHref(category, subslug),
+      path,
     });
   }
 
   return buildPageMetadata({
     title: detail.metaTitle,
     description: detail.metaDescription,
-    path: serviceSubPageHref(category, subslug),
+    path,
   });
 }
 
@@ -48,10 +60,12 @@ export default async function ServiceSubPage({ params }: ServiceSubPageProps) {
     notFound();
   }
 
-  // A dashboard-built page for this service takes over the URL.
-  const landingHref = await findServiceLandingHrefForRoute(serviceSubPageHref(category, subslug));
-  if (landingHref) {
-    permanentRedirect(landingHref);
+  const path = serviceSubPageHref(category, subslug);
+
+  // A published dashboard-built page for this service is shown here in place of the template.
+  const landing = await loadServiceLandingArea(path);
+  if (landing) {
+    return <ServiceLandingPage area={landing} path={path} />;
   }
 
   const detail = buildServiceSubPageDetail(category, subslug);
@@ -64,7 +78,7 @@ export default async function ServiceSubPage({ params }: ServiceSubPageProps) {
       detail={detail}
       subPages={getServiceSubPagesForCategory(category)}
       activeSubPage={subslug}
-      path={`/services/${category}/${subslug}`}
+      path={path}
     />
   );
 }

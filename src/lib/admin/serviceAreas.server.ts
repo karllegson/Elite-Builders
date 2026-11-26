@@ -1,11 +1,9 @@
 import {
   createDefaultStore,
-  isTopLevelServiceArea,
   normalizeServiceAreaRecord,
   type ServiceAreasStore,
 } from "@/lib/admin/serviceAreasData";
 import { serviceLandingSlugForRoute } from "@/lib/site/serviceLandingPages";
-import { getServiceAreaPublicHref } from "@/lib/site/serviceAreaUrls";
 import {
   readServiceAreasStoreFromDisk,
   writeServiceAreasStoreToDisk,
@@ -160,53 +158,17 @@ export async function getPublishedPublicServiceAreaSubPage(
 }
 
 /**
- * Final URL for each built-in /services route: the dashboard-built page that replaces it
- * when one is published, otherwise the route itself. Reads the store once for all routes.
+ * Dashboard-built page shown at a built-in /services route, or null when none is
+ * published or the store can't be read (the built-in template page is used instead).
  */
-export async function resolveServiceRouteHrefs(routes: string[]): Promise<Record<string, string>> {
-  const hrefs: Record<string, string> = Object.fromEntries(routes.map((route) => [route, route]));
-
-  try {
-    const store = await loadServiceAreasStore();
-    for (const route of routes) {
-      const slug = serviceLandingSlugForRoute(route);
-      if (!slug) continue;
-      const record = store.areas.find(
-        (area) =>
-          area.slug === slug &&
-          isTopLevelServiceArea(area) &&
-          area.status === "published" &&
-          !area.hidden &&
-          !area.unused,
-      );
-      if (record) hrefs[route] = getServiceAreaPublicHref(record, store.areas);
-    }
-  } catch {
-    // Store unavailable: keep the built-in routes (they still redirect correctly).
-  }
-
-  return hrefs;
-}
-
-/**
- * Public URL of the dashboard-built page that replaces a built-in /services route,
- * or null when none is published (the built-in template page is used instead).
- */
-export async function findServiceLandingHrefForRoute(route: string): Promise<string | null> {
+export async function getPublishedServiceLandingArea(
+  route: string,
+): Promise<PublicServiceArea | null> {
   const slug = serviceLandingSlugForRoute(route);
   if (!slug) return null;
 
   try {
-    const store = await loadServiceAreasStore();
-    const record = store.areas.find(
-      (area) =>
-        area.slug === slug &&
-        isTopLevelServiceArea(area) &&
-        area.status === "published" &&
-        !area.hidden &&
-        !area.unused,
-    );
-    return record ? getServiceAreaPublicHref(record, store.areas) : null;
+    return await getPublishedPublicServiceAreaBySlug(slug);
   } catch {
     return null;
   }
