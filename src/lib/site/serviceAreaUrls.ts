@@ -6,6 +6,10 @@ import {
   type ServiceAreaRecord,
 } from "@/lib/admin/serviceAreasData";
 import { slugifyServiceAreaPermalink } from "@/lib/admin/postSeo";
+import {
+  serviceLandingRouteForSlug,
+  serviceLandingSlugForRoute,
+} from "@/lib/site/serviceLandingPages";
 
 export type ServiceAreaPublicPath = {
   parentSlug: string;
@@ -39,7 +43,8 @@ export function getServiceAreaPublicHref(
   areas: ServiceAreaRecord[] = readServiceAreasStore().areas,
 ): string {
   if (!record.parentId) {
-    return `/service-areas/${record.slug}`;
+    // Service landing pages live at their /services URL, not under /service-areas.
+    return serviceLandingRouteForSlug(record.slug) ?? `/service-areas/${record.slug}`;
   }
 
   const parent = areas.find((area) => area.id === record.parentId);
@@ -62,6 +67,11 @@ export function buildServiceAreaPermalinkUrl(
   if (parentSlug) {
     const cleanParentSlug = slugifyServiceAreaPermalink(parentSlug) || "parent";
     return `${base}/service-areas/${cleanParentSlug}/${cleanSlug}/`;
+  }
+
+  const landingRoute = serviceLandingRouteForSlug(cleanSlug);
+  if (landingRoute) {
+    return `${base}${landingRoute}/`;
   }
 
   return `${base}/service-areas/${cleanSlug}/`;
@@ -163,6 +173,11 @@ export function createServiceAreaRecordId(
 }
 
 export function resolveServiceAreaAdminIdFromPath(pathname: string): string | null {
+  const landingSlug = serviceLandingSlugForRoute(pathname.replace(/\/$/, ""));
+  if (landingSlug) {
+    return findServiceAreaByPublicPath(landingSlug)?.id ?? null;
+  }
+
   const parsed = parseServiceAreaPublicPath(pathname);
 
   if (!parsed) {

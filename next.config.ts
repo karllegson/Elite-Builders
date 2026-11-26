@@ -1,5 +1,6 @@
 import type { NextConfig } from "next";
 import { getSupabaseStorageHostname } from "./src/lib/supabase/storage";
+import { MOVED_SERVICE_AREA_PATHS } from "./src/lib/site/serviceLandingPages";
 
 const supabaseHostname = getSupabaseStorageHostname();
 
@@ -67,7 +68,7 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       // Framing contractor — primary category
-      { source: "/services/framing", destination: "/services/framing-contractor/residential-framing", permanent: true },
+      { source: "/services/framing", destination: "/services/framing-contractor", permanent: true },
       {
         source: "/services/general-contracting",
         destination: "/services/framing-contractor/residential-framing",
@@ -202,9 +203,15 @@ const nextConfig: NextConfig = {
       // Dashboard page renamed to match the GBP service name
       {
         source: "/service-areas/home-addition-framing",
-        destination: "/service-areas/home-addition-construction",
+        destination: "/services/home-builder/home-addition-construction",
         permanent: true,
       },
+      // Service pages built in the dashboard are served at their /services URLs (exact paths).
+      ...Object.entries(MOVED_SERVICE_AREA_PATHS).map(([source, destination]) => ({
+        source,
+        destination,
+        permanent: true,
+      })),
       // Retired services (not on Google Business Profile) → closest active page
       { source: "/services/framing-contractor/remodel-framing", destination: "/services/framing-contractor", permanent: true },
       { source: "/services/framing-contractor/commercial-framing", destination: "/services/framing-contractor", permanent: true },

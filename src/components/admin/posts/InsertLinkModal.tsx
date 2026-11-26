@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { serviceAreas } from "@/lib/site/config";
+import { MOVED_SERVICE_AREA_PATHS } from "@/lib/site/serviceLandingPages";
 import { buildLinkSnippet, type LinkInsertOptions } from "@/lib/admin/postEditor";
 
 export type InsertLinkModalProps = {
@@ -17,11 +18,14 @@ type ExistingContentItem = {
   url: string;
 };
 
-const existingContentItems: ExistingContentItem[] = serviceAreas.map((area) => ({
-  title: area.city,
-  type: "SERVICE AREA",
-  url: area.href,
-}));
+const existingContentItems: ExistingContentItem[] = serviceAreas
+  // Skip pages that redirect elsewhere (e.g. Bay Area → /service-areas).
+  .filter((area) => !(area.href in MOVED_SERVICE_AREA_PATHS))
+  .map((area) => ({
+    title: area.city,
+    type: "SERVICE AREA",
+    url: area.href,
+  }));
 
 export function InsertLinkModal({
   isOpen,

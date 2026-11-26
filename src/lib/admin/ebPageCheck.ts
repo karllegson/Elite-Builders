@@ -5,6 +5,9 @@ import {
   isEbContent,
 } from "@/lib/site/ebContent";
 import { EB_WRITE_PROMPT } from "@/lib/admin/ebPageTemplates";
+import { services } from "@/lib/site/config";
+import { MOVED_SERVICE_AREA_PATHS } from "@/lib/site/serviceLandingPages";
+import { getAllServiceSubPages } from "@/lib/site/serviceSubPages";
 
 export type EbCheckStatus = "pass" | "warn" | "fail";
 
@@ -60,6 +63,32 @@ function plural(count: number, word: string) {
 
 const WEAK_FILE_NAME =
   /(^|\/)(img|dsc|dscn|pxl|image|photo|screenshot|screen shot|untitled|whatsapp)[\s_-]?\d*|(^|\/)\d+\.(jpe?g|png|webp)$/i;
+
+/** Every /services page that renders (not a redirect). */
+const LIVE_SERVICE_PATHS = new Set([
+  ...services.map((service) => service.href),
+  ...getAllServiceSubPages().map((subPage) => subPage.href),
+]);
+
+const SITE_ORIGIN_PATTERN = /^https?:\/\/(?:www\.)?elitebuildersco\.com/i;
+
+/** Links to /services URLs that redirect or are gone, and to moved /service-areas pages. */
+function findOldLinks(content: string): string[] {
+  const hrefs = content.matchAll(/(?:href=["']|\[button\s+href=["'])([^"']+)["']/gi);
+  const found = new Set<string>();
+
+  for (const [, href] of hrefs) {
+    const path = href.replace(SITE_ORIGIN_PATTERN, "").replace(/[?#].*$/, "").replace(/(.)\/$/, "$1");
+    const movedTo = MOVED_SERVICE_AREA_PATHS[path];
+    if (movedTo) {
+      found.add(`${path} (now ${movedTo})`);
+    } else if (path.startsWith("/services/") && !LIVE_SERVICE_PATHS.has(path)) {
+      found.add(path);
+    }
+  }
+
+  return Array.from(found);
+}
 
 /** Runs every Elite page rule on the editor content and SEO fields. */
 export function checkEbPage(input: EbPageCheckInput): EbCheckResult[] {
@@ -264,16 +293,13 @@ export function checkEbPage(input: EbPageCheckInput): EbCheckResult[] {
   );
 
   // Old links that redirect
-  const oldLinks = Array.from(
-    content.matchAll(/(?:href=["']|\[button\s+href=["'])(\/services\/framing-contractor[^"']*)["']/gi),
-    (m) => m[1],
-  );
+  const oldLinks = findOldLinks(content);
   add(
     "links",
     "Links",
     oldLinks.length ? "warn" : "pass",
     oldLinks.length
-      ? `These old links redirect: ${Array.from(new Set(oldLinks)).join(", ")}. Use the /service-areas/... page instead.`
+      ? `These links redirect or no longer exist: ${oldLinks.join(", ")}. Link to the page they end up on instead.`
       : "No links to old redirected pages.",
   );
 

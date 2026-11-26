@@ -14,12 +14,12 @@ export const EB_WRITE_PROMPT = "WRITE:";
 
 /** Framing services in website order; `slug` is the city sub-page slug. */
 export const EB_FRAMING_SERVICES = [
-  { name: "Residential Framing", slug: "residential-framing", href: "/service-areas/residential-framing" },
-  { name: "New Construction Framing", slug: "new-construction-framing", href: "/service-areas/new-construction-framing" },
-  { name: "Custom Home Framing", slug: "custom-home-framing", href: "/service-areas/custom-home-framing" },
-  { name: "Home Addition Framing", slug: "home-addition-framing", href: "/service-areas/home-addition-construction" },
-  { name: "Rough Framing", slug: "rough-framing", href: "/service-areas/rough-framing" },
-  { name: "Structural Framing", slug: "structural-framing", href: "/service-areas/structural-framing" },
+  { name: "Residential Framing", slug: "residential-framing", href: "/services/framing-contractor/residential-framing" },
+  { name: "New Construction Framing", slug: "new-construction-framing", href: "/services/framing-contractor/new-construction-framing" },
+  { name: "Custom Home Framing", slug: "custom-home-framing", href: "/services/framing-contractor/custom-framing" },
+  { name: "Home Addition Framing", slug: "home-addition-framing", href: "/services/home-builder/home-addition-construction" },
+  { name: "Rough Framing", slug: "rough-framing", href: "/services/framing-contractor/rough-framing" },
+  { name: "Structural Framing", slug: "structural-framing", href: "/services/framing-contractor/structural-framing" },
 ] as const;
 
 /** Counties for the cities Elite serves, so the template can name the wider area. */
@@ -205,7 +205,7 @@ function buildSubPageBody({ city, service, serviceHref, cityHref }: SubPageTempl
   const svcLower = svc.toLowerCase();
   const county = countyForCity(name) ?? "the county";
   const known = EB_FRAMING_SERVICES.find((item) => item.name.toLowerCase() === svcLower);
-  const buttonHref = serviceHref ?? known?.href ?? "/service-areas/framing-contractor";
+  const buttonHref = serviceHref ?? known?.href ?? "/services/framing-contractor";
 
   return [
     `<div class="eb-short">`,

@@ -1,3 +1,9 @@
+import { serviceLandingSlugForRoute } from "@/lib/site/serviceLandingPages";
+
+function isServiceLandingRoute(route: string): boolean {
+  return serviceLandingSlugForRoute(route) !== null;
+}
+
 export type FrontendAdminBarItem = {
   label: string;
   href: string;
@@ -88,6 +94,8 @@ const ROUTE_MATCHERS: RouteMatcher[] = [
         {
           label: "Edit Service Sub-Page",
           href: `/admin/services/${category}/${subslug}`,
+          // A dashboard-built page shown here is edited under Service Areas.
+          resolveServiceAreaId: isServiceLandingRoute(`/services/${category}/${subslug}`),
         },
         { label: "Edit Parent Category", href: `/admin/services/${category}` },
         { label: "All Service Pages", href: "/admin/pages" },
@@ -101,7 +109,12 @@ const ROUTE_MATCHERS: RouteMatcher[] = [
       const slug = pathname.match(/^\/services\/([^/]+)\/?$/)?.[1] ?? "";
 
       return [
-        { label: "Edit Service Page", href: `/admin/services/${slug}` },
+        {
+          label: "Edit Service Page",
+          href: `/admin/services/${slug}`,
+          // A dashboard-built page shown here is edited under Service Areas.
+          resolveServiceAreaId: isServiceLandingRoute(`/services/${slug}`),
+        },
         { label: "All Service Pages", href: "/admin/pages" },
         { label: "Dashboard", href: "/admin" },
       ];

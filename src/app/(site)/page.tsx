@@ -15,7 +15,6 @@ import HomeServiceAreasSection from "@/components/site/home/HomeServiceAreasSect
 import HomeServicesSection, { type HomeService } from "@/components/site/home/HomeServicesSection";
 import ScrollReveal from "@/components/site/home/ScrollReveal";
 import { business, serviceAreas, teamMembers } from "@/lib/site/config";
-import { resolveServiceRouteHrefs } from "@/lib/admin/serviceAreas.server";
 import { listPublishedPublicServicePages } from "@/lib/admin/services.server";
 import { getPublicServicePagesFallback } from "@/lib/site/servicesPublic";
 import { getServiceSubPagesForCategory } from "@/lib/site/serviceSubPages";
@@ -131,21 +130,11 @@ export default async function HomePage() {
   const publishedServices = await listPublishedPublicServicePages();
   const services =
     publishedServices.length > 0 ? publishedServices : getPublicServicePagesFallback();
-  // Link each service and its sub-services to their final URLs (a dashboard-built page can
-  // replace the default route), so the links skip a redirect.
-  const subPagesBySlug = new Map(
-    services.map((service) => [service.slug, getServiceSubPagesForCategory(service.slug)]),
-  );
-  const routeHrefs = await resolveServiceRouteHrefs([
-    ...services.map((service) => service.href),
-    ...[...subPagesBySlug.values()].flat().map((page) => page.href),
-  ]);
   const linkedServices: HomeService[] = services.map((service) => ({
     ...service,
-    href: routeHrefs[service.href] ?? service.href,
-    subServices: (subPagesBySlug.get(service.slug) ?? []).map((page) => ({
+    subServices: getServiceSubPagesForCategory(service.slug).map((page) => ({
       label: page.label,
-      href: routeHrefs[page.href] ?? page.href,
+      href: page.href,
     })),
   }));
   // Who We Serve: homeowners go on to home building, builders to the projects framed for builders.

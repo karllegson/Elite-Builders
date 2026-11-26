@@ -8,7 +8,10 @@ import {
 import { serviceAreas as staticServiceAreas, services } from "@/lib/site/config";
 import { SITE_URL } from "@/lib/site/seo";
 import { getServiceAreaPublicHref } from "@/lib/site/serviceAreaUrls";
-import { SERVICE_LANDING_ROUTES } from "@/lib/site/serviceLandingPages";
+import {
+  MOVED_SERVICE_AREA_PATHS,
+  SERVICE_LANDING_ROUTES,
+} from "@/lib/site/serviceLandingPages";
 import { getAllServiceSubPages } from "@/lib/site/serviceSubPages";
 
 const STATIC_ROUTES = [
@@ -40,12 +43,22 @@ function sitemapUrl(
   };
 }
 
+/** Top-level /service-areas pages that redirect elsewhere (e.g. bay-area → /service-areas). */
+function isMovedServiceArea(slug: string) {
+  return `/service-areas/${slug}` in MOVED_SERVICE_AREA_PATHS;
+}
+
+/** Records without a saved date default to 1970; leave those to "now". */
+function savedDate(updatedAt: string | undefined): Date | undefined {
+  return updatedAt && !updatedAt.startsWith("1970") ? new Date(updatedAt) : undefined;
+}
+
 async function getServiceAreaSitemapEntries(): Promise<{
   entries: MetadataRoute.Sitemap;
-  /** Built-in /services routes that redirect to a dashboard-built page. */
-  replacedServiceRoutes: Set<string>;
+  /** Last edit of the dashboard-built page shown at a /services route, keyed by route. */
+  serviceLandingUpdatedAt: Map<string, Date>;
 }> {
-  const replacedServiceRoutes = new Set<string>();
+  const serviceLandingUpdatedAt = new Map<string, Date>();
 
   try {
     const store = await loadServiceAreasStore();
@@ -60,35 +73,46 @@ async function getServiceAreaSitemapEntries(): Promise<{
         continue;
       }
 
-      if (isTopLevelServiceArea(area) && SERVICE_LANDING_ROUTES[area.slug]) {
-        replacedServiceRoutes.add(SERVICE_LANDING_ROUTES[area.slug]);
+      if (isTopLevelServiceArea(area)) {
+        // Service landing pages are listed once, under their /services URL.
+        const landingRoute = SERVICE_LANDING_ROUTES[area.slug];
+        if (landingRoute) {
+          const updatedAt = savedDate(area.updatedAt);
+          if (updatedAt) serviceLandingUpdatedAt.set(landingRoute, updatedAt);
+          continue;
+        }
+
+        if (isMovedServiceArea(area.slug)) {
+          continue;
+        }
       }
 
       entries.push(
         sitemapUrl(getServiceAreaPublicHref(area, store.areas), {
           changeFrequency: "monthly",
           priority: isServiceAreaSubPage(area) ? 0.65 : 0.7,
-          // Records without a saved date default to 1970; leave those to "now".
-          lastModified: area.updatedAt && !area.updatedAt.startsWith("1970") ? new Date(area.updatedAt) : undefined,
+          lastModified: savedDate(area.updatedAt),
         }),
       );
     }
 
     if (entries.length > 0) {
-      return { entries, replacedServiceRoutes };
+      return { entries, serviceLandingUpdatedAt };
     }
   } catch {
     // Fall back to static config when the store is unavailable at build time.
   }
 
   return {
-    entries: staticServiceAreas.map((area) =>
-      sitemapUrl(area.href, {
-        changeFrequency: "monthly",
-        priority: 0.7,
-      }),
-    ),
-    replacedServiceRoutes,
+    entries: staticServiceAreas
+      .filter((area) => !isMovedServiceArea(area.slug))
+      .map((area) =>
+        sitemapUrl(area.href, {
+          changeFrequency: "monthly",
+          priority: 0.7,
+        }),
+      ),
+    serviceLandingUpdatedAt,
   };
 }
 
@@ -110,9 +134,8 @@ async function getBlogSitemapEntries(): Promise<MetadataRoute.Sitemap> {
 
 /** All indexable public URLs for /sitemap.xml (Phase 1 SEO foundation). */
 export async function buildSitemapEntries(): Promise<MetadataRoute.Sitemap> {
-  const [{ entries: serviceAreaEntries, replacedServiceRoutes }, blogEntries] =
+  const [{ entries: serviceAreaEntries, serviceLandingUpdatedAt }, blogEntries] =
     await Promise.all([getServiceAreaSitemapEntries(), getBlogSitemapEntries()]);
-  const isLive = (href: string) => !replacedServiceRoutes.has(href);
 
   return [
     ...STATIC_ROUTES.map((path) =>
@@ -121,18 +144,18 @@ export async function buildSitemapEntries(): Promise<MetadataRoute.Sitemap> {
         priority: path === "" ? 1 : 0.8,
       }),
     ),
-    ...services.filter((service) => isLive(service.href)).map((service) =>
+    ...services.map((service) =>
       sitemapUrl(service.href, {
         changeFrequency: "monthly",
         priority: 0.8,
+        lastModified: serviceLandingUpdatedAt.get(service.href),
       }),
     ),
-    ...getAllServiceSubPages()
-      .filter((subPage) => isLive(subPage.href))
-      .map((subPage) =>
+    ...getAllServiceSubPages().map((subPage) =>
       sitemapUrl(subPage.href, {
         changeFrequency: "monthly",
         priority: 0.75,
+        lastModified: serviceLandingUpdatedAt.get(subPage.href),
       }),
     ),
     ...serviceAreaEntries,
