@@ -42,7 +42,9 @@ export function ServiceAreaFeaturedImage({ src, alt }: ServiceAreaFeaturedImageP
           src={src}
           alt={alt}
           fill
-          priority
+          preload
+          loading="eager"
+          fetchPriority="high"
           quality={FEATURED_IMAGE_QUALITY}
           sizes={FEATURED_IMAGE_SIZES}
           unoptimized={shouldServeFeaturedImageUnoptimized(src)}

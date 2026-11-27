@@ -1,3 +1,4 @@
+import { lazyLoadContentImages } from "@/lib/site/contentImages";
 import { prepareServiceAreaHtml } from "@/lib/site/serviceAreaContent";
 
 type ServiceAreaHtmlContentProps = {
@@ -15,9 +16,9 @@ export function ServiceAreaHtmlContent({
     return null;
   }
 
-  const prepared = skipPrepare
-    ? html
-    : prepareServiceAreaHtml(html, linkSourceHtml ?? html);
+  const prepared = lazyLoadContentImages(
+    skipPrepare ? html : prepareServiceAreaHtml(html, linkSourceHtml ?? html),
+  );
 
   return (
     <div
