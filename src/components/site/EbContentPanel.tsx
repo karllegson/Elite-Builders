@@ -7,6 +7,7 @@ import { ServiceAreaFaqEmpty } from "@/components/site/ServiceAreaFaqEmpty";
 import { ServiceAreaMapEmbed } from "@/components/site/ServiceAreaMapEmbed";
 import { ServiceAreaReviewsSection } from "@/components/site/ServiceAreaReviewsSection";
 import { business } from "@/lib/site/config";
+import { lazyLoadContentImages } from "@/lib/site/contentImages";
 import { prepareEbHtml, splitEbBlocks, type EbBlock, type EbStat } from "@/lib/site/ebContent";
 import type { PublicFaqItem } from "@/lib/site/faqsPublic";
 import { getCtaButtonConfig } from "@/lib/site/runtimeSiteConfig";
@@ -27,7 +28,7 @@ const stats: EbStat[] = [
 export function EbContentPanel({ content, mapEmbed = "", initialFaqItems }: EbContentPanelProps) {
   const estimateHref = useMemo(() => getCtaButtonConfig().href, []);
   const blocks = useMemo(
-    () => splitEbBlocks(prepareEbHtml(content, { estimateHref, stats })),
+    () => splitEbBlocks(lazyLoadContentImages(prepareEbHtml(content, { estimateHref, stats }))),
     [content, estimateHref],
   );
   const faqCategoryRef =
