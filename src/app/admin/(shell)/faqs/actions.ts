@@ -16,6 +16,7 @@ import {
 } from "@/lib/admin/faqs.server";
 import { countFaqsInCategory } from "@/lib/admin/faqsData";
 import { createClient } from "@/lib/supabase/server";
+import { revalidateFaqPages } from "@/lib/site/revalidatePublicPages";
 
 async function assertAdminAuth(): Promise<void> {
   if (isAuthBypassEnabled()) {
@@ -84,6 +85,7 @@ export async function createFaqCategoryAction(input: CreateFaqCategoryInput) {
   try {
     await assertAdminAuth();
     const category = await createFaqCategory(input);
+    revalidateFaqPages();
     return { category };
   } catch (error) {
     return {
@@ -101,6 +103,7 @@ export async function updateFaqCategoryAction(id: string, input: CreateFaqCatego
       return { error: "Category not found." };
     }
 
+    revalidateFaqPages();
     return { category };
   } catch (error) {
     return {
@@ -113,6 +116,7 @@ export async function deleteFaqCategoriesAction(ids: string[]) {
   try {
     await assertAdminAuth();
     const deleted = await deleteFaqCategories(ids);
+    revalidateFaqPages();
     return { deleted };
   } catch (error) {
     return {
@@ -155,6 +159,7 @@ export async function saveFaqAction(input: UpsertFaqInput) {
   try {
     await assertAdminAuth();
     const faq = await upsertFaq(input);
+    revalidateFaqPages();
     return { faq };
   } catch (error) {
     return {
@@ -167,6 +172,7 @@ export async function deleteFaqsAction(ids: string[]) {
   try {
     await assertAdminAuth();
     const deleted = await deleteFaqs(ids);
+    revalidateFaqPages();
     return { deleted };
   } catch (error) {
     return {

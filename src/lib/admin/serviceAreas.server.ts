@@ -1,9 +1,15 @@
 import {
   createDefaultStore,
+  isServiceAreaSubPage,
+  isTopLevelServiceArea,
   normalizeServiceAreaRecord,
   type ServiceAreasStore,
 } from "@/lib/admin/serviceAreasData";
-import { serviceLandingSlugForRoute } from "@/lib/site/serviceLandingPages";
+import { getServiceAreaPublicHref } from "@/lib/site/serviceAreaUrls";
+import {
+  MOVED_SERVICE_AREA_PATHS,
+  serviceLandingSlugForRoute,
+} from "@/lib/site/serviceLandingPages";
 import {
   readServiceAreasStoreFromDisk,
   writeServiceAreasStoreToDisk,
@@ -155,6 +161,31 @@ export async function getPublishedPublicServiceAreaSubPage(
 ): Promise<PublicServiceAreaSubPage | null> {
   const store = await loadServiceAreasStore();
   return findPublicServiceAreaSubPage(parentSlug, childSlug, store);
+}
+
+/**
+ * Published /service-areas URLs split into path segments (["modesto-ca"],
+ * ["modesto-ca", "residential-framing"]) for prerendering. Same filter as the sitemap.
+ * Empty when the store can't be read, so the build never fails (pages render on demand).
+ */
+export async function listPublishedServiceAreaPathSegments(): Promise<string[][]> {
+  try {
+    const store = await loadServiceAreasStore();
+
+    return store.areas
+      .filter(
+        (area) =>
+          area.status === "published" &&
+          !area.hidden &&
+          !area.unused &&
+          (isTopLevelServiceArea(area) || isServiceAreaSubPage(area)),
+      )
+      .map((area) => getServiceAreaPublicHref(area, store.areas))
+      .filter((href) => href.startsWith("/service-areas/") && !(href in MOVED_SERVICE_AREA_PATHS))
+      .map((href) => href.slice("/service-areas/".length).split("/"));
+  } catch {
+    return [];
+  }
 }
 
 /**

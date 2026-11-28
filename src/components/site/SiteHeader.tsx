@@ -44,11 +44,7 @@ const serviceGroupIcons: Record<string, LucideIcon> = {
 const dropdownPanel =
   "absolute top-full z-50 mt-2 overflow-hidden rounded-2xl border border-solid border-site-line bg-white shadow-[0_24px_60px_-20px_rgba(7,21,48,0.35)]";
 
-type SiteHeaderProps = {
-  hasAdminBar?: boolean;
-};
-
-export default function SiteHeader({ hasAdminBar = false }: SiteHeaderProps) {
+export default function SiteHeader() {
   const pathname = usePathname();
   const headerRef = useRef<HTMLElement>(null);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -177,9 +173,7 @@ export default function SiteHeader({ hasAdminBar = false }: SiteHeaderProps) {
   return (
     <header
       ref={headerRef}
-      className={`sticky z-50 transition-shadow duration-300 ${
-        hasAdminBar ? "top-[var(--site-admin-bar-height,32px)]" : "top-0"
-      } ${scrolled ? "shadow-[0_8px_30px_-12px_rgba(7,21,48,0.25)]" : ""}`}
+      className={`sticky top-[var(--site-admin-bar-height,0px)] z-50 transition-shadow duration-300 ${scrolled ? "shadow-[0_8px_30px_-12px_rgba(7,21,48,0.25)]" : ""}`}
     >
       {/* Slim utility bar — desktop only, collapses on scroll */}
       <div

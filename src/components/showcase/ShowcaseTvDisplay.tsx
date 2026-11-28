@@ -1,7 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback, useEffect, useMemo, useState, type CSSProperties } from "react";
+import { useSearchParams } from "next/navigation";
+import { Suspense, useCallback, useEffect, useMemo, useState, type CSSProperties } from "react";
 import { builders } from "@/lib/site/builders";
 import {
   CA_CITY_POINTS,
@@ -20,8 +21,6 @@ import {
 type ShowcaseTvDisplayProps = {
   settings: ShowcaseSettings;
   projects: ShowcaseProject[];
-  /** Zero-based slide to open on (from ?slide=N) — for checking one slide without waiting. */
-  initialSlide?: number;
 };
 
 type ClientGroup = {
@@ -1126,11 +1125,22 @@ function FeatureSlide({ project, durationMs }: { project: ShowcaseProject; durat
   );
 }
 
-export default function ShowcaseTvDisplay({
-  settings,
-  projects,
-  initialSlide = 0,
-}: ShowcaseTvDisplayProps) {
+/** Opens on ?slide=N (1-based) — for checking one slide without waiting. Read in the browser
+ * so the showcase page itself can be cached. */
+function InitialSlideFromQuery({ onSlide }: { onSlide: (index: number) => void }) {
+  const slide = useSearchParams().get("slide");
+
+  useEffect(() => {
+    const requested = Number(slide);
+    if (Number.isInteger(requested) && requested > 0) {
+      onSlide(requested - 1);
+    }
+  }, [slide, onSlide]);
+
+  return null;
+}
+
+export default function ShowcaseTvDisplay({ settings, projects }: ShowcaseTvDisplayProps) {
   const slides = useMemo(() => buildSlides(projects), [projects]);
   const wonProjects = useMemo(() => projects.filter(isWonJob), [projects]);
   const openBids = useMemo(
@@ -1153,7 +1163,7 @@ export default function ShowcaseTvDisplay({
     [settings.calendarSlideDurationSeconds, settings.slideDurationSeconds, slides],
   );
 
-  const [activeIndex, setActiveIndex] = useState(initialSlide);
+  const [activeIndex, setActiveIndex] = useState(0);
   const [visible, setVisible] = useState(true);
   const [now, setNow] = useState(() => new Date());
 
@@ -1222,6 +1232,9 @@ export default function ShowcaseTvDisplay({
 
   return (
     <div className={`tv-screen tv-screen--${slide?.kind ?? "intro"}`}>
+      <Suspense fallback={null}>
+        <InitialSlideFromQuery onSlide={setActiveIndex} />
+      </Suspense>
       {/* One continuous video under every slide — full strength on the intro, a dim texture elsewhere */}
       <div className="tv-ambient" aria-hidden>
         <video

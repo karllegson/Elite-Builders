@@ -67,6 +67,14 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
+      // Canonical www host (moved here from the proxy so it no longer runs on every request).
+      // Vercel already forces HTTPS, so only the bare-domain → www hop is needed.
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "elitebuildersco.com" }],
+        destination: "https://www.elitebuildersco.com/:path*",
+        permanent: true,
+      },
       // Framing contractor — primary category
       { source: "/services/framing", destination: "/services/framing-contractor", permanent: true },
       {

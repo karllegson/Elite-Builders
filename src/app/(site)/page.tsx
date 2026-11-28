@@ -29,6 +29,9 @@ const BuilderPartnersSection = dynamic(
 );
 const TeamSection = dynamic(() => import("@/components/site/TeamSection"));
 
+// Cached for an hour; dashboard saves refresh it right away (revalidatePath).
+export const revalidate = 3600;
+
 export const metadata: Metadata = homepageMetadata;
 
 const yearsInBusiness = new Date().getFullYear() - business.foundedYear;

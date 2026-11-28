@@ -10,6 +10,7 @@ import { fromMediaDTO, toMediaDTO, type MediaAttachmentDTO } from "@/lib/admin/m
 import { getDefaultMediaLibrary } from "@/lib/admin/mediaLibrary";
 import { hasAdminClient } from "@/lib/supabase/admin";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
+import { revalidateMediaPages } from "@/lib/site/revalidatePublicPages";
 
 export async function fetchMediaLibrary(): Promise<{
   items: MediaAttachmentDTO[];
@@ -90,6 +91,7 @@ export async function saveMediaDetails(
       description: attachment.description,
     });
 
+    revalidateMediaPages();
     return { item: toMediaDTO(item) };
   } catch (error) {
     return {
@@ -105,6 +107,7 @@ export async function removeMedia(id: string): Promise<{ error?: string }> {
 
   try {
     await deleteMediaAsset(id);
+    revalidateMediaPages();
     return {};
   } catch (error) {
     return {

@@ -33,6 +33,7 @@ import type {
   PostStoreStatus,
 } from "@/lib/admin/posts.types";
 import { createClient } from "@/lib/supabase/server";
+import { revalidateBlogPages } from "@/lib/site/revalidatePublicPages";
 
 async function assertAdminAuth(): Promise<void> {
   if (isAuthBypassEnabled()) {
@@ -120,6 +121,7 @@ export async function savePostAction(
       lockModifiedDate: payload.lockModifiedDate,
     });
 
+    revalidateBlogPages();
     return { post: toPostDTO(post) };
   } catch (error) {
     return {
@@ -141,6 +143,7 @@ export async function updatePostFeaturedImageAction(
       return { error: "Post not found." };
     }
 
+    revalidateBlogPages();
     return { post: toPostDTO(post) };
   } catch (error) {
     return {
@@ -163,11 +166,13 @@ export async function bulkPostsAction(
 
     if (action === "delete") {
       const updated = await deletePostsPermanently(ids);
+      revalidateBlogPages();
       return { updated };
     }
 
     const status: PostStoreStatus = action === "trash" ? "trash" : "draft";
     const updated = await bulkUpdatePostStatus(ids, status);
+    revalidateBlogPages();
     return { updated };
   } catch (error) {
     return {

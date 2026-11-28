@@ -7,7 +7,8 @@ import { business } from "@/lib/site/config";
 import { homeImages } from "@/lib/site/images";
 import { buildPageMetadata } from "@/lib/site/seo";
 
-export const dynamic = "force-dynamic";
+// Cached for an hour; dashboard saves refresh it right away (revalidatePath).
+export const revalidate = 3600;
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Service Areas: Bay Area & Central Valley",

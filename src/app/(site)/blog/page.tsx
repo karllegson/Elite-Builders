@@ -8,6 +8,9 @@ import { ServiceAreaSidebar } from "@/components/site/ServiceAreaSidebar";
 import { blogEstimateDescription } from "@/lib/site/blogSidebar";
 import { buildPageMetadata } from "@/lib/site/seo";
 
+// Cached for an hour; dashboard saves refresh it right away (revalidatePath).
+export const revalidate = 3600;
+
 export const metadata: Metadata = buildPageMetadata({
   title: "Framing & Construction Blog",
   description:

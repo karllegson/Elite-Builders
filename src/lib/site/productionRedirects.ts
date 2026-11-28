@@ -2,7 +2,13 @@ import { NextResponse, type NextRequest } from "next/server";
 
 const PRIMARY_HOST = "www.elitebuildersco.com";
 
-/** Production-only HTTPS + canonical www redirects (Phase 1 SEO). */
+/**
+ * Production-only HTTPS + canonical www redirects (Phase 1 SEO).
+ *
+ * Unused: the bare-domain → www redirect now lives in `redirects()` in next.config.ts
+ * (and Vercel forces HTTPS), so the proxy no longer runs on every request.
+ * Kept for reference / easy rollback.
+ */
 export function applyProductionSeoRedirects(request: NextRequest): NextResponse | null {
   if (process.env.NODE_ENV !== "production") {
     return null;

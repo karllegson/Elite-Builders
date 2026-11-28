@@ -14,6 +14,7 @@ import {
   upsertShowcaseProject,
 } from "@/lib/admin/showcase.server";
 import { createClient } from "@/lib/supabase/server";
+import { revalidateShowcasePage } from "@/lib/site/revalidatePublicPages";
 
 async function assertAdminAuth(): Promise<void> {
   if (isAuthBypassEnabled()) {
@@ -78,6 +79,7 @@ export async function saveShowcaseProjectAction(input: UpsertShowcaseProjectInpu
     }
 
     const project = await upsertShowcaseProject(input);
+    revalidateShowcasePage();
     return { project };
   } catch (error) {
     return {
@@ -90,6 +92,7 @@ export async function deleteShowcaseProjectsAction(ids: string[]) {
   try {
     await assertAdminAuth();
     await deleteShowcaseProjects(ids);
+    revalidateShowcasePage();
     return { ok: true as const };
   } catch (error) {
     return {
@@ -109,6 +112,7 @@ export async function saveShowcaseSettingsAction(settings: {
       slideDurationSeconds: settings.slideDurationSeconds,
       calendarSlideDurationSeconds: settings.calendarSlideDurationSeconds,
     });
+    revalidateShowcasePage();
     return { settings: saved };
   } catch (error) {
     return {

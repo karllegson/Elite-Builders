@@ -11,6 +11,9 @@ import { getPublicServicePagesFallback } from "@/lib/site/servicesPublic";
 import { getServiceSubPagesForCategory } from "@/lib/site/serviceSubPages";
 import { buildPageMetadata } from "@/lib/site/seo";
 
+// Cached for an hour; dashboard saves refresh it right away (revalidatePath).
+export const revalidate = 3600;
+
 export const metadata: Metadata = buildPageMetadata({
   title: "Framing & Home Building Services",
   description:

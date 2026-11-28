@@ -14,6 +14,9 @@ import {
   serviceSubPageHref,
 } from "@/lib/site/serviceSubPages";
 
+// Cached for an hour; dashboard saves refresh it right away (revalidatePath).
+export const revalidate = 3600;
+
 type ServiceSubPageProps = {
   params: Promise<{ category: string; subslug: string }>;
 };

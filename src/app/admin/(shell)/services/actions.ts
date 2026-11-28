@@ -8,6 +8,7 @@ import {
 } from "@/lib/admin/services.server";
 import type { ServicePagesStore } from "@/lib/admin/servicesData";
 import type { PublicServicePage } from "@/lib/site/servicesPublic";
+import { revalidateServicePages } from "@/lib/site/revalidatePublicPages";
 
 export async function syncServicePagesStoreAction(
   store: ServicePagesStore,
@@ -17,6 +18,7 @@ export async function syncServicePagesStoreAction(
   }
 
   await saveServicePagesStore(store);
+  revalidateServicePages();
   return { ok: true };
 }
 

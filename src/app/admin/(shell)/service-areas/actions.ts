@@ -13,6 +13,7 @@ import type {
   PublicServiceArea,
   PublicServiceAreaSubPage,
 } from "@/lib/site/serviceAreasPublic";
+import { revalidateServiceAreaPages } from "@/lib/site/revalidatePublicPages";
 
 export async function syncServiceAreasStoreAction(
   store: ServiceAreasStore,
@@ -25,6 +26,7 @@ export async function syncServiceAreasStoreAction(
   const current = await loadServiceAreasStore().catch(() => null);
   const merged = current ? mergeServiceAreasStores(current, store) : store;
   await saveServiceAreasStore(merged);
+  revalidateServiceAreaPages();
   return { ok: true, store: merged };
 }
 

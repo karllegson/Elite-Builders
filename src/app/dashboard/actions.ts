@@ -26,6 +26,7 @@ import {
   endDashboardSession,
   startDashboardSession,
 } from "@/lib/dashboard/session";
+import { revalidateShowcasePage } from "@/lib/site/revalidatePublicPages";
 
 export type LoginState = { error?: string };
 
@@ -86,6 +87,7 @@ export async function addJobAction(input: NewJobInput): Promise<JobResult> {
       displayOrder: 0,
       published: true,
     });
+    revalidateShowcasePage();
 
     return { job };
   } catch (error) {
@@ -102,6 +104,7 @@ export async function updateJobAction(id: string, patch: ShowcaseJobPatch): Prom
     }
 
     const job = await patchShowcaseProject(id, patch);
+    revalidateShowcasePage();
     return { job };
   } catch (error) {
     return { error: errorMessage(error, "Could not save the change.") };
@@ -114,6 +117,7 @@ export async function saveStagesAction(
   try {
     await assertDashboardSession();
     const saved = await updateShowcaseSettings({ jobStages: normalizeJobStages(stages) });
+    revalidateShowcasePage();
     return { stages: saved.jobStages };
   } catch (error) {
     return { error: errorMessage(error, "Could not save the stages.") };
@@ -124,6 +128,7 @@ export async function deleteJobAction(id: string): Promise<{ ok?: true; error?: 
   try {
     await assertDashboardSession();
     await deleteShowcaseProjects([id]);
+    revalidateShowcasePage();
     return { ok: true };
   } catch (error) {
     return { error: errorMessage(error, "Could not delete the job.") };

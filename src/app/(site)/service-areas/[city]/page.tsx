@@ -3,7 +3,10 @@ import { notFound, permanentRedirect } from "next/navigation";
 import { cache } from "react";
 import JsonLd from "@/components/site/JsonLd";
 import { ServiceAreaCityView } from "@/components/site/ServiceAreaCityView";
-import { getPublishedPublicServiceAreaBySlug } from "@/lib/admin/serviceAreas.server";
+import {
+  getPublishedPublicServiceAreaBySlug,
+  listPublishedServiceAreaPathSegments,
+} from "@/lib/admin/serviceAreas.server";
 import { business } from "@/lib/site/config";
 import { loadFaqsForContent } from "@/lib/site/serviceAreaFaqs.server";
 import { buildPageMetadata } from "@/lib/site/seo";
@@ -14,7 +17,15 @@ import {
   serviceSchema,
 } from "@/lib/site/structuredData";
 
-export const dynamic = "force-dynamic";
+// Cached for an hour; dashboard saves refresh it right away (revalidatePath).
+export const revalidate = 3600;
+// Cities added after the build still render on first visit.
+export const dynamicParams = true;
+
+export async function generateStaticParams() {
+  const paths = await listPublishedServiceAreaPathSegments();
+  return paths.filter((segments) => segments.length === 1).map(([city]) => ({ city }));
+}
 
 /** Shorter than this, a dashboard blurb is too thin to use as the meta description. */
 const MIN_DESCRIPTION_LENGTH = 110;

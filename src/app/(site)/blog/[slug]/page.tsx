@@ -16,6 +16,9 @@ import { formatBlogDateLong } from "@/lib/site/formatBlogDate";
 import { buildPageMetadata } from "@/lib/site/seo";
 import { blogPostingSchema, breadcrumbSchema } from "@/lib/site/structuredData";
 
+// Stays per-request: draft/private previews check the admin cookie (getBlogPostView).
+export const dynamic = "force-dynamic";
+
 type BlogPostPageProps = {
   params: Promise<{ slug: string }>;
 };

@@ -10,6 +10,9 @@ import { getPublicServicePagesFallback } from "@/lib/site/servicesPublic";
 import { buildPageMetadata } from "@/lib/site/seo";
 import { getServiceSubPagesForCategory } from "@/lib/site/serviceSubPages";
 
+// Cached for an hour; dashboard saves refresh it right away (revalidatePath).
+export const revalidate = 3600;
+
 type ServiceCategoryPageProps = {
   params: Promise<{ category: string }>;
 };
